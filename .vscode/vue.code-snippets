@@ -1,0 +1,22 @@
+{
+	"Vue Setup": {
+		"scope": "vue",
+		"prefix": "vue",
+		"body":[
+			"<template>",
+			"  <div>",
+			"",
+			"  </div>",
+			"</template>",
+			"",
+			"<script lang=\"ts\" setup>",
+			"",
+			"</script>",
+			"",
+			"<style scoped>",
+			"",
+			"</style>"
+		],
+		"description": "Create vue3 setup"
+	},
+}
