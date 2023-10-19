@@ -6,20 +6,27 @@
       <div class="item-submenu" v-if="item.type === 'submenu'" @mouseenter="handleEnterSubmenu">
         {{ item.text }}
         <MenuRightIcon class="item-submenu-right" />
-        <ContextMenu :is-submenu="true" :x="submenuX" :y="submenuY" :items="item.submenu" v-if="enterSubmenu" />
+        <ContextMenu :is-submenu="true" :x="submenuX" :y="submenuY" :items="item.submenu" :hide="hide" v-if="enterSubmenu" />
       </div>
     </template>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ContextMenuItemData, useAppStore } from '@renderer/stores/appStore';
+import { ContextMenuItemData } from '@renderer/stores/appStore';
 import { onMounted, onUnmounted, ref } from 'vue';
 import MenuRightIcon from '@renderer/icons/MenuRightIcon.vue'
 
-const props = defineProps<{ items: ContextMenuItemData[], x: number, y: number, isSubmenu?: boolean }>()
+const props = defineProps<{
+  isSubmenu?: boolean
+  x?: number,
+  y?: number,
+  items?: ContextMenuItemData[],
+  triggerEl?: HTMLElement,
+  outsideAutoClose?: boolean,
+  hide: () => void,
+}>()
 
-const appStore = useAppStore()
 const enterSubmenu = ref(false)
 const contextMenuEl = ref<HTMLDivElement>(undefined!)
 
@@ -27,23 +34,34 @@ const submenuX = ref(0)
 const submenuY = ref(0)
 
 onMounted(() => {
-  window.addEventListener('mousedown', handleWindowClick)
+  if (!props.isSubmenu) {
+    window.addEventListener('mousedown', handleWindowClick)
+    window.addEventListener('mousemove', handleWindowMouseMove)
+  }
 })
 
 onUnmounted(() => {
-  window.removeEventListener('mousedown', handleWindowClick)
+  if (!props.isSubmenu) {
+    window.removeEventListener('mousedown', handleWindowClick)
+    window.removeEventListener('mousemove', handleWindowMouseMove)
+  }
 })
 
 const handleWindowClick = (e: MouseEvent) => {
   const el = e.target as HTMLDivElement
-  if (!props.isSubmenu && el.className !== 'menu-bar-item' && !contextMenuEl.value.contains(el)) {
-    appStore.hideContextMenu()
-  }
+
+  if (props.triggerEl!.contains(el))
+    return
+
+  if (contextMenuEl.value.contains(el))
+    return
+
+  props.hide()
 }
 
 const handleClickText = (onClick: () => void) => {
   onClick()
-  appStore.hideContextMenu()
+  props.hide()
 }
 
 const handleEnterOthers = () => {
@@ -56,6 +74,21 @@ const handleEnterSubmenu = (e: MouseEvent) => {
   const rect = (e.target as HTMLDivElement).getBoundingClientRect()
   submenuX.value = rect.right
   submenuY.value = rect.top
+}
+
+const handleWindowMouseMove = (e: MouseEvent) => {
+  if (!props.outsideAutoClose)
+    return
+
+  const el = e.target as HTMLDivElement
+
+  if (props.triggerEl!.contains(el))
+    return
+
+  if (contextMenuEl.value.contains(el))
+    return
+
+  props.hide()
 }
 
 </script>

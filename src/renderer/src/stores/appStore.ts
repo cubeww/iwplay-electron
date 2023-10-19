@@ -7,6 +7,8 @@ export interface ContextMenuData {
   x: number
   y: number
   items: ContextMenuItemData[]
+  outsideAutoClose?: boolean
+  triggerEl?: HTMLElement
 }
 
 export type ContextMenuItemData =
@@ -59,6 +61,7 @@ export const useAppStore = defineStore('app', () => {
 
   const toggleBrowserAndLoadURL = backable((url: string) => {
     present.value = { tab: 'browser', targetBrowserURL: url }
+    shouldLoadURL.value = true
   })
 
   const recordBrowserURL = backable((url: string) => {

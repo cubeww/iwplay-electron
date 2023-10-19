@@ -2,7 +2,7 @@
   <div class="tab-bar">
     <BrowserBackIcon class="browser-button" :class="{ enable: canBack }" @click="handleBack()" />
     <BrowserForwardIcon class="browser-button" :class="{ enable: canForward }" @click="handleForward()" />
-    <AppTabBarItem to="browser">DelFruit</AppTabBarItem>
+    <AppTabBarItem to="browser" :items="menuItems[0]">DelFruit</AppTabBarItem>
     <AppTabBarItem to="library">库</AppTabBarItem>
     <AppTabBarItem to="user">Cube</AppTabBarItem>
   </div>
@@ -12,12 +12,20 @@
 import BrowserBackIcon from '@renderer/icons/BrowserBackIcon.vue';
 import BrowserForwardIcon from '@renderer/icons/BrowserForwardIcon.vue';
 import AppTabBarItem from './AppTabBarItem.vue';
-import { useAppStore } from '@renderer/stores/appStore';
+import { ContextMenuItemData, useAppStore } from '@renderer/stores/appStore';
 import { computed } from 'vue';
 
 const appStore = useAppStore()
 const canBack = computed(() => appStore.past.length > 0)
 const canForward = computed(() => appStore.future.length > 0)
+
+const menuItems: ContextMenuItemData[][] = [
+  // DelFruit
+  [
+    { type: 'text', text: 'Delicious Fruit', onClick: () => appStore.toggleBrowserAndLoadURL("https://delicious-fruit.com/") },
+    { type: 'text', text: 'I wanna Wiki', onClick: () => appStore.toggleBrowserAndLoadURL("https://www.iwannawiki.com/") },
+  ],
+]
 
 const handleBack = () => {
   if (canBack) {

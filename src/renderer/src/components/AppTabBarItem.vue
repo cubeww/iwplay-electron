@@ -1,18 +1,33 @@
 <template>
-  <div class="tab-bar-item" :class="{ selected }" @click="appStore.toggleTab(to)">
+  <div class="tab-bar-item" ref="tabBarItemEl" :class="{ selected }" @click="handleClick" @mouseenter="handleMouseEnter">
     <slot />
     <div class="underline" :class="{ selected }" />
+    <div class="placeholder"></div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { TabName, useAppStore } from '@renderer/stores/appStore';
-import { computed } from 'vue';
+import { ContextMenuItemData, TabName, useAppStore } from '@renderer/stores/appStore';
+import { computed, ref } from 'vue';
 
-const props = defineProps<{ to: TabName }>()
+const props = defineProps<{ to: TabName, items?: ContextMenuItemData[] }>()
 
 const appStore = useAppStore()
 const selected = computed(() => props.to === appStore.present.tab)
+
+const tabBarItemEl = ref<HTMLDivElement>(undefined!)
+
+const handleClick = () => {
+  if (appStore.present && appStore.present.tab !== props.to)
+    appStore.toggleTab(props.to)
+}
+
+const handleMouseEnter = () => {
+  if (props.items) {
+    const rect = tabBarItemEl.value.getBoundingClientRect()
+    appStore.showContextMenu({ x: rect.left, y: rect.bottom + 8, items: props.items, triggerEl: tabBarItemEl.value, outsideAutoClose: true })
+  }
+}
 
 </script>
 
@@ -51,5 +66,11 @@ const selected = computed(() => props.to === appStore.present.tab)
   &.selected {
     width: 100%;
   }
+}
+
+.placeholder {
+  position: absolute;
+  width: 100%;
+  height: 10px;
 }
 </style>

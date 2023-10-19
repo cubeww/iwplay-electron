@@ -28,20 +28,9 @@ const hasContextMenu = computed(() => appStore.contextMenu !== undefined)
 const menuItems: ContextMenuItemData[][] = [
   // IWPlay
   [
-    { type: 'text', text: '唉', onClick: () => send('close') },
-    { type: 'text', text: '我真的服了', onClick: () => send('close') },
-    {
-      type: 'submenu', text: '你们这些', submenu: [
-        { type: 'text', text: '大明星', onClick: () => send('close') },
-        { type: 'text', text: '黑粉', onClick: () => send('close') },
-        {
-          type: 'submenu', text: '不讲道理', submenu: [
-            { type: 'text', text: '质疑我', onClick: () => send('close') },
-            { type: 'text', text: '不敢直播', onClick: () => send('close') },
-          ]
-        },
-      ]
-    },
+    { type: 'text', text: '设置', onClick: () => {} },
+    { type: 'separator' },
+    { type: 'text', text: '退出', onClick: () => send('close') },
   ],
   // 帮助
   [

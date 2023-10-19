@@ -6,7 +6,7 @@
 
 <script lang="ts" setup>
 import { ContextMenuItemData, useAppStore } from '@renderer/stores/appStore';
-import { computed, ref, toRaw } from 'vue';
+import { ref } from 'vue';
 
 const props = defineProps<{ items: ContextMenuItemData[] }>()
 const itemEl = ref<HTMLDivElement>(undefined!)
@@ -14,20 +14,18 @@ const appStore = useAppStore()
 
 const showMenu = () => {
   const rect = itemEl.value.getBoundingClientRect()
-  appStore.showContextMenu({ x: rect.left, y: rect.bottom, items: props.items })
+  appStore.showContextMenu({ x: rect.left + 10, y: rect.bottom, items: props.items, triggerEl: itemEl.value })
 }
 
-const contextMenuIsCurrent = computed(() => appStore.contextMenu && toRaw(appStore.contextMenu.items) === props.items)
-
 const handleClick = () => {
-  if (contextMenuIsCurrent.value) {
+  if (appStore.contextMenu && appStore.contextMenu.triggerEl === itemEl.value) {
     appStore.hideContextMenu()
   } else {
     showMenu()
   }
 }
 const handleEnter = () => {
-  if (appStore.contextMenu && toRaw(appStore.contextMenu.items) !== props.items) {
+  if (appStore.contextMenu && appStore.contextMenu.triggerEl !== itemEl.value) {
     showMenu()
   }
 }

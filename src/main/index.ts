@@ -6,6 +6,8 @@ import icon from '../../resources/icon.png?asset'
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
+    minWidth: 1000,
+    minHeight: 600,
     width: 1000,
     height: 600,
     show: false,
@@ -16,8 +18,7 @@ function createWindow(): void {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
       webviewTag: true,
-      contextIsolation: false,
-      nodeIntegration: true
+      nodeIntegration: true // This is required due to some permissions of webview
     }
   })
 
@@ -31,7 +32,7 @@ function createWindow(): void {
   })
 
   mainWindow.webContents.openDevTools()
-  
+
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
@@ -69,6 +70,14 @@ app.whenReady().then(() => {
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
+  })
+
+  app.on('web-contents-created', (_event, contents) => {
+    contents.on('will-attach-webview', (_wawevent, webPreferences, _params) => {
+      // Inject a preload file into all webviews
+      // to facilitate sending IPC messages from within the webviews to their parent.
+      webPreferences.preload = join(__dirname, '../preload/index.js')
+    })
   })
 
   createWindow()

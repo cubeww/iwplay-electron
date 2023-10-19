@@ -7,7 +7,7 @@
         <div class="url-text">{{ url }}</div>
       </div>
     </div>
-    <webview ref="webviewEl" style="flex-grow: 1" src="https://delicious-fruit.com/" webpreferences="contextIsolation=false" nodeintegration />
+    <webview ref="webviewEl" style="flex-grow: 1" src="https://delicious-fruit.com/" nodeintegration />
   </TabView>
 </template>
 
@@ -67,7 +67,6 @@ onUnmounted(() => {
 watchEffect(() => {
   if (appStore.shouldLoadURL) {
     appStore.setShouldLoadURL(false)
-
     webviewEl.value.loadURL(appStore.present.targetBrowserURL)
   }
 })
@@ -81,9 +80,9 @@ const handleDidStopLoading = () => {
   loading.value = false
 
   webviewEl.value.executeJavaScript(`
-    const electron = require('electron')
+    document.querySelectorAll('a').forEach(a => a.removeAttribute('target'))
     document.addEventListener('mousedown', () => {
-      electron.ipcRenderer.sendToHost('mousedown')
+      window.electron.ipcRenderer.sendToHost('mousedown')
     })
   `)
 }
