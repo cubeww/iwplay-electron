@@ -6,7 +6,7 @@
     <ViewLibrary />
     <ViewUser />
     <AppFooter />
-    <ContextMenu v-if="appStore.contextMenu" :x="appStore.contextMenu.x" :y="appStore.contextMenu.y" :items="appStore.contextMenu.items" :outside-auto-close="appStore.contextMenu.outsideAutoClose" :trigger-el="appStore.contextMenu.triggerEl" :hide="appStore.hideContextMenu" />
+    <ContextMenu v-if="appStore.contextMenu" :options="appStore.contextMenu" :hide="appStore.hideContextMenu" />
   </div>
 </template>
 

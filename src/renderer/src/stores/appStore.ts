@@ -3,18 +3,18 @@ import { ref } from 'vue'
 
 export type TabName = 'browser' | 'library' | 'user'
 
-export interface ContextMenuData {
+export interface ContextMenuOptions {
   x: number
   y: number
   items: ContextMenuItemData[]
+  triggerEl: HTMLElement
   outsideAutoClose?: boolean
-  triggerEl?: HTMLElement
 }
 
 export type ContextMenuItemData =
   | ContextMenuItemText
   | ContextMenuItemSeparator
-  | ContextMenuItemSubmenu
+  | ContextMenuItemSubMenu
 
 export interface ContextMenuItemText {
   type: 'text'
@@ -26,7 +26,7 @@ export interface ContextMenuItemSeparator {
   type: 'separator'
 }
 
-export interface ContextMenuItemSubmenu {
+export interface ContextMenuItemSubMenu {
   type: 'submenu'
   text: string
   submenu: ContextMenuItemData[]
@@ -92,10 +92,10 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
-  const contextMenu = ref<ContextMenuData>()
+  const contextMenu = ref<ContextMenuOptions>()
 
-  const showContextMenu = (data: ContextMenuData) => {
-    contextMenu.value = data
+  const showContextMenu = (options: ContextMenuOptions) => {
+    contextMenu.value = options
   }
 
   const hideContextMenu = () => {
