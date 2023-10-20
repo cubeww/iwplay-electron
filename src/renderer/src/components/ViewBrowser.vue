@@ -80,7 +80,10 @@ const handleDidStopLoading = () => {
   loading.value = false
 
   webviewEl.value.executeJavaScript(`
+    // Prevent website from opening new page
     document.querySelectorAll('a').forEach(a => a.removeAttribute('target'))
+    
+    // Get mouse input and use it to close the context menu if needed
     document.addEventListener('mousedown', () => {
       window.electron.ipcRenderer.sendToHost('mousedown')
     })

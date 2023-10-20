@@ -102,6 +102,8 @@ export const useAppStore = defineStore('app', () => {
     contextMenu.value = undefined
   }
 
+  const isMaximize = ref(false)
+
   return {
     past,
     future,
@@ -115,6 +117,7 @@ export const useAppStore = defineStore('app', () => {
     forward,
     showContextMenu,
     hideContextMenu,
-    contextMenu
+    contextMenu,
+    isMaximize,
   }
 })

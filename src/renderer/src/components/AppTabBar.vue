@@ -4,7 +4,7 @@
     <BrowserForwardIcon class="browser-button" :class="{ enable: canForward }" @click="handleForward()" />
     <AppTabBarItem to="browser" :items="menuItems[0]">DelFruit</AppTabBarItem>
     <AppTabBarItem to="library">库</AppTabBarItem>
-    <AppTabBarItem to="user">Cube</AppTabBarItem>
+    <!-- <AppTabBarItem to="user">Cube</AppTabBarItem> -->
   </div>
 </template>
 

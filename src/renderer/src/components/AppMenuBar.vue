@@ -4,7 +4,8 @@
     <AppMenuBarItem :items="menuItems[1]">帮助</AppMenuBarItem>
     <div class="control-buttons">
       <WindowMinimizeIcon class="control-button minimize" @click="send('minimize')" />
-      <WindowMaximizeIcon class="control-button maximize" @click="send('maximize')" />
+      <WindowMaximizeIcon class="control-button maximize" @click="send('maximize')" v-if="!appStore.isMaximize" />
+      <WindowRestoreIcon class="control-button maximize" @click="send('maximize')" v-else />
       <WindowCloseIcon class="control-button close" @click="send('close')" />
     </div>
   </div>
@@ -17,6 +18,7 @@ import WindowMinimizeIcon from '@renderer/icons/WindowMinimizeIcon.vue';
 import AppMenuBarItem from '@renderer/components/AppMenuBarItem.vue'
 import { ContextMenuItemData, useAppStore } from '@renderer/stores/appStore';
 import { computed } from 'vue';
+import WindowRestoreIcon from '@renderer/icons/WindowRestoreIcon.vue';
 
 const send = (message: string) => {
   window.electron.ipcRenderer.send(message)
