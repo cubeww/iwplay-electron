@@ -1,3 +1,4 @@
+import { delFruitUtil } from '@renderer/utils/delFruitUtil'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
@@ -37,7 +38,18 @@ export interface BackableState {
   targetBrowserURL?: string
 }
 
+export interface FangameItem {
+  id: string
+  name: string
+  isRunning: boolean
+  isInstalled: boolean
+}
+
+export type ActionStatus = 'pending' | 'fetching' | 'ok' | 'error'
+
 export const useAppStore = defineStore('app', () => {
+  // ========== Backable State
+
   const past = ref<BackableState[]>([])
   const present = ref<BackableState>({
     tab: 'browser',
@@ -92,6 +104,8 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
+  // ========== Context Menu
+
   const contextMenu = ref<ContextMenuOptions>()
 
   const showContextMenu = (options: ContextMenuOptions) => {
@@ -101,6 +115,30 @@ export const useAppStore = defineStore('app', () => {
   const hideContextMenu = () => {
     contextMenu.value = undefined
   }
+
+  // ========== Library
+
+  const fangameItems = ref<FangameItem[]>([])
+  const fetchFangameItemsStatus = ref<ActionStatus>('pending')
+
+  const libraryLocation = ref('')
+
+  const fetchFangameItems = async () => {
+    fetchFangameItemsStatus.value = 'fetching'
+
+    // 1. Fetch fangame list from DelFruit
+    const items = await delFruitUtil.fetchFangameItems()
+
+    // 2. Get installed fangames
+
+
+    // 3. Get running fangames
+
+    // 4. Update store items
+    fetchFangameItemsStatus.value = 'ok'
+  }
+
+  // ========== Misc
 
   const isMaximize = ref(false)
 
@@ -118,6 +156,6 @@ export const useAppStore = defineStore('app', () => {
     showContextMenu,
     hideContextMenu,
     contextMenu,
-    isMaximize,
+    isMaximize
   }
 })

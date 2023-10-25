@@ -6,7 +6,9 @@
     <ViewLibrary />
     <ViewUser />
     <AppFooter />
-    <ContextMenu v-if="appStore.contextMenu" :options="appStore.contextMenu" :hide="appStore.hideContextMenu" />
+    <ContextMenu v-if="appStore.contextMenu"
+      :options="appStore.contextMenu"
+      :hide="appStore.hideContextMenu" />
   </div>
 </template>
 
@@ -19,25 +21,33 @@ import ViewUser from './components/ViewUser.vue';
 import AppFooter from './components/AppFooter.vue';
 import ContextMenu from './components/ContextMenu.vue';
 import { useAppStore } from './stores/appStore';
-import { onMounted, onUnmounted } from 'vue';
-
+import { onMounted } from 'vue';
+import { libraryUtil } from './utils/libraryUtil';
+import { api } from './utils/api';
+import { join } from 'path-browserify';
+import { stderr, stdout } from 'process';
 const appStore = useAppStore()
 
-let removeMessageListener: () => void
-
-onMounted(() => {
-  removeMessageListener = window.electron.ipcRenderer.on('message', (_, msg) => {
-    if (msg.type === 'maximize') {
-      appStore.isMaximize = true
-    } else if (msg.type === 'unmaximize') {
-      appStore.isMaximize = false
-    }
+onMounted(async () => {
+  window.electron.ipcRenderer.on('maximize', (_evt, value) => {
+    appStore.isMaximize = value
   })
+
+  // const lib = 'D:/IWPlayLibrary'
+  // await libraryUtil.createAllManifest(lib)
+  const toUnzip = "D:/Downloads/I Wanna Remember The Memorial Games2 Ver1.1.zip"
+  const dist = 'D:/dude'
+
+  window.electron.ipcRenderer.on('zip', (_, error, stdout, stderr) => {
+    console.log(error);
+    console.log(stderr);
+    console.log(stdout);
+  })
+
+  api.exec(`"resources/7z.exe" x "${toUnzip}" -o"${dist}"`, 'zip')
+
 })
 
-onUnmounted(() => {
-  removeMessageListener()
-})
 </script>
 
 <style scoped>

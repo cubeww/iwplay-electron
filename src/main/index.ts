@@ -1,7 +1,8 @@
-import { app, shell, BrowserWindow, ipcMain, ipcRenderer } from 'electron'
+import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { initMainAPI } from './mainAPI'
 
 function createWindow(): void {
   // Create the browser window.
@@ -17,6 +18,7 @@ function createWindow(): void {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
+      webSecurity: false, // This is required due to cross-domain requests
       webviewTag: true,
       nodeIntegration: true // This is required due to some permissions of webview
     }
@@ -27,11 +29,11 @@ function createWindow(): void {
   })
 
   mainWindow.on('maximize', () => {
-    mainWindow.webContents.send('message', { type: 'maximize' })
+    mainWindow.webContents.send('maximize', true)
   })
 
   mainWindow.on('unmaximize', () => {
-    mainWindow.webContents.send('message', { type: 'unmaximize' })
+    mainWindow.webContents.send('maximize', false)
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -49,21 +51,7 @@ function createWindow(): void {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 
-  ipcMain.on('close', () => {
-    app.quit()
-  })
-
-  ipcMain.on('minimize', () => {
-    mainWindow.minimize()
-  })
-
-  ipcMain.on('maximize', () => {
-    if (mainWindow.isMaximized()) {
-      mainWindow.unmaximize()
-    } else {
-      mainWindow.maximize()
-    }
-  })
+  initMainAPI(mainWindow)
 }
 
 // This method will be called when Electron has finished
@@ -88,6 +76,7 @@ app.whenReady().then(() => {
     })
   })
 
+  process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
   createWindow()
 
   app.on('activate', function () {

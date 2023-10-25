@@ -3,10 +3,10 @@
     <AppMenuBarItem :items="menuItems[0]">IWPlay</AppMenuBarItem>
     <AppMenuBarItem :items="menuItems[1]">帮助</AppMenuBarItem>
     <div class="control-buttons">
-      <WindowMinimizeIcon class="control-button minimize" @click="send('minimize')" />
-      <WindowMaximizeIcon class="control-button maximize" @click="send('maximize')" v-if="!appStore.isMaximize" />
-      <WindowRestoreIcon class="control-button maximize" @click="send('maximize')" v-else />
-      <WindowCloseIcon class="control-button close" @click="send('close')" />
+      <WindowMinimizeIcon class="control-button minimize" @click="api.minimize()" />
+      <WindowMaximizeIcon class="control-button maximize" @click="api.maximize()" v-if="!appStore.isMaximize" />
+      <WindowRestoreIcon class="control-button maximize" @click="api.maximize()" v-else />
+      <WindowCloseIcon class="control-button close" @click="api.close()" />
     </div>
   </div>
 </template>
@@ -19,10 +19,7 @@ import AppMenuBarItem from '@renderer/components/AppMenuBarItem.vue'
 import { ContextMenuItemData, useAppStore } from '@renderer/stores/appStore';
 import { computed } from 'vue';
 import WindowRestoreIcon from '@renderer/icons/WindowRestoreIcon.vue';
-
-const send = (message: string) => {
-  window.electron.ipcRenderer.send(message)
-}
+import { api } from '@renderer/utils/api';
 
 const appStore = useAppStore()
 const hasContextMenu = computed(() => appStore.contextMenu !== undefined)
@@ -32,7 +29,7 @@ const menuItems: ContextMenuItemData[][] = [
   [
     { type: 'text', text: '设置', onClick: () => { } },
     { type: 'separator' },
-    { type: 'text', text: '退出', onClick: () => send('close') },
+    { type: 'text', text: '退出', onClick: () => api.close() },
   ],
   // 帮助
   [
