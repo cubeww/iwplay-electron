@@ -6,7 +6,7 @@ import {
   execFile,
   execSync
 } from 'child_process'
-import { BrowserWindow, ipcMain } from 'electron'
+import { BrowserWindow, dialog, ipcMain } from 'electron'
 import {
   ObjectEncodingOptions,
   PathLike,
@@ -121,6 +121,14 @@ export const mainAPI = {
     })
 
     return (await Promise.all(paths)).flat(Infinity).reduce((i: any, size: any) => i + size, 0)
+  },
+
+  async fileSize(file: string) {
+    return statSync(file).size
+  },
+
+  async openFileDialog(options: Electron.OpenDialogSyncOptions) {
+    return dialog.showOpenDialogSync(mainWindow, options)
   },
 
   // ========== Window

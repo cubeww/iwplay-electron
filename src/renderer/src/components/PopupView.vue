@@ -40,6 +40,8 @@ import WindowCloseIcon from '@renderer/icons/WindowCloseIcon.vue';
   border-image-slice: 1;
 
   background: linear-gradient(to right bottom, #343941, #25282e);
+
+  line-height: 32px;
 }
 
 .close-button {
