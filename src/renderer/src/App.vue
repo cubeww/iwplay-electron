@@ -9,6 +9,7 @@
     <ContextMenu v-if="appStore.contextMenu"
       :options="appStore.contextMenu"
       :hide="appStore.hideContextMenu" />
+    <PopupViewInstallGame />
   </div>
 </template>
 
@@ -26,6 +27,7 @@ import { libraryUtil } from './utils/libraryUtil';
 import { api } from './utils/api';
 import { join } from 'path-browserify';
 import { stderr, stdout } from 'process';
+import PopupViewInstallGame from './components/PopupViewInstallGame.vue';
 const appStore = useAppStore()
 
 onMounted(async () => {
@@ -33,19 +35,10 @@ onMounted(async () => {
     appStore.isMaximize = value
   })
 
-  // const lib = 'D:/IWPlayLibrary'
-  // await libraryUtil.createAllManifest(lib)
-  const toUnzip = "D:/Downloads/I Wanna Remember The Memorial Games2 Ver1.1.zip"
-  const dist = 'D:/dude'
+  const lib = 'D:/IWPlayLibrary'
 
-  window.electron.ipcRenderer.on('zip', (_, error, stdout, stderr) => {
-    console.log(error);
-    console.log(stderr);
-    console.log(stdout);
-  })
-
-  api.exec(`"resources/7z.exe" x "${toUnzip}" -o"${dist}"`, 'zip')
-
+  // libraryUtil.install(lib, '11451419', "D:/Downloads/I Wanna Kill The Junko v1.00a.zip")
+  // libraryUtil.createManifest(lib, '11451419')
 })
 
 </script>

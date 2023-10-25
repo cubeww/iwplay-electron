@@ -1,4 +1,11 @@
-import { ExecException, ExecFileOptions, exec, execFile } from 'child_process'
+import {
+  ExecException,
+  ExecFileOptions,
+  ExecSyncOptionsWithStringEncoding,
+  exec,
+  execFile,
+  execSync
+} from 'child_process'
 import { BrowserWindow, ipcMain } from 'electron'
 import {
   ObjectEncodingOptions,
@@ -13,7 +20,6 @@ import {
   writeFileSync
 } from 'fs'
 import { join } from 'path'
-import { stdout } from 'process'
 
 let mainWindow: BrowserWindow = undefined!
 
@@ -27,6 +33,17 @@ export const initMainAPI = (_mainWindow: BrowserWindow) => {
   for (const methodName in api) {
     if (typeof api[methodName] === 'function') {
       ipcMain.handle(methodName, async (_event, ...args) => {
+        // Experimental: callback converter
+        // for (let i = 0; i < args.length; i++) {
+        //   if (typeof args[i] === 'object' && args[i].__type === 'ipcCallback') {
+        //     const handlerCreator = (channelName: string) => {
+        //       return (...args1: any[]) => {
+        //         mainWindow.webContents.send(channelName, ...args1)
+        //       }
+        //     }
+        //     args[i] = handlerCreator(args[i].channel)
+        //   }
+        // }
         return await api[methodName](...args)
       })
     }
@@ -103,7 +120,7 @@ export const mainAPI = {
       return 0
     })
 
-    return paths.flat(Infinity).reduce((i: any, size: any) => i + size, 0)
+    return (await Promise.all(paths)).flat(Infinity).reduce((i: any, size: any) => i + size, 0)
   },
 
   // ========== Window
@@ -124,17 +141,7 @@ export const mainAPI = {
   },
 
   // ========== Process
-  async execFile(
-    file: string,
-    args: readonly string[] | null | undefined,
-    callback: (ObjectEncodingOptions & ExecFileOptions) | null | undefined
-  ) {
-    execFile(file, args, callback)
-  },
-
-  async exec(command: string, message: string) {
-    exec(command, (error, stdout, stderr) => {
-      mainWindow.webContents.send(message, error, stdout, stderr)
-    })
+  async exec(command: string, options?: ExecSyncOptionsWithStringEncoding) {
+    return execSync(command, options)
   }
 }

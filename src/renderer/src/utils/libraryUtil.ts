@@ -43,9 +43,16 @@ export const libraryUtil = {
   async install(location: string, id: string, file: string) {
     await this.checkLibrary(location)
 
-    if (await api.pathExists(getGamePath(location, id))) {
+    const gamePath = getGamePath(location, id)
+
+    if (await api.pathExists(gamePath)) {
       await this.uninstall(location, id)
     }
+
+    await api.createDir(gamePath)
+    await api.exec(`"resources/7z.exe" x "${file}" -o"${gamePath}"`)
+    
+    await this.createManifest(location, id)
   },
 
   async uninstall(location: string, id: string) {
