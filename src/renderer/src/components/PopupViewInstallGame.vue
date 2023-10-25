@@ -1,8 +1,8 @@
 <template>
-  <PopupView>
+  <PopupView :close="close">
     <PopupTitle>安装</PopupTitle>
     <PopupSeparator />
-    <div>I Wanna Kill The Kamilia 3 (ID: 123456)</div>
+    <div>{{ context.name }} (ID: {{ context.id }})</div>
     <PopupSeparator />
     <ButtonGradient style="width: 120px;" :onClick="handleSelectZip" color1="#4ade80" color2="#16a34a">选择压缩包</ButtonGradient>
     <template v-if="filename">
@@ -18,7 +18,7 @@
     </div>
     <div class="bottom">
       <ButtonGradient class="bottom-button" :enabled="filename !== '' && installStatus !== 'installing'" :onClick="handleInstall">安装</ButtonGradient>
-      <ButtonPure class="bottom-button">取消</ButtonPure>
+      <ButtonPure class="bottom-button" :onClick="close">取消</ButtonPure>
     </div>
   </PopupView>
 </template>
@@ -32,6 +32,13 @@ import ButtonPure from './ButtonPure.vue';
 import LoadingIcon from '@renderer/icons/LoadingIcon.vue';
 import { api } from '@renderer/utils/api';
 import { computed, ref } from 'vue';
+
+export interface InstallPopupContext {
+  id: string
+  name: string
+}
+
+defineProps<{ close: () => void, context: InstallPopupContext }>()
 
 const filename = ref('')
 const filesize = ref(0)

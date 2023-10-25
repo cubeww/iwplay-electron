@@ -6,10 +6,15 @@
     <ViewLibrary />
     <ViewUser />
     <AppFooter />
-    <ContextMenu v-if="appStore.contextMenu"
+    <ContextMenu
+      v-if="appStore.contextMenu"
       :options="appStore.contextMenu"
       :hide="appStore.hideContextMenu" />
-    <PopupViewInstallGame />
+    <Component
+      v-for="popup in appStore.popups"
+      :is="popup.component"
+      :context="popup.context"
+      :close="() => appStore.closePopup(popup.context)" />
   </div>
 </template>
 

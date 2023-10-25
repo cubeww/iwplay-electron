@@ -19,9 +19,7 @@
     </div>
     <div class="fangame-list" @scroll="handleScroll">
       <div class="fangame-items-wrapper" :style="{ height: items.length * itemHeight + 'px' }">
-        <div class="fangame-item" :style="{
-          transform: `translateY(${translateY}px)`
-        }" v-for="item in displayItems">
+        <div class="fangame-item" :style="{ transform: `translateY(${translateY}px)` }" v-for="item in displayItems">
           {{ item.name }}
         </div>
       </div>

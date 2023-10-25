@@ -1,6 +1,6 @@
 import { delFruitUtil } from '@renderer/utils/delFruitUtil'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, shallowRef } from 'vue'
 
 export type TabName = 'browser' | 'library' | 'user'
 
@@ -131,11 +131,25 @@ export const useAppStore = defineStore('app', () => {
 
     // 2. Get installed fangames
 
-
     // 3. Get running fangames
 
     // 4. Update store items
     fetchFangameItemsStatus.value = 'ok'
+  }
+
+  // ========== Popup
+
+  const popups = ref<{ component: any; context: any }[]>([])
+
+  const showPopup = (component: any, context: any) => {
+    popups.value.push({ component: shallowRef(component), context })
+  }
+
+  const closePopup = (context: any) => {
+    const index = popups.value.findIndex((p) => p.context === context)
+    if (index !== -1) {
+      popups.value.splice(index, 1)
+    }
   }
 
   // ========== Misc
@@ -156,6 +170,9 @@ export const useAppStore = defineStore('app', () => {
     showContextMenu,
     hideContextMenu,
     contextMenu,
-    isMaximize
+    isMaximize,
+    popups,
+    showPopup,
+    closePopup,
   }
 })

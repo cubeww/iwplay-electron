@@ -1,13 +1,14 @@
 <template>
   <div class="popup-background" />
   <div class="popup-wrapper">
-    <WindowCloseIcon class="close-button" />
+    <WindowCloseIcon class="close-button" @click="close" />
     <slot />
   </div>
 </template>
 
 <script lang="ts" setup>
 import WindowCloseIcon from '@renderer/icons/WindowCloseIcon.vue';
+defineProps<{ close: () => void }>()
 </script>
 
 <style scoped>
