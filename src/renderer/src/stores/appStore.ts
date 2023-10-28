@@ -36,6 +36,7 @@ export interface ContextMenuItemSubMenu {
 export interface BackableState {
   tab: TabName
   targetBrowserURL?: string
+  fangameItem?: FangameItem
 }
 
 export interface FangameItem {
@@ -129,13 +130,23 @@ export const useAppStore = defineStore('app', () => {
     // 1. Fetch fangame list from DelFruit
     const items = await delFruitUtil.fetchFangameItems()
 
-    // 2. Get installed fangames
+    for (const i of items as FangameItem[]) {
+      i.isInstalled = false
+      i.isRunning = false
+    }
 
-    // 3. Get running fangames
+    // TODO: 2. Get installed fangames
+
+    // TODO: 3. Get running fangames
 
     // 4. Update store items
     fetchFangameItemsStatus.value = 'ok'
+    fangameItems.value = items as FangameItem[]
   }
+
+  const selectFangameItem = backable((item: FangameItem) => {
+    present.value = { tab: 'library', fangameItem: item }
+  })
 
   // ========== Popup
 
@@ -174,5 +185,9 @@ export const useAppStore = defineStore('app', () => {
     popups,
     showPopup,
     closePopup,
+    fangameItems,
+    fetchFangameItems,
+    fetchFangameItemsStatus,
+    selectFangameItem
   }
 })

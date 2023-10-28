@@ -19,5 +19,6 @@ const show = computed(() => appStore.present.tab === props.name)
   flex-grow: 1;
   flex-direction: column;
   display: flex;
+  min-height: 0;
 }
 </style>

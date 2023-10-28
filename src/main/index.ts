@@ -1,8 +1,9 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { initMainAPI } from './mainAPI'
+import log from 'electron-log/main'
 
 function createWindow(): void {
   // Create the browser window.
@@ -77,6 +78,7 @@ app.whenReady().then(() => {
   })
 
   process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
+  log.initialize({ preload: true })
   createWindow()
 
   app.on('activate', function () {

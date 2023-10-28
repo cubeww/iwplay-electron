@@ -18,8 +18,12 @@
       </button>
     </div>
     <div class="fangame-list" @scroll="handleScroll">
-      <div class="fangame-items-wrapper" :style="{ height: items.length * itemHeight + 'px' }">
-        <div class="fangame-item" :style="{ transform: `translateY(${translateY}px)` }" v-for="item in displayItems">
+      <div class="fangame-items-wrapper" :style="{ height: appStore.fangameItems.length * itemHeight + 'px' }">
+        <div v-for="item in displayItems"
+          class="fangame-item"
+          :class="{ select: appStore.present.fangameItem === item }"
+          :style="{ transform: `translateY(${translateY}px)` }"
+          @click="appStore.selectFangameItem(item)">
           {{ item.name }}
         </div>
       </div>
@@ -32,25 +36,23 @@ import RefreshIcon from '@renderer/icons/RefreshIcon.vue';
 import SearchIcon from '@renderer/icons/SearchIcon.vue';
 import FilterIcon from '@renderer/icons/FilterIcon.vue';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { useAppStore } from '@renderer/stores/appStore';
 
 const itemHeight = 25 // px
 
 const searchInputEl = ref<HTMLInputElement>(undefined!)
 const searchText = ref('')
 
-const items = ref<{ name: string }[]>([])
 const displayCount = ref(36)
 const scrollTop = ref(0)
+
+const appStore = useAppStore()
 
 onMounted(() => {
   window.addEventListener('resize', handleWindowResize)
   handleWindowResize()
 
-  const ls: any = []
-  for (let i = 0; i < 10000; i++) {
-    ls.push({ name: 'I wanna be the  ' + i })
-  }
-  items.value = ls
+  appStore.fetchFangameItems()
 })
 
 onUnmounted(() => {
@@ -67,9 +69,9 @@ const startIndex = computed(() => {
 
 const searchItems = computed(() => {
   if (searchText.value === '') {
-    return items.value
+    return appStore.fangameItems
   } else {
-    return items.value.filter(i => i.name.toLowerCase().includes(searchText.value.toLowerCase()))
+    return appStore.fangameItems.filter(i => i.name.toLowerCase().includes(searchText.value.toLowerCase()))
   }
 })
 
@@ -271,6 +273,10 @@ const handleScroll = (e: Event) => {
 
   &:hover {
     background-color: #323a4b;
+  }
+
+  &.select {
+    background-color: #3e4e69;
   }
 }
 </style>

@@ -2,15 +2,21 @@
   <TabView name="library" class="library">
     <LibrarySidebar :style="{ width: sidebarWidth + 'px' }" />
     <div class="resize-slider" @mousedown="handleSliderMouseDown" />
-    <LibraryDetail />
+    <LibraryDetailGame v-if="item" :item="item" />
+    <LibraryDetailHome v-else />
   </TabView>
 </template>
 
 <script lang="ts" setup>
 import TabView from './TabView.vue';
 import LibrarySidebar from './LibrarySidebar.vue';
-import LibraryDetail from './LibraryDetail.vue';
-import { onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { useAppStore } from '@renderer/stores/appStore';
+import LibraryDetailGame from './LibraryDetailGame.vue';
+import LibraryDetailHome from './LibraryDetailHome.vue';
+
+const appStore = useAppStore()
+const item = computed(() => appStore.present.fangameItem)
 
 onMounted(() => {
   window.addEventListener('mouseup', handleWindowMouseUp)
