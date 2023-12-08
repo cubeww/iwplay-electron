@@ -1,7 +1,7 @@
 <template>
   <div class="library-sidebar">
     <div class="header">
-      <button class="home-button">
+      <button class="home-button" :class="{ active: isInHome }" @click="handleToHome">
         主页
       </button>
       <button class="refresh-button">
@@ -87,6 +87,12 @@ const handleScroll = (e: Event) => {
   scrollTop.value = (e.target as HTMLDivElement).scrollTop
 }
 
+const handleToHome = () => {
+  appStore.selectFangameItem(undefined)
+}
+
+const isInHome = computed(() => !appStore.present.fangameItem)
+
 </script>
 
 <style scoped>
@@ -122,7 +128,7 @@ const handleScroll = (e: Event) => {
   cursor: pointer;
   transition: all 0.1s;
 
-  &:hover {
+  &:hover, &.active {
     background-color: #3e4047;
     color: white;
   }

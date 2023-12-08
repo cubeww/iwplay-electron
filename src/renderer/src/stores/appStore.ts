@@ -1,4 +1,6 @@
-import { delFruitUtil } from '@renderer/utils/delFruitUtil'
+import { api } from '@renderer/utils/api'
+import { DelFruitFangameItem, delFruitUtil } from '@renderer/utils/delFruitUtil'
+import { join } from 'path-browserify'
 import { defineStore } from 'pinia'
 import { ref, shallowRef } from 'vue'
 
@@ -124,27 +126,66 @@ export const useAppStore = defineStore('app', () => {
 
   const libraryLocation = ref('')
 
-  const fetchFangameItems = async () => {
+  const fetchFangameItems = async (forceDownload: boolean = false) => {
     fetchFangameItemsStatus.value = 'fetching'
 
-    // 1. Fetch fangame list from DelFruit
-    const items = await delFruitUtil.fetchFangameItems()
+    const cachePath = join(await api.getPath('userData'), 'appcache')
+    if (!(await api.pathExists(cachePath))) await api.createDir(cachePath)
+
+    const cacheFile = join(cachePath, 'delfruit-fangamelist.json')
+
+    let items: DelFruitFangameItem[] = []
+
+    let loadCacheOK = false
+
+    if (!forceDownload) {
+      // Try to load cache first
+      try {
+        const cacheData: { fetchdate: string; list: DelFruitFangameItem[] } = JSON.parse(
+          await api.readFile(cacheFile)
+        )
+
+        const differenceDays =
+          (new Date().getTime() - new Date(cacheData.fetchdate).getTime()) / (1000 * 60 * 60 * 24)
+
+        if (differenceDays < 1) {
+          items = cacheData.list
+          loadCacheOK = true
+        }
+      } catch (e) {
+        loadCacheOK = false
+      }
+    }
+
+    if (!loadCacheOK) {
+      // Fetch fangame list from DelFruit
+      items = await delFruitUtil.fetchFangameItems()
+
+      // Write to cache
+      await api.writeFile(
+        cacheFile,
+        JSON.stringify({
+          fetchdate: new Date(),
+          list: items
+        })
+      )
+    }
 
     for (const i of items as FangameItem[]) {
       i.isInstalled = false
       i.isRunning = false
     }
 
-    // TODO: 2. Get installed fangames
+    // TODO: Get installed fangames
 
-    // TODO: 3. Get running fangames
+    // TODO: Get running fangames
 
-    // 4. Update store items
+    // Update store items
     fetchFangameItemsStatus.value = 'ok'
     fangameItems.value = items as FangameItem[]
   }
 
-  const selectFangameItem = backable((item: FangameItem) => {
+  const selectFangameItem = backable((item?: FangameItem) => {
     present.value = { tab: 'library', fangameItem: item }
   })
 

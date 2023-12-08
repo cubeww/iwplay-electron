@@ -6,7 +6,7 @@ import {
   execFile,
   execSync
 } from 'child_process'
-import { BrowserWindow, dialog, ipcMain } from 'electron'
+import { BrowserWindow, app, dialog, ipcMain } from 'electron'
 import {
   ObjectEncodingOptions,
   PathLike,
@@ -20,6 +20,7 @@ import {
   writeFileSync
 } from 'fs'
 import { join } from 'path'
+import { electron } from 'process'
 
 let mainWindow: BrowserWindow = undefined!
 
@@ -129,6 +130,28 @@ export const mainAPI = {
 
   async openFileDialog(options: Electron.OpenDialogSyncOptions) {
     return dialog.showOpenDialogSync(mainWindow, options)
+  },
+
+  async getPath(
+    name:
+      | 'home'
+      | 'appData'
+      | 'userData'
+      | 'sessionData'
+      | 'temp'
+      | 'exe'
+      | 'module'
+      | 'desktop'
+      | 'documents'
+      | 'downloads'
+      | 'music'
+      | 'pictures'
+      | 'videos'
+      | 'recent'
+      | 'logs'
+      | 'crashDumps'
+  ) {
+    return app.getPath(name)
   },
 
   // ========== Window
