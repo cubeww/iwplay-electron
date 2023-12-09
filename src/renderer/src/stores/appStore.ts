@@ -1,3 +1,4 @@
+import { ContextMenuOptions } from '@renderer/components/ContextMenu.vue'
 import { api } from '@renderer/utils/api'
 import { DelFruitFangameItem, delFruitUtil } from '@renderer/utils/delFruitUtil'
 import { join } from 'path-browserify'
@@ -5,35 +6,6 @@ import { defineStore } from 'pinia'
 import { ref, shallowRef } from 'vue'
 
 export type TabName = 'browser' | 'library' | 'user'
-
-export interface ContextMenuOptions {
-  x: number
-  y: number
-  items: ContextMenuItemData[]
-  triggerEl: HTMLElement
-  outsideAutoClose?: boolean
-}
-
-export type ContextMenuItemData =
-  | ContextMenuItemText
-  | ContextMenuItemSeparator
-  | ContextMenuItemSubMenu
-
-export interface ContextMenuItemText {
-  type: 'text'
-  text: string
-  onClick: () => void
-}
-
-export interface ContextMenuItemSeparator {
-  type: 'separator'
-}
-
-export interface ContextMenuItemSubMenu {
-  type: 'submenu'
-  text: string
-  submenu: ContextMenuItemData[]
-}
 
 export interface BackableState {
   tab: TabName

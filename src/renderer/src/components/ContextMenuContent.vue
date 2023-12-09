@@ -13,10 +13,10 @@
 </template>
 
 <script lang="ts" setup>
-import { ContextMenuItemData } from '@renderer/stores/appStore';
 import { ref } from 'vue';
 
 import MenuRightIcon from '@renderer/icons/MenuRightIcon.vue'
+import { ContextMenuItemData } from './ContextMenu.vue';
 
 const props = defineProps<{ x: number, y: number, hide: () => void, items: ContextMenuItemData[] }>()
 

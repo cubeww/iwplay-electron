@@ -6,9 +6,37 @@
 
 <script lang="ts" setup>
 import ContextMenuContent from './ContextMenuContent.vue';
-
-import { ContextMenuOptions } from '@renderer/stores/appStore';
 import { onMounted, onUnmounted, ref } from 'vue';
+
+export interface ContextMenuOptions {
+  x: number
+  y: number
+  items: ContextMenuItemData[]
+  triggerEl: HTMLElement
+  outsideAutoClose?: boolean
+}
+
+export type ContextMenuItemData =
+  | ContextMenuItemText
+  | ContextMenuItemSeparator
+  | ContextMenuItemSubMenu
+
+export interface ContextMenuItemText {
+  type: 'text'
+  text: string
+  onClick: () => void
+}
+
+export interface ContextMenuItemSeparator {
+  type: 'separator'
+}
+
+export interface ContextMenuItemSubMenu {
+  type: 'submenu'
+  text: string
+  submenu: ContextMenuItemData[]
+}
+
 
 const props = defineProps<{
   options: ContextMenuOptions,
