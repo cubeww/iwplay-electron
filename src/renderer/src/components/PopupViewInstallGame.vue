@@ -30,8 +30,8 @@ import PopupSeparator from './PopupSeparator.vue';
 import ButtonGradient from './ButtonGradient.vue';
 import ButtonPure from './ButtonPure.vue';
 import LoadingIcon from '@renderer/icons/LoadingIcon.vue';
-import { api } from '@renderer/utils/api';
 import { computed, ref } from 'vue';
+import { invoke } from '@renderer/utils/invoke';
 
 export interface InstallPopupContext {
   id: string
@@ -46,16 +46,10 @@ const filesize = ref(0)
 const installStatus = ref<'pending' | 'installing' | 'error'>('pending')
 
 const handleSelectZip = async () => {
-  const f = await api.openFileDialog({
-    title: '选择游戏压缩包', filters: [
-      { name: 'Compress Files', extensions: ['zip', 'rar', '7z'] },
-      { name: 'All Files', extensions: ['*'] }
-    ]
-  })
-
-  if (typeof f === 'object' && typeof f[0] === 'string') {
-    filename.value = f[0]
-    filesize.value = await api.fileSize(filename.value)
+  const selectResult = await invoke('library-select-install-zip')
+  if (selectResult) {
+    filename.value = selectResult.filename
+    filesize.value = selectResult.filesize
   }
 }
 

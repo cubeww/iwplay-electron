@@ -28,22 +28,12 @@ import AppFooter from './components/AppFooter.vue';
 import ContextMenu from './components/ContextMenu.vue';
 import { useAppStore } from './stores/appStore';
 import { onMounted } from 'vue';
-import { libraryUtil } from './utils/libraryUtil';
-import { api } from './utils/api';
-import { join } from 'path-browserify';
-import { stderr, stdout } from 'process';
-import PopupViewInstallGame from './components/PopupViewInstallGame.vue';
 const appStore = useAppStore()
 
 onMounted(async () => {
   window.electron.ipcRenderer.on('maximize', (_evt, value) => {
     appStore.isMaximize = value
   })
-
-  const lib = 'D:/IWPlayLibrary'
-
-  // libraryUtil.install(lib, '11451419', "D:/Downloads/I Wanna Kill The Junko v1.00a.zip")
-  // libraryUtil.createManifest(lib, '11451419')
 })
 
 </script>
