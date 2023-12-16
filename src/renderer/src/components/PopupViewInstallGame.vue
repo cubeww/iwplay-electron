@@ -4,7 +4,7 @@
     <PopupSeparator />
     <div>{{ context.name }} (ID: {{ context.id }})</div>
     <PopupSeparator />
-    <ButtonGradient style="width: 120px;" :onClick="handleSelectZip" color1="#4ade80" color2="#16a34a">选择压缩包</ButtonGradient>
+    <ButtonGradient style="width: 120px" :onClick="handleSelectZip" color1="#4ade80" color2="#16a34a">选择压缩包</ButtonGradient>
     <template v-if="filename">
       <div><b>文件名：</b>{{ filename }}</div>
       <div><b>文件大小：</b>{{ filesizeStr }}</div>
@@ -13,9 +13,7 @@
       <div><b>未选择游戏压缩包文件</b></div>
     </template>
     <PopupSeparator />
-    <div v-if="installStatus === 'installing'" style="display: flex;">
-      <LoadingIcon :size="32" />安装中...
-    </div>
+    <div v-if="installStatus === 'installing'" style="display: flex"><LoadingIcon :size="32" />安装中...</div>
     <div class="bottom">
       <ButtonGradient class="bottom-button" :enabled="filename !== '' && installStatus !== 'installing'" :onClick="handleInstall">安装</ButtonGradient>
       <ButtonPure class="bottom-button" :onClick="close">取消</ButtonPure>
@@ -30,40 +28,41 @@ import PopupSeparator from './PopupSeparator.vue';
 import ButtonGradient from './ButtonGradient.vue';
 import ButtonPure from './ButtonPure.vue';
 import LoadingIcon from '@renderer/icons/LoadingIcon.vue';
-import { api } from '@renderer/utils/api';
+import { invoke } from '@renderer/utils/invoke';
 import { computed, ref } from 'vue';
 
 export interface InstallPopupContext {
-  id: string
-  name: string
+  id: string;
+  name: string;
 }
 
-defineProps<{ close: () => void, context: InstallPopupContext }>()
+defineProps<{ close: () => void; context: InstallPopupContext }>();
 
-const filename = ref('')
-const filesize = ref(0)
+const filename = ref('');
+const filesize = ref(0);
 
-const installStatus = ref<'pending' | 'installing' | 'error'>('pending')
+const installStatus = ref<'pending' | 'installing' | 'error'>('pending');
 
 const handleSelectZip = async () => {
-  const f = await api.openFileDialog({
-    title: '选择游戏压缩包', filters: [
+  const f = await invoke('open-file-dialog', {
+    title: '选择游戏压缩包',
+    filters: [
       { name: 'Compress Files', extensions: ['zip', 'rar', '7z'] },
       { name: 'All Files', extensions: ['*'] }
     ]
-  })
+  });
 
   if (typeof f === 'object' && typeof f[0] === 'string') {
-    filename.value = f[0]
-    filesize.value = await api.fileSize(filename.value)
+    filename.value = f[0];
+    filesize.value = await invoke('file-size', filename.value);
   }
-}
+};
 
 const handleInstall = () => {
-  installStatus.value = 'installing'
-}
+  installStatus.value = 'installing';
+};
 
-const filesizeStr = computed(() => (filesize.value / 1048576.0).toFixed(2) + ' MB')
+const filesizeStr = computed(() => (filesize.value / 1048576.0).toFixed(2) + ' MB');
 </script>
 
 <style scoped>

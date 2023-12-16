@@ -1,9 +1,7 @@
 <template>
   <div class="library-sidebar">
     <div class="header">
-      <button class="home-button" :class="{ active: isInHome }" @click="handleToHome">
-        主页
-      </button>
+      <button class="home-button" :class="{ active: isInHome }" @click="handleToHome">主页</button>
       <button class="refresh-button">
         <RefreshIcon />
       </button>
@@ -12,18 +10,14 @@
       <div class="search-icon" @click="searchInputEl.focus">
         <SearchIcon />
       </div>
-      <input class="search-input" v-model="searchText" ref="searchInputEl" placeholder="按名称搜索" type="text">
+      <input class="search-input" v-model="searchText" ref="searchInputEl" placeholder="按名称搜索" type="text" />
       <button class="search-filter-button">
         <FilterIcon />
       </button>
     </div>
     <div class="fangame-list" @scroll="handleScroll">
       <div class="fangame-items-wrapper" :style="{ height: appStore.fangameItems.length * itemHeight + 'px' }">
-        <div v-for="item in displayItems"
-          class="fangame-item"
-          :class="{ select: appStore.present.fangameItem === item }"
-          :style="{ transform: `translateY(${translateY}px)` }"
-          @click="appStore.selectFangameItem(item)">
+        <div v-for="item in displayItems" class="fangame-item" :class="{ select: appStore.present.fangameItem === item }" :style="{ transform: `translateY(${translateY}px)` }" @click="appStore.selectFangameItem(item)">
           {{ item.name }}
         </div>
       </div>
@@ -38,61 +32,60 @@ import FilterIcon from '@renderer/icons/FilterIcon.vue';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useAppStore } from '@renderer/stores/appStore';
 
-const itemHeight = 25 // px
+const itemHeight = 25; // px
 
-const searchInputEl = ref<HTMLInputElement>(undefined!)
-const searchText = ref('')
+const searchInputEl = ref<HTMLInputElement>(undefined!);
+const searchText = ref('');
 
-const displayCount = ref(36)
-const scrollTop = ref(0)
+const displayCount = ref(36);
+const scrollTop = ref(0);
 
-const appStore = useAppStore()
+const appStore = useAppStore();
 
 onMounted(() => {
-  window.addEventListener('resize', handleWindowResize)
-  handleWindowResize()
+  window.addEventListener('resize', handleWindowResize);
+  handleWindowResize();
 
-  appStore.fetchFangameItems()
-})
+  appStore.fetchFangameItems();
+});
 
 onUnmounted(() => {
-  window.removeEventListener('resize', handleWindowResize)
-})
+  window.removeEventListener('resize', handleWindowResize);
+});
 
 const handleWindowResize = () => {
-  displayCount.value = (window.innerHeight / itemHeight) | 0
-}
+  displayCount.value = (window.innerHeight / itemHeight) | 0;
+};
 
 const startIndex = computed(() => {
-  return (scrollTop.value / itemHeight) | 0
-})
+  return (scrollTop.value / itemHeight) | 0;
+});
 
 const searchItems = computed(() => {
   if (searchText.value === '') {
-    return appStore.fangameItems
+    return appStore.fangameItems;
   } else {
-    return appStore.fangameItems.filter(i => i.name.toLowerCase().includes(searchText.value.toLowerCase()))
+    return appStore.fangameItems.filter((i) => i.name.toLowerCase().includes(searchText.value.toLowerCase()));
   }
-})
+});
 
 const displayItems = computed(() => {
-  return searchItems.value.slice(startIndex.value, startIndex.value + displayCount.value)
-})
+  return searchItems.value.slice(startIndex.value, startIndex.value + displayCount.value);
+});
 
 const translateY = computed(() => {
-  return startIndex.value * itemHeight
-})
+  return startIndex.value * itemHeight;
+});
 
 const handleScroll = (e: Event) => {
-  scrollTop.value = (e.target as HTMLDivElement).scrollTop
-}
+  scrollTop.value = (e.target as HTMLDivElement).scrollTop;
+};
 
 const handleToHome = () => {
-  appStore.selectFangameItem(undefined)
-}
+  appStore.selectFangameItem(undefined);
+};
 
-const isInHome = computed(() => !appStore.present.fangameItem)
-
+const isInHome = computed(() => !appStore.present.fangameItem);
 </script>
 
 <style scoped>
@@ -128,7 +121,8 @@ const isInHome = computed(() => !appStore.present.fangameItem)
   cursor: pointer;
   transition: all 0.1s;
 
-  &:hover, &.active {
+  &:hover,
+  &.active {
     background-color: #3e4047;
     color: white;
   }

@@ -8,17 +8,15 @@
 </template>
 
 <script lang="ts" setup>
-
-import AddGameIcon from '@renderer/icons/AddGameIcon.vue'
+import AddGameIcon from '@renderer/icons/AddGameIcon.vue';
 import { useAppStore } from '@renderer/stores/appStore';
 import PopupViewInstallGame, { InstallPopupContext } from './PopupViewInstallGame.vue';
 
-const appStore = useAppStore()
+const appStore = useAppStore();
 
 const handleAddGame = () => {
-  appStore.showPopup(PopupViewInstallGame, { id: '114514', name: 'I Wanna Be The Beast' } as InstallPopupContext)
-}
-
+  appStore.showPopup(PopupViewInstallGame, { id: '114514', name: 'I Wanna Be The Beast' } as InstallPopupContext);
+};
 </script>
 
 <style scoped>

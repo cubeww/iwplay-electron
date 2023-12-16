@@ -8,7 +8,7 @@
 
 <script lang="ts" setup>
 import WindowCloseIcon from '@renderer/icons/WindowCloseIcon.vue';
-defineProps<{ close: () => void }>()
+defineProps<{ close: () => void }>();
 </script>
 
 <style scoped>

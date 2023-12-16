@@ -1,5 +1,5 @@
-import { api } from './api'
 import { join, extname } from 'path-browserify'
+import { invoke } from './invoke'
 
 export interface FangameManifest {
   id: string
@@ -27,16 +27,16 @@ function getManifestPath(location: string, id: string) {
 
 export const libraryUtil = {
   async initializeLibrary(location: string) {
-    if (await api.pathExists(location)) {
-      await api.removeDir(location)
-      await api.createDir(location)
+    if (await invoke('path-exists', location)) {
+      await invoke('remove-dir', location)
+      await invoke('create-dir', location)
     }
-    await api.createDir(getCommonPath(location))
+    await invoke('create-dir', getCommonPath(location))
   },
 
   async checkLibrary(location: string) {
-    if (!(await api.pathExists(getCommonPath(location)))) {
-      await api.createDir(getCommonPath(location))
+    if (!(await invoke('path-exists', getCommonPath(location)))) {
+      await invoke('create-dir', getCommonPath(location))
     }
   },
 
@@ -45,25 +45,25 @@ export const libraryUtil = {
 
     const gamePath = getGamePath(location, id)
 
-    if (await api.pathExists(gamePath)) {
+    if (await invoke('path-exists', gamePath)) {
       await this.uninstall(location, id)
     }
 
-    await api.createDir(gamePath)
-    await api.exec(`"resources/7z.exe" x "${file}" -o"${gamePath}"`)
-    
+    await invoke('create-dir', gamePath)
+    await invoke('exec', `"resources/7z.exe" x "${file}" -o"${gamePath}"`)
+
     await this.createManifest(location, id)
   },
 
   async uninstall(location: string, id: string) {
     await this.checkLibrary(location)
 
-    if (await api.pathExists(getGamePath(location, id))) {
-      await api.removeDir(getGamePath(location, id))
+    if (await invoke('path-exists', getGamePath(location, id))) {
+      await invoke('remove-dir', getGamePath(location, id))
     }
 
-    if (await api.pathExists(getManifestPath(location, id))) {
-      await api.removeFile(getManifestPath(location, id))
+    if (await invoke('path-exists', getManifestPath(location, id))) {
+      await invoke('remove-file', getManifestPath(location, id))
     }
   },
 
@@ -71,12 +71,12 @@ export const libraryUtil = {
     await this.checkLibrary(location)
 
     const appsPath = getAppsPath(location)
-    const files = await api.readDir(appsPath)
+    const files = await invoke('read-dir', appsPath)
 
     const ids: string[] = []
     for (const f of files) {
       const fullPath = join(appsPath, f)
-      if (await api.isDir(fullPath)) {
+      if (await invoke('is-dir', fullPath)) {
         continue
       }
       if (extname(f) === '.json' && f.slice(0, 10) === 'iwmanifest') {
@@ -91,12 +91,12 @@ export const libraryUtil = {
     await this.checkLibrary(location)
 
     const commonPath = getCommonPath(location)
-    const files = await api.readDir(commonPath)
+    const files = await invoke('read-dir', commonPath)
 
     const ids: string[] = []
     for (const f of files) {
       const fullPath = join(commonPath, f)
-      if (await api.isDir(fullPath)) {
+      if (await invoke('is-dir', fullPath)) {
         ids.push(f)
       }
     }
@@ -107,16 +107,16 @@ export const libraryUtil = {
     await this.checkLibrary(location)
 
     const manifestPath = getManifestPath(location, id)
-    if (await api.pathExists(manifestPath)) {
-      await api.removeFile(manifestPath)
+    if (await invoke('path-exists', manifestPath)) {
+      await invoke('remove-dir', manifestPath)
     }
 
     const gamePath = getGamePath(location, id)
-    if (!(await api.pathExists(gamePath))) {
+    if (!(await invoke('path-exists', gamePath))) {
       throw new Error('game not installed')
     }
 
-    const files = await api.readDir(gamePath, true)
+    const files = await invoke('read-dir', gamePath, true)
     const executablePaths: string[] = []
 
     for (const f of files) {
@@ -126,7 +126,7 @@ export const libraryUtil = {
     }
 
     const startupPath = executablePaths.length === 1 ? executablePaths[0] : ''
-    const sizeOnDisk = await api.dirSize(gamePath)
+    const sizeOnDisk = await invoke('dir-size', gamePath)
 
     const manifest: FangameManifest = {
       id,
@@ -136,7 +136,7 @@ export const libraryUtil = {
       startupPath
     }
 
-    await api.writeFile(manifestPath, JSON.stringify(manifest, null, 4))
+    await invoke('write-file', manifestPath, JSON.stringify(manifest, null, 4))
 
     return manifest
   },

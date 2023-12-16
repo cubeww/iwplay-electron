@@ -5,21 +5,22 @@
 </template>
 
 <script lang="ts" setup>
-const props = withDefaults(defineProps<{
-  onClick?: () => void,
-  enabled?: boolean
-}>(),
+const props = withDefaults(
+  defineProps<{
+    onClick?: () => void;
+    enabled?: boolean;
+  }>(),
   {
     onClick: undefined,
     enabled: true
-  })
+  }
+);
 
 const handleClick = () => {
   if (props.enabled && props.onClick) {
-    props.onClick()
+    props.onClick();
   }
-}
-
+};
 </script>
 
 <style scoped>

@@ -12,33 +12,33 @@
 import BrowserBackIcon from '@renderer/icons/BrowserBackIcon.vue';
 import BrowserForwardIcon from '@renderer/icons/BrowserForwardIcon.vue';
 import AppTabBarItem from './AppTabBarItem.vue';
-import { ContextMenuItemData, useAppStore } from '@renderer/stores/appStore';
+import { useAppStore } from '@renderer/stores/appStore';
 import { computed } from 'vue';
+import { ContextMenuItemData } from './ContextMenu.vue';
 
-const appStore = useAppStore()
-const canBack = computed(() => appStore.past.length > 0)
-const canForward = computed(() => appStore.future.length > 0)
+const appStore = useAppStore();
+const canBack = computed(() => appStore.past.length > 0);
+const canForward = computed(() => appStore.future.length > 0);
 
 const menuItems: ContextMenuItemData[][] = [
   // DelFruit
   [
-    { type: 'text', text: 'Delicious Fruit', onClick: () => appStore.toggleBrowserAndLoadURL("https://delicious-fruit.com/") },
-    { type: 'text', text: 'I wanna Wiki', onClick: () => appStore.toggleBrowserAndLoadURL("https://www.iwannawiki.com/") },
-  ],
-]
+    { type: 'text', text: 'Delicious Fruit', onClick: () => appStore.toggleBrowserAndLoadURL('https://delicious-fruit.com/') },
+    { type: 'text', text: 'I wanna Wiki', onClick: () => appStore.toggleBrowserAndLoadURL('https://www.iwannawiki.com/') }
+  ]
+];
 
 const handleBack = () => {
   if (canBack) {
-    appStore.back()
+    appStore.back();
   }
-}
+};
 
 const handleForward = () => {
   if (canForward) {
-    appStore.forward()
+    appStore.forward();
   }
-}
-
+};
 </script>
 
 <style scoped>

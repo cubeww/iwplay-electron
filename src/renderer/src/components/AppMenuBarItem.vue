@@ -5,30 +5,31 @@
 </template>
 
 <script lang="ts" setup>
-import { ContextMenuItemData, useAppStore } from '@renderer/stores/appStore';
+import { useAppStore } from '@renderer/stores/appStore';
 import { ref } from 'vue';
+import { ContextMenuItemData } from './ContextMenu.vue';
 
-const props = defineProps<{ items: ContextMenuItemData[] }>()
-const itemEl = ref<HTMLDivElement>(undefined!)
-const appStore = useAppStore()
+const props = defineProps<{ items: ContextMenuItemData[] }>();
+const itemEl = ref<HTMLDivElement>(undefined!);
+const appStore = useAppStore();
 
 const showMenu = () => {
-  const rect = itemEl.value.getBoundingClientRect()
-  appStore.showContextMenu({ x: rect.left + 10, y: rect.bottom, items: props.items, triggerEl: itemEl.value })
-}
+  const rect = itemEl.value.getBoundingClientRect();
+  appStore.showContextMenu({ x: rect.left + 10, y: rect.bottom, items: props.items, triggerEl: itemEl.value });
+};
 
 const handleClick = () => {
   if (appStore.contextMenu && appStore.contextMenu.triggerEl === itemEl.value) {
-    appStore.hideContextMenu()
+    appStore.hideContextMenu();
   } else {
-    showMenu()
+    showMenu();
   }
-}
+};
 const handleEnter = () => {
   if (appStore.contextMenu && appStore.contextMenu.triggerEl !== itemEl.value) {
-    showMenu()
+    showMenu();
   }
-}
+};
 </script>
 
 <style scoped>

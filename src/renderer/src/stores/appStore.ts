@@ -1,5 +1,5 @@
 import { ContextMenuOptions } from '@renderer/components/ContextMenu.vue'
-import { api } from '@renderer/utils/api'
+import { invoke } from '@renderer/utils/invoke'
 import { DelFruitFangameItem, delFruitUtil } from '@renderer/utils/delFruitUtil'
 import { join } from 'path-browserify'
 import { defineStore } from 'pinia'
@@ -101,8 +101,8 @@ export const useAppStore = defineStore('app', () => {
   const fetchFangameItems = async (forceDownload: boolean = false) => {
     fetchFangameItemsStatus.value = 'fetching'
 
-    const cachePath = join(await api.getPath('userData'), 'appcache')
-    if (!(await api.pathExists(cachePath))) await api.createDir(cachePath)
+    const cachePath = join(await invoke('get-path', 'userData'), 'appcache')
+    if (!(await invoke('path-exists', cachePath))) await invoke('create-dir', cachePath)
 
     const cacheFile = join(cachePath, 'delfruit-fangamelist.json')
 
@@ -114,7 +114,7 @@ export const useAppStore = defineStore('app', () => {
       // Try to load cache first
       try {
         const cacheData: { fetchdate: string; list: DelFruitFangameItem[] } = JSON.parse(
-          await api.readFile(cacheFile)
+          await invoke('read-file', cacheFile)
         )
 
         const differenceDays =
@@ -134,7 +134,8 @@ export const useAppStore = defineStore('app', () => {
       items = await delFruitUtil.fetchFangameItems()
 
       // Write to cache
-      await api.writeFile(
+      await invoke(
+        'write-file',
         cacheFile,
         JSON.stringify({
           fetchdate: new Date(),

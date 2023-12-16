@@ -5,9 +5,7 @@
     </div>
     <div class="panel">
       <div class="panel-header-row">
-        <ButtonGradient class="install-button">
-          <InstallGameIcon />安装
-        </ButtonGradient>
+        <ButtonGradient class="install-button"> <InstallGameIcon />安装 </ButtonGradient>
         <div class="profile-col">
           <div class="label">最后启动日期</div>
           <div class="content">2023年10月28日</div>
@@ -32,23 +30,22 @@
 <script lang="ts" setup>
 import { FangameItem, useAppStore } from '@renderer/stores/appStore';
 import { ref } from 'vue';
-import InstallGameIcon from '@renderer/icons/InstallGameIcon.vue'
+import InstallGameIcon from '@renderer/icons/InstallGameIcon.vue';
 import ButtonGradient from './ButtonGradient.vue';
-import SettingsIcon from '@renderer/icons/SettingsIcon.vue'
+import SettingsIcon from '@renderer/icons/SettingsIcon.vue';
 
-const props = defineProps<{ item: FangameItem }>()
+const props = defineProps<{ item: FangameItem }>();
 
-const appStore = useAppStore()
-const backgroundY = ref(0)
+const appStore = useAppStore();
+const backgroundY = ref(0);
 
 const handleScroll = (e: any) => {
-  backgroundY.value = -e.target.scrollTop / 3
-}
+  backgroundY.value = -e.target.scrollTop / 3;
+};
 
 const handleToDelFruit = () => {
-  appStore.toggleBrowserAndLoadURL('https://delicious-fruit.com/ratings/game_details.php?id=' + props.item.id)
-}
-
+  appStore.toggleBrowserAndLoadURL('https://delicious-fruit.com/ratings/game_details.php?id=' + props.item.id);
+};
 </script>
 
 <style scoped>
@@ -62,7 +59,6 @@ const handleToDelFruit = () => {
   background: url('src/images/game-detail.png');
   background-repeat: no-repeat;
   background-position-y: v-bind(backgroundY + 'px');
-
 
   &::-webkit-scrollbar {
     width: 10px;
@@ -176,7 +172,9 @@ const handleToDelFruit = () => {
 .link-button {
   margin-left: 20px;
   margin-right: 20px;
-  transition: color 0.1s, background-color 0.25s;
+  transition:
+    color 0.1s,
+    background-color 0.25s;
   padding: 4px;
   cursor: pointer;
   font-size: 15px;

@@ -6,15 +6,8 @@
     <ViewLibrary />
     <ViewUser />
     <AppFooter />
-    <ContextMenu
-      v-if="appStore.contextMenu"
-      :options="appStore.contextMenu"
-      :hide="appStore.hideContextMenu" />
-    <Component
-      v-for="popup in appStore.popups"
-      :is="popup.component"
-      :context="popup.context"
-      :close="() => appStore.closePopup(popup.context)" />
+    <ContextMenu v-if="appStore.contextMenu" :options="appStore.contextMenu" :hide="appStore.hideContextMenu" />
+    <Component v-for="popup in appStore.popups" :is="popup.component" :context="popup.context" :close="() => appStore.closePopup(popup.context)" />
   </div>
 </template>
 
@@ -28,24 +21,18 @@ import AppFooter from './components/AppFooter.vue';
 import ContextMenu from './components/ContextMenu.vue';
 import { useAppStore } from './stores/appStore';
 import { onMounted } from 'vue';
-import { libraryUtil } from './utils/libraryUtil';
-import { api } from './utils/api';
-import { join } from 'path-browserify';
-import { stderr, stdout } from 'process';
-import PopupViewInstallGame from './components/PopupViewInstallGame.vue';
-const appStore = useAppStore()
+const appStore = useAppStore();
 
 onMounted(async () => {
   window.electron.ipcRenderer.on('maximize', (_evt, value) => {
-    appStore.isMaximize = value
-  })
+    appStore.isMaximize = value;
+  });
 
-  const lib = 'D:/IWPlayLibrary'
+  const lib = 'D:/IWPlayLibrary';
 
   // libraryUtil.install(lib, '11451419', "D:/Downloads/I Wanna Kill The Junko v1.00a.zip")
   // libraryUtil.createManifest(lib, '11451419')
-})
-
+});
 </script>
 
 <style scoped>

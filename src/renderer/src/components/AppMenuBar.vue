@@ -3,10 +3,10 @@
     <AppMenuBarItem :items="menuItems[0]">IWPlay</AppMenuBarItem>
     <AppMenuBarItem :items="menuItems[1]">帮助</AppMenuBarItem>
     <div class="control-buttons">
-      <WindowMinimizeIcon class="control-button minimize" @click="api.minimize()" />
-      <WindowMaximizeIcon class="control-button maximize" @click="api.maximize()" v-if="!appStore.isMaximize" />
-      <WindowRestoreIcon class="control-button maximize" @click="api.maximize()" v-else />
-      <WindowCloseIcon class="control-button close" @click="api.close()" />
+      <WindowMinimizeIcon class="control-button minimize" @click="invoke('minimize')" />
+      <WindowMaximizeIcon class="control-button maximize" @click="invoke('maximize')" v-if="!appStore.isMaximize" />
+      <WindowRestoreIcon class="control-button maximize" @click="invoke('maximize')" v-else />
+      <WindowCloseIcon class="control-button close" @click="invoke('close')" />
     </div>
   </div>
 </template>
@@ -15,30 +15,22 @@
 import WindowCloseIcon from '@renderer/icons/WindowCloseIcon.vue';
 import WindowMaximizeIcon from '@renderer/icons/WindowMaximizeIcon.vue';
 import WindowMinimizeIcon from '@renderer/icons/WindowMinimizeIcon.vue';
-import AppMenuBarItem from '@renderer/components/AppMenuBarItem.vue'
-import { ContextMenuItemData, useAppStore } from '@renderer/stores/appStore';
+import AppMenuBarItem from '@renderer/components/AppMenuBarItem.vue';
+import { useAppStore } from '@renderer/stores/appStore';
 import { computed } from 'vue';
 import WindowRestoreIcon from '@renderer/icons/WindowRestoreIcon.vue';
-import { api } from '@renderer/utils/api';
+import { invoke } from '@renderer/utils/invoke';
+import { ContextMenuItemData } from './ContextMenu.vue';
 
-const appStore = useAppStore()
-const hasContextMenu = computed(() => appStore.contextMenu !== undefined)
+const appStore = useAppStore();
+const hasContextMenu = computed(() => appStore.contextMenu !== undefined);
 
 const menuItems: ContextMenuItemData[][] = [
   // IWPlay
-  [
-    { type: 'text', text: '设置', onClick: () => { } },
-    { type: 'separator' },
-    { type: 'text', text: '退出', onClick: () => api.close() },
-  ],
+  [{ type: 'text', text: '设置', onClick: () => {} }, { type: 'separator' }, { type: 'text', text: '退出', onClick: () => invoke('close') }],
   // 帮助
-  [
-    { type: 'text', text: 'Github', onClick: () => { } },
-    { type: 'separator' },
-    { type: 'text', text: '关于', onClick: () => { } },
-  ],
-]
-
+  [{ type: 'text', text: 'Github', onClick: () => {} }, { type: 'separator' }, { type: 'text', text: '关于', onClick: () => {} }]
+];
 </script>
 
 <style scoped>

@@ -15,35 +15,35 @@ import { useAppStore } from '@renderer/stores/appStore';
 import LibraryDetailGame from './LibraryDetailGame.vue';
 import LibraryDetailHome from './LibraryDetailHome.vue';
 
-const appStore = useAppStore()
-const item = computed(() => appStore.present.fangameItem)
+const appStore = useAppStore();
+const item = computed(() => appStore.present.fangameItem);
 
 onMounted(() => {
-  window.addEventListener('mouseup', handleWindowMouseUp)
-  window.addEventListener('mousemove', handleWindowMouseMove)
-})
+  window.addEventListener('mouseup', handleWindowMouseUp);
+  window.addEventListener('mousemove', handleWindowMouseMove);
+});
 
 onUnmounted(() => {
-  window.removeEventListener('mouseup', handleWindowMouseUp)
-  window.removeEventListener('mousemove', handleWindowMouseMove)
-})
+  window.removeEventListener('mouseup', handleWindowMouseUp);
+  window.removeEventListener('mousemove', handleWindowMouseMove);
+});
 
-const resizing = ref(false)
-const sidebarWidth = ref(100)
+const resizing = ref(false);
+const sidebarWidth = ref(100);
 
 const handleSliderMouseDown = () => {
-  resizing.value = true
-}
+  resizing.value = true;
+};
 
 const handleWindowMouseUp = () => {
-  resizing.value = false
-}
+  resizing.value = false;
+};
 
 const handleWindowMouseMove = (e: MouseEvent) => {
   if (resizing.value) {
-    sidebarWidth.value = e.pageX
+    sidebarWidth.value = e.pageX;
   }
-}
+};
 </script>
 
 <style scoped>

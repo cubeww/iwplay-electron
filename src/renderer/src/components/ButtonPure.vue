@@ -7,19 +7,20 @@
 <script lang="ts" setup>
 import ButtonBase from './ButtonBase.vue';
 
-withDefaults(defineProps<{
-  onClick?: () => void,
-  enabled?: boolean,
-  color1?: string,
-  color2?: string
-}>(),
+withDefaults(
+  defineProps<{
+    onClick?: () => void;
+    enabled?: boolean;
+    color1?: string;
+    color2?: string;
+  }>(),
   {
     onClick: undefined,
     enabled: true,
     color1: '#3d4450',
     color2: '#464d58'
-  })
-
+  }
+);
 </script>
 
 <style scoped>

@@ -7,28 +7,27 @@
 </template>
 
 <script lang="ts" setup>
-import { ContextMenuItemData, TabName, useAppStore } from '@renderer/stores/appStore';
+import { TabName, useAppStore } from '@renderer/stores/appStore';
 import { computed, ref } from 'vue';
+import { ContextMenuItemData } from './ContextMenu.vue';
 
-const props = defineProps<{ to: TabName, items?: ContextMenuItemData[] }>()
+const props = defineProps<{ to: TabName; items?: ContextMenuItemData[] }>();
 
-const appStore = useAppStore()
-const selected = computed(() => props.to === appStore.present.tab)
+const appStore = useAppStore();
+const selected = computed(() => props.to === appStore.present.tab);
 
-const tabBarItemEl = ref<HTMLDivElement>(undefined!)
+const tabBarItemEl = ref<HTMLDivElement>(undefined!);
 
 const handleClick = () => {
-  if (appStore.present && appStore.present.tab !== props.to)
-    appStore.toggleTab(props.to)
-}
+  if (appStore.present && appStore.present.tab !== props.to) appStore.toggleTab(props.to);
+};
 
 const handleMouseEnter = () => {
   if (props.items) {
-    const rect = tabBarItemEl.value.getBoundingClientRect()
-    appStore.showContextMenu({ x: rect.left, y: rect.bottom + 8, items: props.items, triggerEl: tabBarItemEl.value, outsideAutoClose: true })
+    const rect = tabBarItemEl.value.getBoundingClientRect();
+    appStore.showContextMenu({ x: rect.left, y: rect.bottom + 8, items: props.items, triggerEl: tabBarItemEl.value, outsideAutoClose: true });
   }
-}
-
+};
 </script>
 
 <style scoped>

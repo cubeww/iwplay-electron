@@ -8,10 +8,10 @@
 import { TabName, useAppStore } from '@renderer/stores/appStore';
 import { computed } from 'vue';
 
-const appStore = useAppStore()
-const props = defineProps<{ name: TabName }>()
+const appStore = useAppStore();
+const props = defineProps<{ name: TabName }>();
 
-const show = computed(() => appStore.present.tab === props.name)
+const show = computed(() => appStore.present.tab === props.name);
 </script>
 
 <style scoped>

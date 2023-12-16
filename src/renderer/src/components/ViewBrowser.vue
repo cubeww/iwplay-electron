@@ -18,11 +18,11 @@ import RefreshIcon from '@renderer/icons/RefreshIcon.vue';
 import LoadingIcon from '@renderer/icons/LoadingIcon.vue';
 import { useAppStore } from '@renderer/stores/appStore';
 
-const appStore = useAppStore()
+const appStore = useAppStore();
 
-const loading = ref(true)
-const url = ref("https://delicious-fruit.com/")
-const webviewEl: any = ref()
+const loading = ref(true);
+const url = ref('https://delicious-fruit.com/');
+const webviewEl: any = ref();
 
 const webviewCSS = `
   ::-webkit-scrollbar {
@@ -46,38 +46,38 @@ const webviewCSS = `
   ::-webkit-scrollbar-corner {
     background: #202020;
   }
-`
+`;
 
 onMounted(() => {
-  webviewEl.value.addEventListener('did-navigate', handleDidNavigate)
-  webviewEl.value.addEventListener('did-start-loading', handleDidStartLoading)
-  webviewEl.value.addEventListener('did-stop-loading', handleDidStopLoading)
-  webviewEl.value.addEventListener('will-navigate', handleWillNavigate)
-  webviewEl.value.addEventListener('ipc-message', handleIpcMessage)
-})
+  webviewEl.value.addEventListener('did-navigate', handleDidNavigate);
+  webviewEl.value.addEventListener('did-start-loading', handleDidStartLoading);
+  webviewEl.value.addEventListener('did-stop-loading', handleDidStopLoading);
+  webviewEl.value.addEventListener('will-navigate', handleWillNavigate);
+  webviewEl.value.addEventListener('ipc-message', handleIpcMessage);
+});
 
 onUnmounted(() => {
-  webviewEl.value.removeEventListener('did-navigate', handleDidNavigate)
-  webviewEl.value.removeEventListener('did-start-loading', handleDidStartLoading)
-  webviewEl.value.removeEventListener('did-stop-loading', handleDidStopLoading)
-  webviewEl.value.removeEventListener('will-navigate', handleWillNavigate)
-  webviewEl.value.removeEventListener('ipc-message', handleIpcMessage)
-})
+  webviewEl.value.removeEventListener('did-navigate', handleDidNavigate);
+  webviewEl.value.removeEventListener('did-start-loading', handleDidStartLoading);
+  webviewEl.value.removeEventListener('did-stop-loading', handleDidStopLoading);
+  webviewEl.value.removeEventListener('will-navigate', handleWillNavigate);
+  webviewEl.value.removeEventListener('ipc-message', handleIpcMessage);
+});
 
 watchEffect(() => {
   if (appStore.shouldLoadURL) {
-    appStore.setShouldLoadURL(false)
-    webviewEl.value.loadURL(appStore.present.targetBrowserURL)
+    appStore.setShouldLoadURL(false);
+    webviewEl.value.loadURL(appStore.present.targetBrowserURL);
   }
-})
+});
 
 const handleDidNavigate = (event: any) => {
-  webviewEl.value.insertCSS(webviewCSS)
-  url.value = event.url
-}
+  webviewEl.value.insertCSS(webviewCSS);
+  url.value = event.url;
+};
 
 const handleDidStopLoading = () => {
-  loading.value = false
+  loading.value = false;
 
   webviewEl.value.executeJavaScript(`
     // Prevent website from opening new page
@@ -87,26 +87,25 @@ const handleDidStopLoading = () => {
     document.addEventListener('mousedown', () => {
       window.electron.ipcRenderer.sendToHost('mousedown')
     })
-  `)
-}
+  `);
+};
 
 const handleDidStartLoading = () => {
-  loading.value = true
-}
+  loading.value = true;
+};
 
 const handleWillNavigate = (event: any) => {
   // **NOT** trigger in LoadURL
   if (event.url !== appStore.present.targetBrowserURL) {
-    appStore.recordBrowserURL(event.url)
+    appStore.recordBrowserURL(event.url);
   }
-}
+};
 
 const handleIpcMessage = (event: any) => {
   if (event.channel === 'mousedown') {
-    appStore.hideContextMenu()
+    appStore.hideContextMenu();
   }
-}
-
+};
 </script>
 
 <style scoped>

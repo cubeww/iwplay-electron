@@ -1,12 +1,8 @@
 <template>
-  <div class="library-detail-home">
-
-  </div>
+  <div class="library-detail-home"></div>
 </template>
 
-<script lang="ts" setup>
-
-</script>
+<script lang="ts" setup></script>
 
 <style scoped>
 .library-detail-home {
