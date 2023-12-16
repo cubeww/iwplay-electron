@@ -19,7 +19,9 @@ const selected = computed(() => props.to === appStore.present.tab);
 const tabBarItemEl = ref<HTMLDivElement>(undefined!);
 
 const handleClick = () => {
-  if (appStore.present && appStore.present.tab !== props.to) appStore.toggleTab(props.to);
+  if (appStore.present && appStore.present.tab !== props.to) {
+    appStore.toggleTab(props.to);
+  }
 };
 
 const handleMouseEnter = () => {

@@ -6,7 +6,6 @@ import log from 'electron-log/main';
 import { initMainAPI } from './api';
 
 function createWindow(): void {
-  // Create the browser window.
   const mainWindow = new BrowserWindow({
     minWidth: 1000,
     minHeight: 600,
@@ -19,9 +18,9 @@ function createWindow(): void {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
-      webSecurity: false, // This is required due to cross-domain requests
+      webSecurity: false,
       webviewTag: true,
-      nodeIntegration: true // This is required due to some permissions of webview
+      nodeIntegration: true
     }
   });
 
@@ -78,6 +77,7 @@ app.whenReady().then(() => {
   });
 
   process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
+  
   log.initialize({ preload: true });
   createWindow();
 

@@ -1,137 +1,134 @@
-import { ContextMenuOptions } from '@renderer/components/ContextMenu.vue'
-import { invoke } from '@renderer/utils/invoke'
-import { DelFruitFangameItem, delFruitUtil } from '@renderer/utils/delFruitUtil'
-import { join } from 'path-browserify'
-import { defineStore } from 'pinia'
-import { ref, shallowRef } from 'vue'
+import { ContextMenuOptions } from '@renderer/components/ContextMenu.vue';
+import { invoke } from '@renderer/utils/invoke';
+import { DelFruitFangameItem, delFruitUtil } from '@renderer/utils/delFruitUtil';
+import { join } from 'path-browserify';
+import { defineStore } from 'pinia';
+import { ref, shallowRef } from 'vue';
 
-export type TabName = 'browser' | 'library' | 'user'
+export type TabName = 'browser' | 'library' | 'user';
 
 export interface BackableState {
-  tab: TabName
-  targetBrowserURL?: string
-  fangameItem?: FangameItem
+  tab: TabName;
+  targetBrowserURL?: string;
+  fangameItem?: FangameItem;
 }
 
 export interface FangameItem {
-  id: string
-  name: string
-  isRunning: boolean
-  isInstalled: boolean
+  id: string;
+  name: string;
+  isRunning: boolean;
+  isInstalled: boolean;
 }
 
-export type ActionStatus = 'pending' | 'fetching' | 'ok' | 'error'
+export type ActionStatus = 'pending' | 'fetching' | 'ok' | 'error';
 
 export const useAppStore = defineStore('app', () => {
   // ========== Backable State
 
-  const past = ref<BackableState[]>([])
+  const past = ref<BackableState[]>([]);
   const present = ref<BackableState>({
     tab: 'browser',
     targetBrowserURL: 'https://delicious-fruit.com/'
-  })
-  const future = ref<BackableState[]>([])
+  });
+  const future = ref<BackableState[]>([]);
 
-  const shouldLoadURL = ref(false)
+  const shouldLoadURL = ref(false);
 
   const backable = <T extends Function>(action: T) => {
     return ((...args: any) => {
-      future.value = []
-      past.value.push(present.value)
-      action(...args)
-    }) as unknown as T
-  }
+      future.value = [];
+      past.value.push(present.value);
+      action(...args);
+    }) as unknown as T;
+  };
 
   const toggleTab = backable((tab: TabName) => {
-    present.value = { tab }
-  })
+    present.value = { tab };
+  });
 
   const toggleBrowserAndLoadURL = backable((url: string) => {
-    present.value = { tab: 'browser', targetBrowserURL: url }
-    shouldLoadURL.value = true
-  })
+    present.value = { tab: 'browser', targetBrowserURL: url };
+    shouldLoadURL.value = true;
+  });
 
   const recordBrowserURL = backable((url: string) => {
-    present.value = { tab: 'browser', targetBrowserURL: url }
-  })
+    present.value = { tab: 'browser', targetBrowserURL: url };
+  });
 
   const setShouldLoadURL = (value: boolean) => {
-    shouldLoadURL.value = value
-  }
+    shouldLoadURL.value = value;
+  };
 
   const back = () => {
     if (past.value.length > 0) {
-      future.value.push(present.value)
-      present.value = past.value.pop()!
+      future.value.push(present.value);
+      present.value = past.value.pop()!;
       if (present.value.tab === 'browser') {
-        shouldLoadURL.value = true
+        shouldLoadURL.value = true;
       }
     }
-  }
+  };
 
   const forward = () => {
     if (future.value.length > 0) {
-      past.value.push(present.value)
-      present.value = future.value.pop()!
+      past.value.push(present.value);
+      present.value = future.value.pop()!;
       if (present.value.tab === 'browser') {
-        shouldLoadURL.value = true
+        shouldLoadURL.value = true;
       }
     }
-  }
+  };
 
   // ========== Context Menu
 
-  const contextMenu = ref<ContextMenuOptions>()
+  const contextMenu = ref<ContextMenuOptions>();
 
   const showContextMenu = (options: ContextMenuOptions) => {
-    contextMenu.value = options
-  }
+    contextMenu.value = options;
+  };
 
   const hideContextMenu = () => {
-    contextMenu.value = undefined
-  }
+    contextMenu.value = undefined;
+  };
 
   // ========== Library
 
-  const fangameItems = ref<FangameItem[]>([])
-  const fetchFangameItemsStatus = ref<ActionStatus>('pending')
+  const fangameItems = ref<FangameItem[]>([]);
+  const fetchFangameItemsStatus = ref<ActionStatus>('pending');
 
-  const libraryLocation = ref('')
+  const fetchFangameItems = async (forceRefetch: boolean = false) => {
+    fetchFangameItemsStatus.value = 'fetching';
 
-  const fetchFangameItems = async (forceDownload: boolean = false) => {
-    fetchFangameItemsStatus.value = 'fetching'
+    const cachePath = join(await invoke('get-path', 'userData'), 'appcache');
+    if (!(await invoke('path-exists', cachePath))) {
+      await invoke('create-dir', cachePath);
+    }
 
-    const cachePath = join(await invoke('get-path', 'userData'), 'appcache')
-    if (!(await invoke('path-exists', cachePath))) await invoke('create-dir', cachePath)
+    const cacheFile = join(cachePath, 'delfruit-fangamelist.json');
 
-    const cacheFile = join(cachePath, 'delfruit-fangamelist.json')
+    let items: DelFruitFangameItem[] = [];
 
-    let items: DelFruitFangameItem[] = []
-
-    let loadCacheOK = false
-
-    if (!forceDownload) {
+    let loadCacheOK = false;
+    
+    if (!forceRefetch) {
       // Try to load cache first
       try {
-        const cacheData: { fetchdate: string; list: DelFruitFangameItem[] } = JSON.parse(
-          await invoke('read-file', cacheFile)
-        )
+        const cacheData: { fetchdate: string; list: DelFruitFangameItem[] } = JSON.parse(await invoke('read-file', cacheFile));
 
-        const differenceDays =
-          (new Date().getTime() - new Date(cacheData.fetchdate).getTime()) / (1000 * 60 * 60 * 24)
+        const differenceDays = (new Date().getTime() - new Date(cacheData.fetchdate).getTime()) / (1000 * 60 * 60 * 24);
 
         if (differenceDays < 1) {
-          items = cacheData.list
-          loadCacheOK = true
+          items = cacheData.list;
+          loadCacheOK = true;
         }
       } catch (e) {
-        loadCacheOK = false
+        loadCacheOK = false;
       }
     }
 
     if (!loadCacheOK) {
       // Fetch fangame list from DelFruit
-      items = await delFruitUtil.fetchFangameItems()
+      items = await delFruitUtil.fetchFangameItems();
 
       // Write to cache
       await invoke(
@@ -141,12 +138,12 @@ export const useAppStore = defineStore('app', () => {
           fetchdate: new Date(),
           list: items
         })
-      )
+      );
     }
 
     for (const i of items as FangameItem[]) {
-      i.isInstalled = false
-      i.isRunning = false
+      i.isInstalled = false;
+      i.isRunning = false;
     }
 
     // TODO: Get installed fangames
@@ -154,32 +151,32 @@ export const useAppStore = defineStore('app', () => {
     // TODO: Get running fangames
 
     // Update store items
-    fetchFangameItemsStatus.value = 'ok'
-    fangameItems.value = items as FangameItem[]
-  }
+    fetchFangameItemsStatus.value = 'ok';
+    fangameItems.value = items as FangameItem[];
+  };
 
   const selectFangameItem = backable((item?: FangameItem) => {
-    present.value = { tab: 'library', fangameItem: item }
-  })
+    present.value = { tab: 'library', fangameItem: item };
+  });
 
   // ========== Popup
 
-  const popups = ref<{ component: any; context: any }[]>([])
+  const popups = ref<{ component: any; context: any }[]>([]);
 
   const showPopup = (component: any, context: any) => {
-    popups.value.push({ component: shallowRef(component), context })
-  }
+    popups.value.push({ component: shallowRef(component), context });
+  };
 
   const closePopup = (context: any) => {
-    const index = popups.value.findIndex((p) => p.context === context)
+    const index = popups.value.findIndex((p) => p.context === context);
     if (index !== -1) {
-      popups.value.splice(index, 1)
+      popups.value.splice(index, 1);
     }
-  }
+  };
 
   // ========== Misc
 
-  const isMaximize = ref(false)
+  const isMaximize = ref(false);
 
   return {
     past,
@@ -203,5 +200,5 @@ export const useAppStore = defineStore('app', () => {
     fetchFangameItems,
     fetchFangameItemsStatus,
     selectFangameItem
-  }
-})
+  };
+});
