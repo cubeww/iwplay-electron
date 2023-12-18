@@ -42,9 +42,9 @@ function dirSize(dir: string) {
 export function initMainAPI(_mainWindow: BrowserWindow) {
   mainWindow = _mainWindow;
 
-  /**
-   * File System
-   */
+  /////////////////
+  // File System //
+  /////////////////
 
   ipcMain.handle('read-file', (_event, file) => {
     return readFileSync(file, { encoding: 'utf8' });
@@ -94,9 +94,9 @@ export function initMainAPI(_mainWindow: BrowserWindow) {
     return app.getPath(name);
   });
 
-  /**
-   * Window
-   */
+  ////////////
+  // Window //
+  ////////////
 
   ipcMain.handle('maximize', (_event) => {
     if (mainWindow.isMaximized()) {
@@ -114,9 +114,14 @@ export function initMainAPI(_mainWindow: BrowserWindow) {
     mainWindow.close();
   });
 
-  /**
-   * Process
-   */
+  ipcMain.handle('show-options', (_event) => {
+    // const optionsWindow = new BrowserWindow({ width: 800, height: 600 });
+    // optionsWindow.loadFile(join(__dirname, '../renderer/index-options.html'))
+  });
+
+  /////////////
+  // Process //
+  /////////////
 
   ipcMain.handle('exec', (_event, command, options) => {
     return execSync(command, options);

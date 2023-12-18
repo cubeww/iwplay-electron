@@ -27,11 +27,6 @@ onMounted(async () => {
   window.electron.ipcRenderer.on('maximize', (_evt, value) => {
     appStore.isMaximize = value;
   });
-
-  const lib = 'D:/IWPlayLibrary';
-
-  // libraryUtil.install(lib, '11451419', "D:/Downloads/I Wanna Kill The Junko v1.00a.zip")
-  // libraryUtil.createManifest(lib, '11451419')
 });
 </script>
 

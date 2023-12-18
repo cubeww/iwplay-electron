@@ -2,8 +2,8 @@
   <div class="library-sidebar">
     <div class="header">
       <button class="home-button" :class="{ active: isInHome }" @click="handleToHome">主页</button>
-      <button class="refresh-button">
-        <RefreshIcon />
+      <button class="refresh-button" :class="{ enable: fetchStatus !== 'fetching' }" @click="fetchItems(true)">
+        <RefreshIcon :class="{ rotate: fetchStatus === 'fetching' }" />
       </button>
     </div>
     <div class="search-box">
@@ -15,12 +15,16 @@
         <FilterIcon />
       </button>
     </div>
-    <div class="fangame-list" @scroll="handleScroll">
-      <div class="fangame-items-wrapper" :style="{ height: appStore.fangameItems.length * itemHeight + 'px' }">
+    <div class="fangame-list" v-show="fetchStatus === 'ok'" @scroll="handleScroll">
+      <div class="fangame-items-wrapper" :style="{ height: searchItems.length * itemHeight + 'px' }">
         <div v-for="item in displayItems" class="fangame-item" :class="{ select: appStore.present.fangameItem === item }" :style="{ transform: `translateY(${translateY}px)` }" @click="appStore.selectFangameItem(item)">
           {{ item.name }}
         </div>
       </div>
+    </div>
+    <div class="fangame-list-error" v-show="fetchStatus === 'error'">
+      {{ appStore.fetchFangameItemsError }}
+      <ButtonPure :onClick="() => fetchItems(true)">重试</ButtonPure>
     </div>
   </div>
 </template>
@@ -29,6 +33,7 @@
 import RefreshIcon from '@renderer/icons/RefreshIcon.vue';
 import SearchIcon from '@renderer/icons/SearchIcon.vue';
 import FilterIcon from '@renderer/icons/FilterIcon.vue';
+import ButtonPure from './ButtonPure.vue';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useAppStore } from '@renderer/stores/appStore';
 
@@ -42,11 +47,19 @@ const scrollTop = ref(0);
 
 const appStore = useAppStore();
 
+const fetchStatus = computed(() => appStore.fetchFangameItemsStatus);
+
+const fetchItems = (forceRefetch: boolean) => {
+  if (fetchStatus.value !== 'fetching') {
+    appStore.fetchFangameItems(forceRefetch);
+  }
+};
+
 onMounted(() => {
   window.addEventListener('resize', handleWindowResize);
   handleWindowResize();
 
-  appStore.fetchFangameItems();
+  fetchItems(false);
 });
 
 onUnmounted(() => {
@@ -128,6 +141,15 @@ const isInHome = computed(() => !appStore.present.fangameItem);
   }
 }
 
+@keyframes rotating {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
 .refresh-button {
   display: flex;
   justify-content: center;
@@ -145,10 +167,14 @@ const isInHome = computed(() => !appStore.present.fangameItem);
   cursor: pointer;
   transition: all 0.1s;
 
-  &:hover {
+  &.enable:hover {
     color: white;
     background-color: #3e4047;
   }
+}
+
+.rotate {
+  animation: rotating 2s linear infinite;
 }
 
 .search-box {
@@ -278,5 +304,13 @@ const isInHome = computed(() => !appStore.present.fangameItem);
   &.select {
     background-color: #3e4e69;
   }
+}
+
+.fangame-list-error{
+  display: flex;
+  padding-top: 50%;
+  align-items: center;
+  flex-grow: 1;
+  flex-direction: column;
 }
 </style>

@@ -27,7 +27,7 @@ const hasContextMenu = computed(() => appStore.contextMenu !== undefined);
 
 const menuItems: ContextMenuItemData[][] = [
   // IWPlay
-  [{ type: 'text', text: '设置', onClick: () => {} }, { type: 'separator' }, { type: 'text', text: '退出', onClick: () => invoke('close') }],
+  [{ type: 'text', text: '设置', onClick: () => invoke('show-options') }, { type: 'separator' }, { type: 'text', text: '退出', onClick: () => invoke('close') }],
   // 帮助
   [{ type: 'text', text: 'Github', onClick: () => {} }, { type: 'separator' }, { type: 'text', text: '关于', onClick: () => {} }]
 ];

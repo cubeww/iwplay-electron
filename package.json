@@ -1,5 +1,5 @@
 {
-  "name": "iwplay-electron",
+  "name": "iwplay",
   "version": "1.0.0",
   "description": "'I Wanna Fangames' Management Software",
   "main": "./out/main/index.js",

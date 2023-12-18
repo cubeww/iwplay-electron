@@ -15,5 +15,4 @@ pinia.use(({ store }) => {
 
 const app = createApp(App);
 app.use(pinia);
-
-createApp(App).mount('#app');
+app.mount('#app');

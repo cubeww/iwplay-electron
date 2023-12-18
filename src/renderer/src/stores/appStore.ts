@@ -23,7 +23,9 @@ export interface FangameItem {
 export type ActionStatus = 'pending' | 'fetching' | 'ok' | 'error';
 
 export const useAppStore = defineStore('app', () => {
-  // ========== Backable State
+  ////////////////////
+  // Backable State //
+  ////////////////////
 
   const past = ref<BackableState[]>([]);
   const present = ref<BackableState>({
@@ -79,7 +81,9 @@ export const useAppStore = defineStore('app', () => {
     }
   };
 
-  // ========== Context Menu
+  //////////////////
+  // Context Menu //
+  //////////////////
 
   const contextMenu = ref<ContextMenuOptions>();
 
@@ -91,12 +95,15 @@ export const useAppStore = defineStore('app', () => {
     contextMenu.value = undefined;
   };
 
-  // ========== Library
+  /////////////
+  // Library //
+  /////////////
 
   const fangameItems = ref<FangameItem[]>([]);
   const fetchFangameItemsStatus = ref<ActionStatus>('pending');
+  const fetchFangameItemsError = ref('');
 
-  const fetchFangameItems = async (forceRefetch: boolean = false) => {
+  const fetchFangameItems = async (forceDownload: boolean = false) => {
     fetchFangameItemsStatus.value = 'fetching';
 
     const cachePath = join(await invoke('get-path', 'userData'), 'appcache');
@@ -109,8 +116,8 @@ export const useAppStore = defineStore('app', () => {
     let items: DelFruitFangameItem[] = [];
 
     let loadCacheOK = false;
-    
-    if (!forceRefetch) {
+
+    if (!forceDownload) {
       // Try to load cache first
       try {
         const cacheData: { fetchdate: string; list: DelFruitFangameItem[] } = JSON.parse(await invoke('read-file', cacheFile));
@@ -128,7 +135,13 @@ export const useAppStore = defineStore('app', () => {
 
     if (!loadCacheOK) {
       // Fetch fangame list from DelFruit
-      items = await delFruitUtil.fetchFangameItems();
+      try {
+        items = await delFruitUtil.fetchFangameItems();
+      } catch {
+        fetchFangameItemsStatus.value = 'error';
+        fetchFangameItemsError.value = 'Network Error';
+        return
+      }
 
       // Write to cache
       await invoke(
@@ -159,11 +172,13 @@ export const useAppStore = defineStore('app', () => {
     present.value = { tab: 'library', fangameItem: item };
   });
 
-  // ========== Popup
+  ///////////
+  // Popup //
+  ///////////
 
   const popups = ref<{ component: any; context: any }[]>([]);
 
-  const showPopup = (component: any, context: any) => {
+  const showPopup = (component: any, context?: any) => {
     popups.value.push({ component: shallowRef(component), context });
   };
 
@@ -174,7 +189,9 @@ export const useAppStore = defineStore('app', () => {
     }
   };
 
-  // ========== Misc
+  //////////
+  // Misc //
+  //////////
 
   const isMaximize = ref(false);
 
@@ -199,6 +216,7 @@ export const useAppStore = defineStore('app', () => {
     fangameItems,
     fetchFangameItems,
     fetchFangameItemsStatus,
+    fetchFangameItemsError,
     selectFangameItem
   };
 });

@@ -9,68 +9,68 @@ export interface FangameManifest {
   sizeOnDisk: number
 }
 
-function getAppsPath(location: string) {
-  return join(location, 'iwapps')
+function getAppsPath(libraryPath: string) {
+  return join(libraryPath, 'iwapps')
 }
 
-function getCommonPath(location: string) {
-  return join(location, 'iwapps', 'common')
+function getCommonPath(libraryPath: string) {
+  return join(libraryPath, 'iwapps', 'common')
 }
 
-function getGamePath(location: string, id: string) {
-  return join(location, 'iwapps', 'common', id)
+function getGamePath(libraryPath: string, id: string) {
+  return join(libraryPath, 'iwapps', 'common', id)
 }
 
-function getManifestPath(location: string, id: string) {
-  return join(location, 'iwapps', 'iwmanifest_' + id + '.json')
+function getManifestPath(libraryPath: string, id: string) {
+  return join(libraryPath, 'iwapps', 'iwmanifest_' + id + '.json')
 }
 
 export const libraryUtil = {
-  async initializeLibrary(location: string) {
-    if (await invoke('path-exists', location)) {
-      await invoke('remove-dir', location)
-      await invoke('create-dir', location)
+  async initializeLibrary(path: string) {
+    if (await invoke('path-exists', path)) {
+      await invoke('remove-dir', path)
+      await invoke('create-dir', path)
     }
-    await invoke('create-dir', getCommonPath(location))
+    await invoke('create-dir', getCommonPath(path))
   },
 
-  async checkLibrary(location: string) {
-    if (!(await invoke('path-exists', getCommonPath(location)))) {
-      await invoke('create-dir', getCommonPath(location))
+  async checkLibrary(path: string) {
+    if (!(await invoke('path-exists', getCommonPath(path)))) {
+      await invoke('create-dir', getCommonPath(path))
     }
   },
 
-  async install(location: string, id: string, file: string) {
-    await this.checkLibrary(location)
+  async install(libraryPath: string, id: string, file: string) {
+    await this.checkLibrary(libraryPath)
 
-    const gamePath = getGamePath(location, id)
+    const gamePath = getGamePath(libraryPath, id)
 
     if (await invoke('path-exists', gamePath)) {
-      await this.uninstall(location, id)
+      await this.uninstall(libraryPath, id)
     }
 
     await invoke('create-dir', gamePath)
     await invoke('exec', `"resources/7z.exe" x "${file}" -o"${gamePath}"`)
 
-    await this.createManifest(location, id)
+    await this.createManifest(libraryPath, id)
   },
 
-  async uninstall(location: string, id: string) {
-    await this.checkLibrary(location)
+  async uninstall(libraryPath: string, id: string) {
+    await this.checkLibrary(libraryPath)
 
-    if (await invoke('path-exists', getGamePath(location, id))) {
-      await invoke('remove-dir', getGamePath(location, id))
+    if (await invoke('path-exists', getGamePath(libraryPath, id))) {
+      await invoke('remove-dir', getGamePath(libraryPath, id))
     }
 
-    if (await invoke('path-exists', getManifestPath(location, id))) {
-      await invoke('remove-file', getManifestPath(location, id))
+    if (await invoke('path-exists', getManifestPath(libraryPath, id))) {
+      await invoke('remove-file', getManifestPath(libraryPath, id))
     }
   },
 
-  async getFangameIDsByManifest(location: string) {
-    await this.checkLibrary(location)
+  async getFangameIDsByManifest(libraryPath: string) {
+    await this.checkLibrary(libraryPath)
 
-    const appsPath = getAppsPath(location)
+    const appsPath = getAppsPath(libraryPath)
     const files = await invoke('read-dir', appsPath)
 
     const ids: string[] = []
@@ -87,10 +87,10 @@ export const libraryUtil = {
     return ids
   },
 
-  async getFangameIDsByGameDir(location: string) {
-    await this.checkLibrary(location)
+  async getFangameIDsByGameDir(libraryPath: string) {
+    await this.checkLibrary(libraryPath)
 
-    const commonPath = getCommonPath(location)
+    const commonPath = getCommonPath(libraryPath)
     const files = await invoke('read-dir', commonPath)
 
     const ids: string[] = []
@@ -103,15 +103,15 @@ export const libraryUtil = {
     return ids
   },
 
-  async createManifest(location: string, id: string) {
-    await this.checkLibrary(location)
+  async createManifest(libraryPath: string, id: string) {
+    await this.checkLibrary(libraryPath)
 
-    const manifestPath = getManifestPath(location, id)
+    const manifestPath = getManifestPath(libraryPath, id)
     if (await invoke('path-exists', manifestPath)) {
       await invoke('remove-dir', manifestPath)
     }
 
-    const gamePath = getGamePath(location, id)
+    const gamePath = getGamePath(libraryPath, id)
     if (!(await invoke('path-exists', gamePath))) {
       throw new Error('game not installed')
     }
@@ -141,12 +141,12 @@ export const libraryUtil = {
     return manifest
   },
 
-  async createAllManifest(location: string) {
-    await this.checkLibrary(location)
+  async createAllManifest(libraryPath: string) {
+    await this.checkLibrary(libraryPath)
 
-    const ids = await this.getFangameIDsByGameDir(location)
+    const ids = await this.getFangameIDsByGameDir(libraryPath)
     for (const id of ids) {
-      await this.createManifest(location, id)
+      await this.createManifest(libraryPath, id)
     }
   }
 }
