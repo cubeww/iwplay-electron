@@ -5,12 +5,20 @@ import icon from '../../resources/icon.png?asset';
 import log from 'electron-log/main';
 import { initMainAPI } from './api';
 
-function createWindow(): void {
-  const mainWindow = new BrowserWindow({
-    minWidth: 1000,
-    minHeight: 600,
-    width: 1000,
-    height: 600,
+export const windows: { [name: string]: BrowserWindow } = {};
+
+export function createWindow(type: string, name: string, width: number, height: number): BrowserWindow {
+  const exists = windows[name];
+  if (exists) {
+    exists.show();
+    return exists;
+  }
+
+  const window = new BrowserWindow({
+    minWidth: width,
+    minHeight: height,
+    width: width,
+    height: height,
     show: false,
     frame: false,
     autoHideMenuBar: true,
@@ -24,39 +32,36 @@ function createWindow(): void {
     }
   });
 
-  mainWindow.on('ready-to-show', () => {
-    mainWindow.show();
+  window.on('ready-to-show', () => {
+    window.show();
   });
 
-  mainWindow.on('maximize', () => {
-    mainWindow.webContents.send('maximize', true);
+  window.on('maximize', () => {
+    window.webContents.send('maximize', true);
   });
 
-  mainWindow.on('unmaximize', () => {
-    mainWindow.webContents.send('maximize', false);
+  window.on('unmaximize', () => {
+    window.webContents.send('maximize', false);
   });
 
-  mainWindow.webContents.setWindowOpenHandler((details) => {
+  window.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url);
     return { action: 'deny' };
   });
 
-  mainWindow.webContents.openDevTools();
-
+  const queryString = `?type=${type}&name=${name}`;
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL']);
+    window.loadURL(process.env['ELECTRON_RENDERER_URL'] + queryString);
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'));
+    window.loadFile(join(__dirname, '../renderer/index.html' + queryString));
   }
 
-  initMainAPI(mainWindow);
+  windows[name] = window;
+  return window;
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron');
@@ -77,25 +82,17 @@ app.whenReady().then(() => {
   });
 
   process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
-  
+
   log.initialize({ preload: true });
-  createWindow();
 
-  app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
-  });
+  // Create the main window.
+  const mainWindow = createWindow('main', 'main', 1000, 600);
+  mainWindow.webContents.openDevTools();
+
+  // Register IPC handlers
+  initMainAPI();
 });
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+  app.quit();
 });
-
-// In this file you can include the rest of your app"s specific main process
-// code. You can also put them in separate files and require them here.

@@ -44,7 +44,7 @@ const filesize = ref(0);
 const installStatus = ref<'pending' | 'installing' | 'error'>('pending');
 
 const handleSelectZip = async () => {
-  const f = await invoke('open-file-dialog', {
+  const f = await invoke('open-file-dialog', 'main', {
     title: '选择游戏压缩包',
     filters: [
       { name: 'Compress Files', extensions: ['zip', 'rar', '7z'] },

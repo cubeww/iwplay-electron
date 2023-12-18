@@ -2,8 +2,7 @@ import { execSync } from 'child_process';
 import { BrowserWindow, app, dialog, ipcMain } from 'electron';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, unlinkSync, writeFileSync } from 'fs';
 import { join } from 'path';
-
-let mainWindow: BrowserWindow = undefined!;
+import { createWindow, windows } from '.';
 
 function getFiles(dir: string, dir2: string, files: string[] = []) {
   const fileList = readdirSync(dir);
@@ -39,9 +38,7 @@ function dirSize(dir: string) {
   return paths.flat(Infinity).reduce((i: any, size: any) => i + size, 0);
 }
 
-export function initMainAPI(_mainWindow: BrowserWindow) {
-  mainWindow = _mainWindow;
-
+export function initMainAPI() {
   /////////////////
   // File System //
   /////////////////
@@ -86,8 +83,9 @@ export function initMainAPI(_mainWindow: BrowserWindow) {
     return statSync(file).size;
   });
 
-  ipcMain.handle('open-file-dialog', (_event, options) => {
-    return dialog.showOpenDialogSync(mainWindow, options);
+  ipcMain.handle('open-file-dialog', (_event, name, options) => {
+    const window = windows[name];
+    return dialog.showOpenDialogSync(window, options);
   });
 
   ipcMain.handle('get-path', (_event, name) => {
@@ -98,25 +96,32 @@ export function initMainAPI(_mainWindow: BrowserWindow) {
   // Window //
   ////////////
 
-  ipcMain.handle('maximize', (_event) => {
-    if (mainWindow.isMaximized()) {
-      mainWindow.unmaximize();
+  ipcMain.handle('maximize', (_event, name) => {
+    const window = windows[name];
+    if (window.isMaximized()) {
+      window.unmaximize();
     } else {
-      mainWindow.maximize();
+      window.maximize();
     }
   });
 
-  ipcMain.handle('minimize', (_event) => {
-    mainWindow.minimize();
+  ipcMain.handle('minimize', (_event, name) => {
+    const window = windows[name];
+    window.minimize();
   });
 
-  ipcMain.handle('close', (_event) => {
-    mainWindow.close();
+  ipcMain.handle('close', (_event, name) => {
+    const window = windows[name];
+    delete windows[name];
+    window.close();
   });
 
-  ipcMain.handle('show-options', (_event) => {
-    // const optionsWindow = new BrowserWindow({ width: 800, height: 600 });
-    // optionsWindow.loadFile(join(__dirname, '../renderer/index-options.html'))
+  ipcMain.handle('quit', (_event) => {
+    Object.values(windows).forEach((window) => window.close());
+  });
+
+  ipcMain.handle('create-window', (_event, type, name, width, height) => {
+    createWindow(type, name, width, height);
   });
 
   /////////////

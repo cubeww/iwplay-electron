@@ -3,22 +3,22 @@
     <AppMenuBarItem :items="menuItems[0]">IWPlay</AppMenuBarItem>
     <AppMenuBarItem :items="menuItems[1]">帮助</AppMenuBarItem>
     <div class="control-buttons">
-      <WindowMinimizeIcon class="control-button minimize" @click="invoke('minimize')" />
-      <WindowMaximizeIcon class="control-button maximize" @click="invoke('maximize')" v-if="!appStore.isMaximize" />
-      <WindowRestoreIcon class="control-button maximize" @click="invoke('maximize')" v-else />
-      <WindowCloseIcon class="control-button close" @click="invoke('close')" />
+      <WindowMinimizeIcon class="control-button minimize" @click="invoke('minimize', 'main')" />
+      <WindowMaximizeIcon class="control-button maximize" @click="invoke('maximize', 'main')" v-if="!appStore.isMaximize" />
+      <WindowRestoreIcon class="control-button maximize" @click="invoke('maximize', 'main')" v-else />
+      <WindowCloseIcon class="control-button close" @click="invoke('quit')" />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
+import AppMenuBarItem from '@renderer/components/AppMenuBarItem.vue';
 import WindowCloseIcon from '@renderer/icons/WindowCloseIcon.vue';
 import WindowMaximizeIcon from '@renderer/icons/WindowMaximizeIcon.vue';
 import WindowMinimizeIcon from '@renderer/icons/WindowMinimizeIcon.vue';
-import AppMenuBarItem from '@renderer/components/AppMenuBarItem.vue';
+import WindowRestoreIcon from '@renderer/icons/WindowRestoreIcon.vue';
 import { useAppStore } from '@renderer/stores/appStore';
 import { computed } from 'vue';
-import WindowRestoreIcon from '@renderer/icons/WindowRestoreIcon.vue';
 import { invoke } from '@renderer/utils/invoke';
 import { ContextMenuItemData } from './ContextMenu.vue';
 
@@ -27,7 +27,7 @@ const hasContextMenu = computed(() => appStore.contextMenu !== undefined);
 
 const menuItems: ContextMenuItemData[][] = [
   // IWPlay
-  [{ type: 'text', text: '设置', onClick: () => invoke('show-options') }, { type: 'separator' }, { type: 'text', text: '退出', onClick: () => invoke('close') }],
+  [{ type: 'text', text: '设置', onClick: () => invoke('create-window', 'settings', 'settings', 800, 600) }, { type: 'separator' }, { type: 'text', text: '退出', onClick: () => invoke('quit') }],
   // 帮助
   [{ type: 'text', text: 'Github', onClick: () => {} }, { type: 'separator' }, { type: 'text', text: '关于', onClick: () => {} }]
 ];
