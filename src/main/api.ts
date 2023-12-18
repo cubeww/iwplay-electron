@@ -1,6 +1,7 @@
 import { execSync } from 'child_process';
 import { BrowserWindow, app, dialog, ipcMain } from 'electron';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, unlinkSync, writeFileSync } from 'fs';
+import { is } from '@electron-toolkit/utils';
 import { join } from 'path';
 
 let mainWindow: BrowserWindow = undefined!;
@@ -115,8 +116,12 @@ export function initMainAPI(_mainWindow: BrowserWindow) {
   });
 
   ipcMain.handle('show-options', (_event) => {
-    // const optionsWindow = new BrowserWindow({ width: 800, height: 600 });
-    // optionsWindow.loadFile(join(__dirname, '../renderer/index-options.html'))
+    const optionsWindow = new BrowserWindow({ width: 800, height: 600 });
+    if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+      optionsWindow.loadURL(join(process.env['ELECTRON_RENDERER_URL'], 'src/child/options/index.html'));
+    } else {
+      optionsWindow.loadFile(join(__dirname, '../renderer/src/child/options/index.html'));
+    }
   });
 
   /////////////
