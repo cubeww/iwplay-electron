@@ -25,7 +25,7 @@ function getManifestPath(libraryPath: string, id: string) {
   return join(libraryPath, 'iwapps', 'iwmanifest_' + id + '.json')
 }
 
-export const libraryUtil = {
+export const library = {
   async initializeLibrary(path: string) {
     if (await invoke('path-exists', path)) {
       await invoke('remove-dir', path)

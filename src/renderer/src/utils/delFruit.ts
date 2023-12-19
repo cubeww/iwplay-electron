@@ -12,7 +12,7 @@ export interface DelFruitFangameDetail {
   difficulty: string
 }
 
-export const delFruitUtil = {
+export const delFruit = {
   async fetchFangameItems() {
     const res = await fetch('https://delicious-fruit.com/ratings/full.php?q=ALL')
     const html = await res.text()

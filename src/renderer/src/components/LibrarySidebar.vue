@@ -48,12 +48,7 @@ const scrollTop = ref(0);
 const appStore = useAppStore();
 
 const fetchStatus = computed(() => appStore.fetchFangameItemsStatus);
-
-const fetchItems = (forceRefetch: boolean) => {
-  if (fetchStatus.value !== 'fetching') {
-    appStore.fetchFangameItems(forceRefetch);
-  }
-};
+const fetchItems = appStore.fetchFangameItems
 
 onMounted(() => {
   window.addEventListener('resize', handleWindowResize);

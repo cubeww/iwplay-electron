@@ -1,9 +1,10 @@
 import { ContextMenuOptions } from '@renderer/components/ContextMenu.vue';
 import { invoke } from '@renderer/utils/invoke';
-import { DelFruitFangameItem, delFruitUtil } from '@renderer/utils/delFruitUtil';
+import { DelFruitFangameItem, delFruit } from '@renderer/utils/delFruit';
 import { join } from 'path-browserify';
 import { defineStore } from 'pinia';
 import { ref, shallowRef } from 'vue';
+import { useFetch } from '@renderer/hooks/useFetch';
 
 export type TabName = 'browser' | 'library' | 'user';
 
@@ -19,8 +20,6 @@ export interface FangameItem {
   isRunning: boolean;
   isInstalled: boolean;
 }
-
-export type ActionStatus = 'pending' | 'fetching' | 'ok' | 'error';
 
 export const useAppStore = defineStore('app', () => {
   ////////////////////
@@ -99,19 +98,8 @@ export const useAppStore = defineStore('app', () => {
   // Library //
   /////////////
 
-  const fangameItems = ref<FangameItem[]>([]);
-  const fetchFangameItemsStatus = ref<ActionStatus>('pending');
-  const fetchFangameItemsError = ref('');
-
-  const fetchFangameItems = async (forceDownload: boolean = false) => {
-    fetchFangameItemsStatus.value = 'fetching';
-
-    const cachePath = join(await invoke('get-path', 'userData'), 'appcache');
-    if (!(await invoke('path-exists', cachePath))) {
-      await invoke('create-dir', cachePath);
-    }
-
-    const cacheFile = join(cachePath, 'delfruit-fangamelist.json');
+  const [fetchFangameItems, fangameItems, fetchFangameItemsStatus, fetchFangameItemsError] = useFetch([], async (forceDownload: boolean = false) => {
+    const cacheFile = join(await invoke('get-path', 'userData'), 'appcache', 'delfruit-fangamelist.json');
 
     let items: DelFruitFangameItem[] = [];
 
@@ -136,11 +124,9 @@ export const useAppStore = defineStore('app', () => {
     if (!loadCacheOK) {
       // Fetch fangame list from DelFruit
       try {
-        items = await delFruitUtil.fetchFangameItems();
+        items = await delFruit.fetchFangameItems();
       } catch {
-        fetchFangameItemsStatus.value = 'error';
-        fetchFangameItemsError.value = 'Network Error';
-        return
+        throw new Error('Network Error');
       }
 
       // Write to cache
@@ -163,10 +149,8 @@ export const useAppStore = defineStore('app', () => {
 
     // TODO: Get running fangames
 
-    // Update store items
-    fetchFangameItemsStatus.value = 'ok';
-    fangameItems.value = items as FangameItem[];
-  };
+    return items as FangameItem[];
+  });
 
   const selectFangameItem = backable((item?: FangameItem) => {
     present.value = { tab: 'library', fangameItem: item };

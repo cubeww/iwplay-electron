@@ -1,7 +1,7 @@
 import { execSync } from 'child_process';
-import { BrowserWindow, app, dialog, ipcMain } from 'electron';
+import { app, dialog, ipcMain } from 'electron';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, unlinkSync, writeFileSync } from 'fs';
-import { join } from 'path';
+import { dirname, join } from 'path';
 import { createWindow, windows } from '.';
 
 function getFiles(dir: string, dir2: string, files: string[] = []) {
@@ -48,6 +48,7 @@ export function initMainAPI() {
   });
 
   ipcMain.handle('write-file', (_event, file, text) => {
+    mkdirSync(dirname(file), { recursive: true });
     writeFileSync(file, text);
   });
 
