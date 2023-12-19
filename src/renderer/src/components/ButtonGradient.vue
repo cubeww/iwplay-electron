@@ -1,5 +1,5 @@
 <template>
-  <ButtonBase class="button-gradient" :enabled="enabled" :onClick="onClick">
+  <ButtonBase class="button-gradient" :enabled="enabled" @click="emit('click')">
     <slot />
   </ButtonBase>
 </template>
@@ -9,18 +9,18 @@ import ButtonBase from './ButtonBase.vue';
 
 withDefaults(
   defineProps<{
-    onClick?: () => void;
     enabled?: boolean;
     color1?: string;
     color2?: string;
   }>(),
   {
-    onClick: undefined,
     enabled: true,
     color1: '#3a9bed',
     color2: '#235dcf'
   }
 );
+
+const emit = defineEmits<{ click: [] }>();
 </script>
 
 <style scoped>

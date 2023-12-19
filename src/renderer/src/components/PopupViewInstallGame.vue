@@ -4,7 +4,7 @@
     <PopupSeparator />
     <div>{{ context.name }} (ID: {{ context.id }})</div>
     <PopupSeparator />
-    <ButtonGradient style="width: 120px" :onClick="handleSelectZip" color1="#4ade80" color2="#16a34a">选择压缩包</ButtonGradient>
+    <ButtonGradient style="width: 120px" @click="handleSelectZip" color1="#4ade80" color2="#16a34a">选择压缩包</ButtonGradient>
     <template v-if="filename">
       <div><b>文件名：</b>{{ filename }}</div>
       <div><b>文件大小：</b>{{ filesizeStr }}</div>
@@ -15,8 +15,8 @@
     <PopupSeparator />
     <div v-if="installStatus === 'installing'" style="display: flex"><LoadingIcon :size="32" />安装中...</div>
     <div class="bottom">
-      <ButtonGradient class="bottom-button" :enabled="filename !== '' && installStatus !== 'installing'" :onClick="handleInstall">安装</ButtonGradient>
-      <ButtonPure class="bottom-button" :onClick="close">取消</ButtonPure>
+      <ButtonGradient class="bottom-button" :enabled="filename !== '' && installStatus !== 'installing'" @click="handleInstall">安装</ButtonGradient>
+      <ButtonPure class="bottom-button" @click="close">取消</ButtonPure>
     </div>
   </PopupView>
 </template>

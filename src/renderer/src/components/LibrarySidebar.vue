@@ -24,7 +24,7 @@
     </div>
     <div class="fangame-list-error" v-show="fetchStatus === 'error'">
       {{ appStore.fetchFangameItemsError }}
-      <ButtonPure :onClick="() => fetchItems(true)">重试</ButtonPure>
+      <ButtonPure @click="fetchItems(true)">重试</ButtonPure>
     </div>
   </div>
 </template>

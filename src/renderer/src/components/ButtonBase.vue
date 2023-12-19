@@ -7,18 +7,18 @@
 <script lang="ts" setup>
 const props = withDefaults(
   defineProps<{
-    onClick?: () => void;
     enabled?: boolean;
   }>(),
   {
-    onClick: undefined,
     enabled: true
   }
 );
 
+const emit = defineEmits<{ click: [] }>();
+
 const handleClick = () => {
-  if (props.enabled && props.onClick) {
-    props.onClick();
+  if (props.enabled) {
+    emit('click');
   }
 };
 </script>

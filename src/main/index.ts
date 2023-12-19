@@ -58,6 +58,8 @@ export function createWindow(type: string, name: string, width: number, height: 
     window.loadFile(join(__dirname, '../renderer/index.html' + queryString));
   }
 
+  window.webContents.openDevTools();
+
   windows[name] = window;
   return window;
 }
@@ -87,7 +89,7 @@ app.whenReady().then(() => {
 
   // Create the main window.
   const mainWindow = createWindow('main', 'main', 1000, 600);
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 
   // Register IPC handlers
   initMainAPI();

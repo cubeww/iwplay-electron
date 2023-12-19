@@ -132,4 +132,16 @@ export function initMainAPI() {
   ipcMain.handle('exec', (_event, command, options) => {
     return execSync(command, options);
   });
+
+  ////////////
+  // Config //
+  ////////////
+
+  ipcMain.handle('main-sync-config', (event, data) => {
+    for (const window of Object.values(windows)) {
+      if (window.webContents !== event.sender) {
+        window.webContents.send('renderer-sync-config', data);
+      }
+    }
+  });
 }
