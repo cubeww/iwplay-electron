@@ -21,7 +21,7 @@ export interface FangameItem {
   isInstalled: boolean;
 }
 
-export const useAppStore = defineStore('app', () => {
+export const useAppStore = defineStore('AppStore', () => {
   ////////////////////
   // Backable State //
   ////////////////////

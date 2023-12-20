@@ -29,4 +29,5 @@ export default {
   "Library": "库",
   "Delicious Fruit": "美味水果",
   "I wanna Wiki": "I wanna 维基",
+  " hours": "小时",
 };

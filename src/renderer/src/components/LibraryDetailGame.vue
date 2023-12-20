@@ -8,11 +8,13 @@
         <ButtonGradient class="install-button"> <InstallGameIcon />{{ $t('INSTALL') }}</ButtonGradient>
         <div class="profile-col">
           <div class="label">{{ $t('LAST PLAYED') }}</div>
-          <div class="content">2023年10月28日</div>
+          <div class="content">
+            {{ $d(new Date(), 'short') }}
+          </div>
         </div>
         <div class="profile-col">
           <div class="label">{{ $t('PLAY TIME') }}</div>
-          <div class="content">10.1小时</div>
+          <div class="content">{{ '10.1' + $t(' hours') }}</div>
         </div>
         <div class="toolbox">
           <SettingsIcon class="button" />

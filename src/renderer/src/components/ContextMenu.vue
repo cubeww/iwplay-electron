@@ -52,26 +52,19 @@ onUnmounted(() => {
 });
 
 const handleWindowClick = (e: MouseEvent) => {
-  // 点击菜单外面时 隐藏菜单
+  // When clicking outside the context menu, hide the menu.
   const el = e.target as HTMLDivElement;
-
   if (props.options.triggerEl.contains(el)) return;
-
   if (contextMenuEl.value.contains(el)) return;
-
   props.hide();
 };
 
 const handleWindowMouseMove = (e: MouseEvent) => {
-  // （可选）移出菜单时 隐藏菜单
+  // (Optional) Hide the menu when the mouse is moved out of it.
   if (!props.options.outsideAutoClose) return;
-
   const el = e.target as HTMLDivElement;
-
   if (props.options.triggerEl.contains(el)) return;
-
   if (contextMenuEl.value.contains(el)) return;
-
   props.hide();
 };
 </script>

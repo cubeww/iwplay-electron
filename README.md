@@ -1,10 +1,10 @@
-# iwplay-electron
+# IWPLAY
 
-(WIP) Experimental "I Wanna Fangames" Management Software
+Experimental "I Wanna Fangames" Management Software
 
 ## Development
 
-vscode + nodejs + electron-vite + vue3 + pinia
+vscode + typescript + electron-vite + vue3 + pinia
 
 ## Build
 

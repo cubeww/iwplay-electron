@@ -14,7 +14,7 @@
       <template v-if="index === 0">
         <div class="row">
           <div class="title">{{ $t('IWPlay Language') }}</div>
-          <ComboBox :list="languages" :value="appConfig.language" @update="(value) => setConfig('language', value as any)" />
+          <ComboBox :list="languages" :value="configStore.cfg.language" @update="(value) => configStore.set('language', value as any)" />
         </div>
       </template>
     </div>
@@ -41,7 +41,9 @@ import ComputerIcon from '@renderer/icons/ComputerIcon.vue';
 
 import { invoke } from '@renderer/utils/invoke';
 import { onMounted, ref } from 'vue';
-import { appConfig, setConfig } from '@renderer/utils/appConfig';
+import { useConfigStore } from '@renderer/stores/configStore';
+
+const configStore = useConfigStore()
 
 const isMaximize = ref(false);
 
