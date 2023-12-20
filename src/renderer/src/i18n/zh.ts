@@ -27,4 +27,6 @@ export default {
   "Select Game ZIP": "选择游戏压缩包",
   "Interface": "界面",
   "Library": "库",
+  "Delicious Fruit": "美味水果",
+  "I wanna Wiki": "I wanna 维基",
 };

@@ -21,17 +21,7 @@ const typeToComponentMap = {
   settings: AppSettings
 };
 
-await initConfig()
-
-const pinia = createPinia();
-
-pinia.use(({ store }) => {
-  store.$onAction((e) => {
-    log.info('%cStore: ' + e.name, 'color: #51ad59');
-  });
-});
-
-const i18n = createI18n({
+export const mainI18n = createI18n({
   legacy: false,
   locale: 'en',
   formatFallbackMessages: true,
@@ -42,7 +32,19 @@ const i18n = createI18n({
   }
 })
 
+await initConfig()
+
+const pinia = createPinia();
+
+pinia.use(({ store }) => {
+  store.$onAction((e) => {
+    log.info('%cStore: ' + e.name, 'color: #51ad59');
+  });
+});
+
+
 const app = createApp(typeToComponentMap[windowType]);
 app.use(pinia);
-app.use(i18n)
+app.use(mainI18n)
+
 app.mount('#app');

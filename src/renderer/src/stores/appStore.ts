@@ -44,16 +44,16 @@ export const useAppStore = defineStore('app', () => {
   };
 
   const toggleTab = backable((tab: TabName) => {
-    present.value = { tab };
+    present.value = { ...present.value, tab };
   });
 
   const toggleBrowserAndLoadURL = backable((url: string) => {
-    present.value = { tab: 'browser', targetBrowserURL: url };
+    present.value = { ...present.value, tab: 'browser', targetBrowserURL: url };
     shouldLoadURL.value = true;
   });
 
   const recordBrowserURL = backable((url: string) => {
-    present.value = { tab: 'browser', targetBrowserURL: url };
+    present.value = { ...present.value, tab: 'browser', targetBrowserURL: url };
   });
 
   const setShouldLoadURL = (value: boolean) => {

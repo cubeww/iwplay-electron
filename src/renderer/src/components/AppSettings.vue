@@ -5,12 +5,12 @@
       <div class="sidebar-content">
         <div class="sidebar-item" :class="{ selected: i === index }" @click="index = i" v-for="(item, i) in sidebarItems">
           <Component :is="item.icon" class="icon" />
-          <div>{{ item.title }}</div>
+          <div>{{ $t(item.title) }}</div>
         </div>
       </div>
     </div>
     <div class="detail">
-      <div class="detail-title">{{ sidebarItems[index].title }}</div>
+      <div class="detail-title">{{ $t(sidebarItems[index].title) }}</div>
       <template v-if="index === 0">
         <div class="row">
           <div class="title">{{ $t('IWPlay Language') }}</div>
@@ -42,11 +42,8 @@ import ComputerIcon from '@renderer/icons/ComputerIcon.vue';
 import { invoke } from '@renderer/utils/invoke';
 import { onMounted, ref } from 'vue';
 import { appConfig, setConfig } from '@renderer/utils/appConfig';
-import { useI18n } from 'vue-i18n';
 
 const isMaximize = ref(false);
-
-const i18n = useI18n();
 
 onMounted(async () => {
   window.electron.ipcRenderer.on('maximize', (_evt, value) => {
@@ -55,11 +52,11 @@ onMounted(async () => {
 });
 
 const sidebarItems = [
-  { icon: ComputerIcon, title: i18n.t('Interface') },
-  { icon: LibraryIcon, title: i18n.t('Library') }
+  { icon: ComputerIcon, title: 'Interface' },
+  { icon: LibraryIcon, title: 'Library' }
 ];
 
-const languages = ['English', '简体中文'];
+const languages = ['en', 'zh'];
 
 const index = ref(0);
 </script>

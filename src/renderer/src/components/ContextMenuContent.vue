@@ -1,10 +1,10 @@
 <template>
   <div class="context-menu-content" :style="{ left: x + 'px', top: y + 'px' }">
     <template v-for="item in items">
-      <div class="item-text" v-if="item.type === 'text'" @mouseenter="handleEnterOthers" @click="handleClickText(item.onClick)">{{ item.text }}</div>
+      <div class="item-text" v-if="item.type === 'text'" @mouseenter="handleEnterOthers" @click="handleClickText(item.onClick)">{{ $t(item.text) }}</div>
       <hr class="item-separator" v-if="item.type === 'separator'" @mouseenter="handleEnterOthers" />
       <div class="item-submenu" v-if="item.type === 'submenu'" @mouseenter="handleEnterSubMenu">
-        {{ item.text }}
+        {{ $t(item.text) }}
         <MenuRightIcon class="item-submenu-right" />
         <ContextMenuContent :x="subMenuX" :y="subMenuY" :items="item.submenu" :hide="hide" v-if="enterSubMenu" />
       </div>

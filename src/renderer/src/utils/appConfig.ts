@@ -1,8 +1,10 @@
 import { join } from 'path-browserify';
 import { ref, toRaw } from 'vue';
 import { invoke } from './invoke';
+import { watch } from 'vue';
+import { mainI18n } from '@renderer/main';
 
-type Language = 'english' | '简体中文';
+type Language = 'en' | 'zh';
 
 interface AppConfig {
   libraryPaths: string[];
@@ -11,7 +13,7 @@ interface AppConfig {
 
 export const appConfig = ref<AppConfig>({
   libraryPaths: [],
-  language: '简体中文'
+  language: 'en'
 });
 
 const configFile = join(await invoke('get-path', 'userData'), 'iwplay-config.json');
@@ -35,3 +37,8 @@ export function setConfig<K extends keyof AppConfig>(key: K, value: AppConfig[K]
   invoke('write-file', configFile, JSON.stringify(appConfig.value, undefined, 4));
   invoke('main-sync-config', toRaw(appConfig.value));
 }
+
+watch(
+  () => appConfig.value.language,
+  (newLang) => (mainI18n.global.locale.value = newLang)
+);

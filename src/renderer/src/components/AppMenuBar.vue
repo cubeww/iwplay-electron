@@ -21,18 +21,14 @@ import { useAppStore } from '@renderer/stores/appStore';
 import { computed } from 'vue';
 import { invoke } from '@renderer/utils/invoke';
 import { ContextMenuItemData } from './ContextMenu.vue';
-import { useI18n } from 'vue-i18n';
-
 const appStore = useAppStore();
 const hasContextMenu = computed(() => appStore.contextMenu !== undefined);
 
-const i18n = useI18n()
-
 const menuItems: ContextMenuItemData[][] = [
   // IWPlay
-  [{ type: 'text', text: i18n.t('Settings'), onClick: () => invoke('create-window', 'settings', 'settings', 800, 600) }, { type: 'separator' }, { type: 'text', text: i18n.t('Quit'), onClick: () => invoke('quit') }],
+  [{ type: 'text', text: 'Settings', onClick: () => invoke('create-window', 'settings', 'settings', 800, 600) }, { type: 'separator' }, { type: 'text', text: 'Quit', onClick: () => invoke('quit') }],
   // 帮助
-  [{ type: 'text', text: 'Github', onClick: () => {} }, { type: 'separator' }, { type: 'text', text: i18n.t('About'), onClick: () => {} }]
+  [{ type: 'text', text: 'Github', onClick: () => {} }, { type: 'separator' }, { type: 'text', text: 'About', onClick: () => {} }]
 ];
 </script>
 
