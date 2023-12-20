@@ -34,6 +34,8 @@ pinia.use(({ store }) => {
 const i18n = createI18n({
   legacy: false,
   locale: 'en',
+  formatFallbackMessages: true,
+  missingWarn: false,
   messages: {
     zh,
     en,
