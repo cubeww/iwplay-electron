@@ -25,7 +25,8 @@
     "electron-log": "^5.0.0",
     "nanoid": "^5.0.2",
     "path-browserify": "^1.0.1",
-    "pinia": "^2.1.7"
+    "pinia": "^2.1.7",
+    "vue-i18n": "^9.8.0"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config": "^1.0.1",

@@ -1,7 +1,7 @@
 <template>
   <div class="title-bar" :class="{ 'can-drag': !hasContextMenu }">
     <AppMenuBarItem :items="menuItems[0]">IWPlay</AppMenuBarItem>
-    <AppMenuBarItem :items="menuItems[1]">帮助</AppMenuBarItem>
+    <AppMenuBarItem :items="menuItems[1]">{{ $t('Help') }}</AppMenuBarItem>
     <div class="control-buttons">
       <WindowMinimizeIcon class="control-button minimize" @click="invoke('minimize', 'main')" />
       <WindowMaximizeIcon class="control-button maximize" @click="invoke('maximize', 'main')" v-if="!appStore.isMaximize" />
@@ -21,15 +21,18 @@ import { useAppStore } from '@renderer/stores/appStore';
 import { computed } from 'vue';
 import { invoke } from '@renderer/utils/invoke';
 import { ContextMenuItemData } from './ContextMenu.vue';
+import { useI18n } from 'vue-i18n';
 
 const appStore = useAppStore();
 const hasContextMenu = computed(() => appStore.contextMenu !== undefined);
 
+const i18n = useI18n()
+
 const menuItems: ContextMenuItemData[][] = [
   // IWPlay
-  [{ type: 'text', text: '设置', onClick: () => invoke('create-window', 'settings', 'settings', 800, 600) }, { type: 'separator' }, { type: 'text', text: '退出', onClick: () => invoke('quit') }],
+  [{ type: 'text', text: i18n.t('Settings'), onClick: () => invoke('create-window', 'settings', 'settings', 800, 600) }, { type: 'separator' }, { type: 'text', text: i18n.t('Quit'), onClick: () => invoke('quit') }],
   // 帮助
-  [{ type: 'text', text: 'Github', onClick: () => {} }, { type: 'separator' }, { type: 'text', text: '关于', onClick: () => {} }]
+  [{ type: 'text', text: 'Github', onClick: () => {} }, { type: 'separator' }, { type: 'text', text: i18n.t('About'), onClick: () => {} }]
 ];
 </script>
 

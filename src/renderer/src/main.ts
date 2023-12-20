@@ -8,6 +8,10 @@ import log from 'electron-log/renderer';
 import App from './App.vue';
 import AppSettings from './components/AppSettings.vue';
 import { initConfig } from './utils/appConfig';
+import { createI18n } from 'vue-i18n';
+
+import zh from './i18n/zh'
+import en from './i18n/en'
 
 const searchParams = new URLSearchParams(window.location.search);
 const windowType = searchParams.get('type') as string;
@@ -27,6 +31,16 @@ pinia.use(({ store }) => {
   });
 });
 
+const i18n = createI18n({
+  legacy: false,
+  locale: 'en',
+  messages: {
+    zh,
+    en,
+  }
+})
+
 const app = createApp(typeToComponentMap[windowType]);
 app.use(pinia);
+app.use(i18n)
 app.mount('#app');

@@ -5,13 +5,13 @@
     </div>
     <div class="panel">
       <div class="panel-header-row">
-        <ButtonGradient class="install-button"> <InstallGameIcon />安装 </ButtonGradient>
+        <ButtonGradient class="install-button"> <InstallGameIcon />{{ $t('INSTALL') }}</ButtonGradient>
         <div class="profile-col">
-          <div class="label">最后启动日期</div>
+          <div class="label">{{ $t('LAST PLAYED') }}</div>
           <div class="content">2023年10月28日</div>
         </div>
         <div class="profile-col">
-          <div class="label">运行时间</div>
+          <div class="label">{{ $t('PLAY TIME') }}</div>
           <div class="content">10.1小时</div>
         </div>
         <div class="toolbox">
@@ -19,9 +19,9 @@
         </div>
       </div>
       <div class="panel-link-row">
-        <div class="link-button" @click="handleToDelFruit">DelFruit</div>
-        <div class="link-button">下载页</div>
-        <div class="link-button">游戏目录</div>
+        <div class="link-button" @click="handleToDelFruit">{{ $t('DelFruit Page') }}</div>
+        <div class="link-button">{{ $t('Download Page') }}</div>
+        <div class="link-button">{{ $t('Game Directory') }}</div>
       </div>
     </div>
   </div>

@@ -1,22 +1,31 @@
 <template>
   <PopupView :close="close">
-    <PopupTitle>安装</PopupTitle>
+    <PopupTitle>{{ $t('Install') }}</PopupTitle>
     <PopupSeparator />
     <div>{{ context.name }} (ID: {{ context.id }})</div>
     <PopupSeparator />
-    <ButtonGradient style="width: 120px" @click="handleSelectZip" color1="#4ade80" color2="#16a34a">选择压缩包</ButtonGradient>
+    <ButtonGradient style="width: 120px" @click="handleSelectZip" color1="#4ade80" color2="#16a34a">{{ $t('Select ZIP') }}</ButtonGradient>
     <template v-if="filename">
-      <div><b>文件名：</b>{{ filename }}</div>
-      <div><b>文件大小：</b>{{ filesizeStr }}</div>
+      <div>
+        <b>
+          {{ $t('File Name: ') }} </b
+        >{{ filename }}
+      </div>
+      <div>
+        <b>
+          {{ $t('File Size: ') }}
+        </b>
+        {{ filesizeStr }}
+      </div>
     </template>
     <template v-else>
-      <div><b>未选择游戏压缩包文件</b></div>
+      <div><b>{{ $t('No ZIP Selected') }}</b></div>
     </template>
     <PopupSeparator />
-    <div v-if="installStatus === 'installing'" style="display: flex"><LoadingIcon :size="32" />安装中...</div>
+    <div v-if="installStatus === 'installing'" style="display: flex"><LoadingIcon :size="32" />{{ $t("Installing") }}</div>
     <div class="bottom">
-      <ButtonGradient class="bottom-button" :enabled="filename !== '' && installStatus !== 'installing'" @click="handleInstall">安装</ButtonGradient>
-      <ButtonPure class="bottom-button" @click="close">取消</ButtonPure>
+      <ButtonGradient class="bottom-button" :enabled="filename !== '' && installStatus !== 'installing'" @click="handleInstall">{{ $t('Install') }}</ButtonGradient>
+      <ButtonPure class="bottom-button" @click="close">{{ $t('Cancel') }}</ButtonPure>
     </div>
   </PopupView>
 </template>
@@ -30,6 +39,7 @@ import ButtonPure from './ButtonPure.vue';
 import LoadingIcon from '@renderer/icons/LoadingIcon.vue';
 import { invoke } from '@renderer/utils/invoke';
 import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 export interface InstallPopupContext {
   id: string;
@@ -41,11 +51,13 @@ defineProps<{ close: () => void; context: InstallPopupContext }>();
 const filename = ref('');
 const filesize = ref(0);
 
+const i18n = useI18n()
+
 const installStatus = ref<'pending' | 'installing' | 'error'>('pending');
 
 const handleSelectZip = async () => {
   const f = await invoke('open-file-dialog', 'main', {
-    title: '选择游戏压缩包',
+    title: i18n.t('Select Game ZIP'),
     filters: [
       { name: 'Compress Files', extensions: ['zip', 'rar', '7z'] },
       { name: 'All Files', extensions: ['*'] }

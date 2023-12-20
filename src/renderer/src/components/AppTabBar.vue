@@ -2,8 +2,8 @@
   <div class="tab-bar">
     <BrowserBackIcon class="browser-button" :class="{ enable: canBack }" @click="handleBack()" />
     <BrowserForwardIcon class="browser-button" :class="{ enable: canForward }" @click="handleForward()" />
-    <AppTabBarItem to="browser" :items="menuItems[0]">DelFruit</AppTabBarItem>
-    <AppTabBarItem to="library">库</AppTabBarItem>
+    <AppTabBarItem to="browser" :items="menuItems[0]">{{ $t('DELFRUIT') }}</AppTabBarItem>
+    <AppTabBarItem to="library">{{ $t('LIBRARY') }}</AppTabBarItem>
     <!-- <AppTabBarItem to="user">Cube</AppTabBarItem> -->
   </div>
 </template>

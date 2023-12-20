@@ -2,7 +2,7 @@
   <div class="footer">
     <div class="footer-button" @click="handleAddGame">
       <AddGameIcon class="footer-button-image" />
-      添加游戏
+      {{ $t('Add a Game') }}
     </div>
   </div>
 </template>

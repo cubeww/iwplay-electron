@@ -1,7 +1,7 @@
 <template>
   <div class="settings">
     <div class="sidebar">
-      <div class="sidebar-title">IWPLAY 设置</div>
+      <div class="sidebar-title">{{ $t('IWPLAY SETTINGS') }}</div>
       <div class="sidebar-content">
         <div class="sidebar-item" :class="{ selected: i === index }" @click="index = i" v-for="(item, i) in sidebarItems">
           <Component :is="item.icon" class="icon" />
@@ -13,7 +13,7 @@
       <div class="detail-title">{{ sidebarItems[index].title }}</div>
       <template v-if="index === 0">
         <div class="row">
-          <div class="title">IWPlay 客户端语言</div>
+          <div class="title">{{ $t('IWPlay Language') }}</div>
           <ComboBox :list="languages" :value="appConfig.language" @update="(value) => setConfig('language', value as any)" />
         </div>
       </template>
@@ -42,8 +42,11 @@ import ComputerIcon from '@renderer/icons/ComputerIcon.vue';
 import { invoke } from '@renderer/utils/invoke';
 import { onMounted, ref } from 'vue';
 import { appConfig, setConfig } from '@renderer/utils/appConfig';
+import { useI18n } from 'vue-i18n';
 
 const isMaximize = ref(false);
+
+const i18n = useI18n();
 
 onMounted(async () => {
   window.electron.ipcRenderer.on('maximize', (_evt, value) => {
@@ -52,8 +55,8 @@ onMounted(async () => {
 });
 
 const sidebarItems = [
-  { icon: ComputerIcon, title: '界面' },
-  { icon: LibraryIcon, title: '库' }
+  { icon: ComputerIcon, title: i18n.t('Interface') },
+  { icon: LibraryIcon, title: i18n.t('Library') }
 ];
 
 const languages = ['English', '简体中文'];

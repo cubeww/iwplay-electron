@@ -1,7 +1,7 @@
 <template>
   <div class="library-sidebar">
     <div class="header">
-      <button class="home-button" :class="{ active: isInHome }" @click="handleToHome">主页</button>
+      <button class="home-button" :class="{ active: isInHome }" @click="handleToHome">{{ $t('HOME') }}</button>
       <button class="refresh-button" :class="{ enable: fetchStatus !== 'fetching' }" @click="fetchItems(true)">
         <RefreshIcon :class="{ rotate: fetchStatus === 'fetching' }" />
       </button>
@@ -10,7 +10,7 @@
       <div class="search-icon" @click="searchInputEl.focus">
         <SearchIcon />
       </div>
-      <input class="search-input" v-model="searchText" ref="searchInputEl" placeholder="按名称搜索" type="text" />
+      <input class="search-input" v-model="searchText" ref="searchInputEl" :placeholder="$t('Search by Name')" type="text" />
       <button class="search-filter-button">
         <FilterIcon />
       </button>
@@ -24,7 +24,7 @@
     </div>
     <div class="fangame-list-error" v-show="fetchStatus === 'error'">
       {{ appStore.fetchFangameItemsError }}
-      <ButtonPure @click="fetchItems(true)">重试</ButtonPure>
+      <ButtonPure @click="fetchItems(true)">{{ $t('Retry') }}</ButtonPure>
     </div>
   </div>
 </template>
