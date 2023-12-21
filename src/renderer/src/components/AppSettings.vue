@@ -43,7 +43,7 @@ import { invoke } from '@renderer/utils/invoke';
 import { onMounted, ref } from 'vue';
 import { useConfigStore } from '@renderer/stores/configStore';
 
-const configStore = useConfigStore()
+const configStore = useConfigStore();
 
 const isMaximize = ref(false);
 
@@ -162,9 +162,9 @@ const index = ref(0);
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
 
-  & .title {
-    color: #dcdedf;
-  }
+.row .title {
+  color: #dcdedf;
 }
 </style>

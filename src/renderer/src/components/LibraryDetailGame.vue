@@ -126,16 +126,16 @@ const handleToDelFruit = () => {
   display: flex;
   flex-direction: column;
   margin-left: 20px;
+}
 
-  & .label {
-    color: #8c9696;
-    font-size: 15px;
-  }
+.profile-col .label {
+  color: #8c9696;
+  font-size: 15px;
+}
 
-  & .content {
-    color: #606a6b;
-    font-size: 13px;
-  }
+.profile-col .content {
+  color: #606a6b;
+  font-size: 13px;
 }
 
 .toolbox {
