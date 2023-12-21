@@ -1,7 +1,7 @@
 <template>
-  <div class="footer">
-    <div class="footer-button" @click="handleAddGame">
-      <AddGameIcon class="footer-button-image" />
+  <div class="app-footer">
+    <div class="button" @click="handleAddGame">
+      <AddGameIcon class="button-image" />
       {{ $t('Add a Game') }}
     </div>
   </div>
@@ -20,7 +20,7 @@ const handleAddGame = () => {
 </script>
 
 <style scoped>
-.footer {
+.app-footer {
   display: flex;
   flex-shrink: 0;
   height: 48px;
@@ -30,7 +30,7 @@ const handleAddGame = () => {
   padding: 10px;
 }
 
-.footer-button {
+.button {
   display: flex;
   align-items: center;
   font-size: small;
@@ -43,7 +43,7 @@ const handleAddGame = () => {
   }
 }
 
-.footer-button-image {
+.button-image {
   width: 20px;
   margin-right: 8px;
 }

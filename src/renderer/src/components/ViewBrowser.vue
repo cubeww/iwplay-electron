@@ -1,10 +1,10 @@
 <template>
   <TabView name="browser">
     <div class="url-bar">
-      <RefreshIcon class="refresh-button" v-if="!loading" @click="webviewEl.reload()"></RefreshIcon>
+      <RefreshIcon class="url-bar-refresh-button" v-if="!loading" @click="webviewEl.reload()"></RefreshIcon>
       <div class="url-box">
-        <LoadingIcon class="loading-icon" :size="14" v-if="loading" />
-        <div class="url-text">{{ url }}</div>
+        <LoadingIcon class="url-box-loading-icon" :size="14" v-if="loading" />
+        <div class="url-box-text">{{ url }}</div>
       </div>
     </div>
     <webview ref="webviewEl" style="flex-grow: 1" src="https://delicious-fruit.com/" nodeintegration />
@@ -117,7 +117,7 @@ const handleIpcMessage = (event: any) => {
   border-bottom: 1.5px solid #1e252d;
 }
 
-.refresh-button {
+.url-bar-refresh-button {
   margin-left: 10px;
   width: 20px;
   transition: all 0.1s;
@@ -155,11 +155,11 @@ const handleIpcMessage = (event: any) => {
   }
 }
 
-.loading-icon {
+.url-box-loading-icon {
   flex-shrink: 0;
 }
 
-.url-text {
+.url-box-text {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

@@ -3,27 +3,27 @@
     <div class="game-title">
       {{ item.name }}
     </div>
-    <div class="panel">
-      <div class="panel-header-row">
-        <ButtonGradient class="install-button"> <InstallGameIcon />{{ $t('INSTALL') }}</ButtonGradient>
-        <div class="profile-col">
-          <div class="label">{{ $t('LAST PLAYED') }}</div>
-          <div class="content">
+    <div class="content">
+      <div class="header">
+        <ButtonGradient class="header-button"> <InstallGameIcon />{{ $t('INSTALL') }}</ButtonGradient>
+        <div class="header-item">
+          <div class="header-item-title">{{ $t('LAST PLAYED') }}</div>
+          <div class="header-item-content">
             {{ $d(new Date(), 'short') }}
           </div>
         </div>
-        <div class="profile-col">
-          <div class="label">{{ $t('PLAY TIME') }}</div>
-          <div class="content">{{ '10.1' + $t(' hours') }}</div>
+        <div class="header-item">
+          <div class="header-item-title">{{ $t('PLAY TIME') }}</div>
+          <div class="header-item-content">{{ '10.1' + $t(' hours') }}</div>
         </div>
-        <div class="toolbox">
-          <SettingsIcon class="button" />
+        <div class="header-toolbox">
+          <SettingsIcon class="header-toolbox-button" />
         </div>
       </div>
-      <div class="panel-link-row">
-        <div class="link-button" @click="handleToDelFruit">{{ $t('DelFruit Page') }}</div>
-        <div class="link-button">{{ $t('Download Page') }}</div>
-        <div class="link-button">{{ $t('Game Directory') }}</div>
+      <div class="nav">
+        <div class="nav-button" @click="handleToDelFruit">{{ $t('DelFruit Page') }}</div>
+        <div class="nav-button">{{ $t('Download Page') }}</div>
+        <div class="nav-button">{{ $t('Game Directory') }}</div>
       </div>
     </div>
   </div>
@@ -103,7 +103,7 @@ const handleToDelFruit = () => {
   flex-shrink: 0;
 }
 
-.panel {
+.content {
   backdrop-filter: blur(8px) saturate(180%);
   background-color: rgba(0, 0, 0, 0.17);
   flex-grow: 1;
@@ -112,57 +112,57 @@ const handleToDelFruit = () => {
   padding-right: 20px;
 }
 
-.install-button {
+.header-button {
   height: 20px !important;
   width: 100px !important;
 }
 
-.panel-header-row {
+.header {
   display: flex;
   align-items: center;
 }
 
-.profile-col {
+.header-item {
   display: flex;
   flex-direction: column;
   margin-left: 20px;
 }
 
-.profile-col .label {
+.header-item-title {
   color: #8c9696;
   font-size: 15px;
 }
 
-.profile-col .content {
+.header-item-content {
   color: #606a6b;
   font-size: 13px;
 }
 
-.toolbox {
+.header-toolbox {
   display: flex;
   align-items: center;
   margin-left: auto;
+}
 
-  & .button {
-    display: flex;
-    width: 32px;
-    height: 32px;
-    background-color: rgba(255, 255, 255, 0.05);
-    margin-left: 10px;
-    padding: 5px;
-    box-sizing: border-box;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.1s;
+.header-toolbox-button {
+  display: flex;
+  width: 32px;
+  height: 32px;
+  background-color: rgba(255, 255, 255, 0.05);
+  margin-left: 10px;
+  padding: 5px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.1s;
 
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.2);
-      color: rgba(255, 255, 255, 1);
-    }
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 1);
   }
 }
 
-.panel-link-row {
+.nav {
   display: flex;
   align-items: center;
   margin-top: 10px;
@@ -171,7 +171,7 @@ const handleToDelFruit = () => {
   padding: 8px;
 }
 
-.link-button {
+.nav-button {
   margin-left: 20px;
   margin-right: 20px;
   transition:

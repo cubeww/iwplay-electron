@@ -1,5 +1,5 @@
 <template>
-  <div class="app" :class="{ border: !appStore.isMaximize }">
+  <div class="app">
     <AppMenuBar />
     <AppTabBar />
     <ViewBrowser />
@@ -20,15 +20,8 @@ import ViewUser from './components/ViewUser.vue';
 import AppFooter from './components/AppFooter.vue';
 import ContextMenu from './components/ContextMenu.vue';
 import { useAppStore } from './stores/appStore';
-import { onMounted } from 'vue';
 
 const appStore = useAppStore();
-
-onMounted(async () => {
-  window.electron.ipcRenderer.on('maximize', (_evt, value) => {
-    appStore.isMaximize = value;
-  });
-});
 </script>
 
 <style scoped>
@@ -41,9 +34,5 @@ onMounted(async () => {
   background-color: #171d25;
   box-sizing: border-box;
   overflow: hidden;
-
-  &.border {
-    border: 1px solid #4c4e54;
-  }
 }
 </style>

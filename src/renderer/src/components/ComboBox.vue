@@ -1,8 +1,8 @@
 <template>
-  <div class="combo">
-    <div class="combo-button" @click="showList = !showList">
+  <div class="combo-box">
+    <div class="button" @click="showList = !showList">
       {{ value }}
-      <ArrowVIcon class="icon" />
+      <ArrowVIcon class="button-arrow" />
     </div>
 
     <div class="combo-list" ref="comboListEl" v-show="showList">
@@ -44,12 +44,12 @@ const handleClickItem = (item: string) => {
 </script>
 
 <style scoped>
-.combo {
+.combo-box {
   position: relative;
   color: #dbdfe2;
 }
 
-.combo-button {
+.button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -68,7 +68,7 @@ const handleClickItem = (item: string) => {
   }
 }
 
-.combo .icon {
+.button-arrow {
   transform: rotate(180deg);
   color: #189cff;
   margin-left: 4px;

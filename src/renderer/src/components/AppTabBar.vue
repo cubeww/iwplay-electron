@@ -1,5 +1,5 @@
 <template>
-  <div class="tab-bar">
+  <div class="app-tab-bar">
     <BrowserBackIcon class="browser-button" :class="{ enable: canBack }" @click="handleBack()" />
     <BrowserForwardIcon class="browser-button" :class="{ enable: canForward }" @click="handleForward()" />
     <AppTabBarItem to="browser" :items="menuItems[0]">{{ $t('DELFRUIT') }}</AppTabBarItem>
@@ -42,7 +42,7 @@ const handleForward = () => {
 </script>
 
 <style scoped>
-.tab-bar {
+.app-tab-bar {
   display: flex;
   padding-left: 6px;
   align-items: center;

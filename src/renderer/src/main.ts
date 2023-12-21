@@ -14,7 +14,8 @@ import en from './i18n/en';
 import { useConfigStore } from './stores/configStore';
 
 const searchParams = new URLSearchParams(window.location.search);
-const windowType = searchParams.get('type') as string;
+export const windowType = searchParams.get('type') as string;
+export const windowName = searchParams.get('name') as string;
 
 const typeToComponentMap = {
   main: App,
@@ -40,7 +41,7 @@ export const mainI18n = createI18n({
         month: 'short',
         day: 'numeric'
       }
-    },
+    }
   },
   messages: {
     zh,

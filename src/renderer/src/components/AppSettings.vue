@@ -1,5 +1,5 @@
 <template>
-  <div class="settings">
+  <div class="app-settings">
     <div class="sidebar">
       <div class="sidebar-title">{{ $t('IWPLAY SETTINGS') }}</div>
       <div class="sidebar-content">
@@ -12,46 +12,28 @@
     <div class="detail">
       <div class="detail-title">{{ $t(sidebarItems[index].title) }}</div>
       <template v-if="index === 0">
-        <div class="row">
-          <div class="title">{{ $t('IWPlay Language') }}</div>
+        <div class="detail-row">
+          <div class="detail-row-title">{{ $t('IWPlay Language') }}</div>
           <ComboBox :list="languages" :value="configStore.cfg.language" @update="(value) => configStore.set('language', value as any)" />
         </div>
       </template>
     </div>
     <div class="drag-area"></div>
-    <div class="control-buttons">
-      <WindowMinimizeIcon class="control-button minimize" @click="invoke('minimize', 'settings')" />
-      <WindowMaximizeIcon class="control-button maximize" @click="invoke('maximize', 'settings')" v-if="!isMaximize" />
-      <WindowRestoreIcon class="control-button maximize" @click="invoke('maximize', 'settings')" v-else />
-      <WindowCloseIcon class="control-button close" @click="invoke('close', 'settings')" />
-    </div>
+    <ControlButtons />
   </div>
 </template>
 
 <script lang="ts" setup>
 import ComboBox from './ComboBox.vue';
-
-import WindowCloseIcon from '@renderer/icons/WindowCloseIcon.vue';
-import WindowMaximizeIcon from '@renderer/icons/WindowMaximizeIcon.vue';
-import WindowMinimizeIcon from '@renderer/icons/WindowMinimizeIcon.vue';
-import WindowRestoreIcon from '@renderer/icons/WindowRestoreIcon.vue';
+import ControlButtons from './ControlButtons.vue';
 
 import LibraryIcon from '@renderer/icons/LibraryIcon.vue';
 import ComputerIcon from '@renderer/icons/ComputerIcon.vue';
 
-import { invoke } from '@renderer/utils/invoke';
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import { useConfigStore } from '@renderer/stores/configStore';
 
 const configStore = useConfigStore();
-
-const isMaximize = ref(false);
-
-onMounted(async () => {
-  window.electron.ipcRenderer.on('maximize', (_evt, value) => {
-    isMaximize.value = value;
-  });
-});
 
 const sidebarItems = [
   { icon: ComputerIcon, title: 'Interface' },
@@ -64,7 +46,7 @@ const index = ref(0);
 </script>
 
 <style scoped>
-.settings {
+.app-settings {
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -77,31 +59,6 @@ const index = ref(0);
   -webkit-app-region: drag;
 }
 
-.control-buttons {
-  position: absolute;
-  right: 0;
-  -webkit-app-region: no-drag;
-}
-
-.control-button {
-  width: 20px;
-  padding: 4px 8px;
-  transition: all 0.1s;
-  color: #788a92;
-
-  &:hover {
-    color: white;
-
-    &.minimize,
-    &.maximize {
-      background-color: #3e4450;
-    }
-
-    &.close {
-      background-color: #dc322b;
-    }
-  }
-}
 .sidebar {
   background-color: #2a2d34;
   width: 200px;
@@ -158,13 +115,13 @@ const index = ref(0);
   padding-bottom: 24px;
 }
 
-.row {
+.detail-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.row .title {
+.detail-row-title {
   color: #dcdedf;
 }
 </style>

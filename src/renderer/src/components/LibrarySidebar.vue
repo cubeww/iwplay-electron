@@ -1,12 +1,12 @@
 <template>
   <div class="library-sidebar">
     <div class="header">
-      <button class="home-button" :class="{ active: isInHome }" @click="handleToHome">{{ $t('HOME') }}</button>
-      <button class="refresh-button" :class="{ enable: fetchStatus !== 'fetching' }" @click="fetchItems(true)">
+      <button class="header-home-button" :class="{ active: isInHome }" @click="handleToHome">{{ $t('HOME') }}</button>
+      <button class="header-refresh-button" :class="{ enable: fetchStatus !== 'fetching' }" @click="fetchItems(true)">
         <RefreshIcon :class="{ rotate: fetchStatus === 'fetching' }" />
       </button>
     </div>
-    <div class="search-box">
+    <div class="search">
       <div class="search-icon" @click="searchInputEl.focus">
         <SearchIcon />
       </div>
@@ -15,9 +15,9 @@
         <FilterIcon />
       </button>
     </div>
-    <div class="fangame-list" v-show="fetchStatus === 'ok'" @scroll="handleScroll">
-      <div class="fangame-items-wrapper" :style="{ height: searchItems.length * itemHeight + 'px' }">
-        <div v-for="item in displayItems" class="fangame-item" :class="{ select: appStore.present.fangameItem === item }" :style="{ transform: `translateY(${translateY}px)` }" @click="appStore.selectFangameItem(item)">
+    <div class="fangame-list-with-scroll" v-show="fetchStatus === 'ok'" @scroll="handleScroll">
+      <div class="fangame-list-with-height" :style="{ height: searchItems.length * itemHeight + 'px' }">
+        <div v-for="item in displayItems" class="fangame-list-item" :class="{ select: appStore.present.fangameItem === item }" :style="{ transform: `translateY(${translateY}px)` }" @click="appStore.selectFangameItem(item)">
           {{ item.name }}
         </div>
       </div>
@@ -48,7 +48,7 @@ const scrollTop = ref(0);
 const appStore = useAppStore();
 
 const fetchStatus = computed(() => appStore.fetchFangameItemsStatus);
-const fetchItems = appStore.fetchFangameItems
+const fetchItems = appStore.fetchFangameItems;
 
 onMounted(() => {
   window.addEventListener('resize', handleWindowResize);
@@ -114,7 +114,7 @@ const isInHome = computed(() => !appStore.present.fangameItem);
   box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
 }
 
-.home-button {
+.header-home-button {
   margin: 3px;
   margin-left: 6px;
   margin-right: 3px;
@@ -145,7 +145,7 @@ const isInHome = computed(() => !appStore.present.fangameItem);
   }
 }
 
-.refresh-button {
+.header-refresh-button {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -172,7 +172,7 @@ const isInHome = computed(() => !appStore.present.fangameItem);
   animation: rotating 2s linear infinite;
 }
 
-.search-box {
+.search {
   position: relative;
   height: 36px;
   display: flex;
@@ -237,7 +237,7 @@ const isInHome = computed(() => !appStore.present.fangameItem);
   }
 }
 
-.fangame-list {
+.fangame-list-with-scroll {
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
@@ -275,11 +275,11 @@ const isInHome = computed(() => !appStore.present.fangameItem);
   }
 }
 
-.fangame-items-wrapper {
+.fangame-list-with-height {
   flex-shrink: 0;
 }
 
-.fangame-item {
+.fangame-list-item {
   padding-left: 48px;
   color: #9097a4;
   cursor: pointer;
@@ -301,7 +301,7 @@ const isInHome = computed(() => !appStore.present.fangameItem);
   }
 }
 
-.fangame-list-error{
+.fangame-list-error {
   display: flex;
   padding-top: 50%;
   align-items: center;

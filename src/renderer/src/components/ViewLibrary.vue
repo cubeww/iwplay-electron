@@ -1,5 +1,5 @@
 <template>
-  <TabView name="library" class="library">
+  <TabView name="library" class="view-library">
     <LibrarySidebar :style="{ width: sidebarWidth + 'px' }" />
     <div class="resize-slider" @mousedown="handleSliderMouseDown" />
     <LibraryDetailGame v-if="item" :item="item" />
@@ -47,7 +47,7 @@ const handleWindowMouseMove = (e: MouseEvent) => {
 </script>
 
 <style scoped>
-.library {
+.view-library {
   display: flex;
   flex-direction: row;
   margin-top: 10px;

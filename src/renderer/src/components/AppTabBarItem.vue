@@ -1,5 +1,5 @@
 <template>
-  <div class="tab-bar-item" ref="tabBarItemEl" :class="{ selected }" @click="handleClick" @mouseenter="handleMouseEnter">
+  <div class="app-tab-bar-item" ref="tabBarItemEl" :class="{ selected }" @click="handleClick" @mouseenter="handleMouseEnter">
     <slot />
     <div class="underline" :class="{ selected }" />
     <div class="placeholder"></div>
@@ -33,7 +33,7 @@ const handleMouseEnter = () => {
 </script>
 
 <style scoped>
-.tab-bar-item {
+.app-tab-bar-item {
   position: relative;
   font-size: large;
   margin-left: 10px;

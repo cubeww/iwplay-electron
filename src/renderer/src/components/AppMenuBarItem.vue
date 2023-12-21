@@ -1,5 +1,5 @@
 <template>
-  <div ref="itemEl" class="menu-bar-item" @click="handleClick" @mouseenter="handleEnter">
+  <div ref="itemEl" class="app-menu-bar-item" @click="handleClick" @mouseenter="handleEnter">
     <slot />
   </div>
 </template>
@@ -33,7 +33,7 @@ const handleEnter = () => {
 </script>
 
 <style scoped>
-.menu-bar-item {
+.app-menu-bar-item {
   color: #8b929a;
   transition: all 0.1s;
   cursor: pointer;
