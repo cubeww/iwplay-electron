@@ -11,12 +11,20 @@
         <SearchIcon />
       </div>
       <input class="search-input" v-model="searchText" ref="searchInputEl" :placeholder="$t('Search by Name')" type="text" />
-      <button class="search-filter-button">
+      <button class="search-filter-button" :class="{ show: showFilter, has: hasFilter }" @click="showFilter = !showFilter">
         <FilterIcon />
       </button>
+      <div class="filter" :class="{ show: showFilter }">
+        <div class="filter-occluder"></div>
+        <div class="filter-content">
+          <div class="filter-title">{{ $t('FILTER') }}</div>
+          <CheckBox class="filter-check-box" v-model="filters.installed" :value="false" :label="$t('Installed')" />
+          <CheckBox class="filter-check-box" v-model="filters.running" :value="false" :label="$t('Running')" />
+        </div>
+      </div>
     </div>
     <div class="fangame-list-with-scroll" v-show="fetchStatus === 'ok'" @scroll="handleScroll">
-      <div class="fangame-list-with-height" :style="{ height: searchItems.length * itemHeight + 'px' }">
+      <div class="fangame-list-with-height" :style="{ height: filteredItems.length * itemHeight + 'px' }">
         <div v-for="item in displayItems" class="fangame-list-item" :class="{ select: appStore.present.fangameItemId === item.id, installed: item.isInstalled }" :style="{ transform: `translateY(${translateY}px)` }" @click="appStore.selectFangameItem(item.id)">
           {{ item.name }}
         </div>
@@ -37,6 +45,8 @@ import ButtonPure from './ButtonPure.vue';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useAppStore } from '@renderer/stores/appStore';
 
+import CheckBox from './CheckBox.vue';
+
 const itemHeight = 25; // px
 
 const searchInputEl = ref<HTMLInputElement>(undefined!);
@@ -49,6 +59,22 @@ const appStore = useAppStore();
 
 const fetchStatus = computed(() => appStore.fetchFangameItemsStatus);
 const fetchItems = appStore.fetchFangameItems;
+
+const showFilter = ref(false);
+
+const filters = ref({
+  installed: false,
+  running: false
+});
+
+const hasFilter = computed(() => {
+  for (const i of Object.values(filters.value)) {
+    if (i) {
+      return true;
+    }
+  }
+  return false;
+});
 
 onMounted(() => {
   window.addEventListener('resize', handleWindowResize);
@@ -77,8 +103,16 @@ const searchItems = computed(() => {
   }
 });
 
+const filteredItems = computed(() => {
+  return searchItems.value.filter((i) => {
+    if (filters.value.installed && !i.isInstalled) return false;
+    if (filters.value.running && !i.isRunning) return false;
+    return true;
+  });
+});
+
 const displayItems = computed(() => {
-  return searchItems.value.slice(startIndex.value, startIndex.value + displayCount.value);
+  return filteredItems.value.slice(startIndex.value, startIndex.value + displayCount.value);
 });
 
 const translateY = computed(() => {
@@ -235,6 +269,14 @@ const isInHome = computed(() => !appStore.present.fangameItemId);
   &:hover {
     background-color: #3e4047;
   }
+
+  &.show {
+    background-color: #3e4047;
+  }
+
+  &.has {
+    color: #26b7ff;
+  }
 }
 
 .fangame-list-with-scroll {
@@ -311,5 +353,56 @@ const isInHome = computed(() => !appStore.present.fangameItemId);
   align-items: center;
   flex-grow: 1;
   flex-direction: column;
+}
+
+.filter {
+  position: absolute;
+  left: calc(100% + 6px);
+  top: calc(100% - 36px);
+  z-index: 100;
+  width: 200px;
+  height: 200px;
+  background-color: #4c515a;
+  box-sizing: border-box;
+
+  transition: all 0.2s;
+  transform: scale(0);
+  transform-origin: 0 0;
+
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  border-bottom-left-radius: 8px;
+
+  box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+
+  &.show {
+    transform: scale(1);
+  }
+}
+
+.filter-occluder {
+  position: absolute;
+  left: -8px;
+  background-color: #4c515a;
+  width: 8px;
+  height: 36px;
+}
+
+.filter-content {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 16px;
+  color: #d3d6d7;
+}
+
+.filter-title {
+  color: #26b7ff;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.filter-check-box {
+  margin-bottom: 8px;
 }
 </style>

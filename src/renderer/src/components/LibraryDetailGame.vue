@@ -15,7 +15,7 @@
         </div>
         <div class="header-item">
           <div class="header-item-title">{{ $t('PLAY TIME') }}</div>
-          <div class="header-item-content">{{ '10.1' + $t(' hours') }}</div>
+          <div class="header-item-content">{{ '0.0' + $t(' hours') }}</div>
         </div>
         <div class="header-toolbox" v-if="item.isInstalled">
           <DeleteIcon class="header-toolbox-button" @click="handleClickDelete" />
