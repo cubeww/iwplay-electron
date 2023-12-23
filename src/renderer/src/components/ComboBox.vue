@@ -1,7 +1,7 @@
 <template>
   <div class="combo-box">
     <div class="button" @click="showList = !showList">
-      {{ value }}
+      <div class="button-text">{{ value }}</div>
       <ArrowVIcon class="button-arrow" />
     </div>
 
@@ -52,7 +52,7 @@ const handleClickItem = (item: string) => {
 .button {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
 
   background-color: #292e36;
   border-radius: 4px;
@@ -68,10 +68,16 @@ const handleClickItem = (item: string) => {
   }
 }
 
+.button-text {
+  word-break: break-all;
+  overflow: hidden;
+}
+
 .button-arrow {
   transform: rotate(180deg);
   color: #189cff;
   margin-left: 4px;
+  flex-shrink: 0;
 }
 
 .combo-list {

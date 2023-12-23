@@ -16,7 +16,7 @@ import LibraryDetailGame from './LibraryDetailGame.vue';
 import LibraryDetailHome from './LibraryDetailHome.vue';
 
 const appStore = useAppStore();
-const item = computed(() => appStore.present.fangameItem);
+const item = computed(() => appStore.fangameItems.find((i) => i.id === appStore.present.fangameItemId));
 
 onMounted(() => {
   window.addEventListener('mouseup', handleWindowMouseUp);

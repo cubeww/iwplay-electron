@@ -12,9 +12,35 @@
     <div class="detail">
       <div class="detail-title">{{ $t(sidebarItems[index].title) }}</div>
       <template v-if="index === 0">
-        <div class="detail-row">
+        <!--  -->
+        <!-- Interface -->
+        <!--  -->
+        <div class="detail-row column-2">
           <div class="detail-row-title">{{ $t('IWPlay Language') }}</div>
-          <ComboBox :list="languages" :value="configStore.cfg.language" @update="(value) => configStore.set('language', value as any)" />
+          <ComboBox :list="languages" :value="configStore.cfg.language" @update="(value) => configStore.set((cfg) => (cfg.language = value as any))" />
+        </div>
+      </template>
+      <template v-if="index === 1">
+        <!--  -->
+        <!-- Storage -->
+        <!--  -->
+        <div class="detail-row column-2">
+          <div class="detail-row-title">
+            {{ $t('Library Paths') }}
+          </div>
+          <div class="flex">
+            <DeleteIcon class="storage-button" @click="handleDeleteLibraryPath" />
+            <AddIcon class="storage-button" @click="handleAddLibraryPath" />
+          </div>
+        </div>
+        <div class="detail-row column-1">
+          <ComboBox class="storage-combo" :list="configStore.cfg.libraryPaths" :value="libraryPath" @update="(value) => (libraryPath = value)" />
+        </div>
+        <div class="description">
+          {{ $t('The library path is used to store installed fangame files. It is recommended to choose an empty folder with ample remaining space on the hard drive. Example: D:\\IWPlayLibrary') }}
+        </div>
+        <div class="description">
+          {{ $t("You can add multiple library paths at the same time, but it's best to use just one.") }}
         </div>
       </template>
     </div>
@@ -27,22 +53,92 @@
 import ComboBox from './ComboBox.vue';
 import ControlButtons from './ControlButtons.vue';
 
-import LibraryIcon from '@renderer/icons/LibraryIcon.vue';
 import ComputerIcon from '@renderer/icons/ComputerIcon.vue';
+import DiskIcon from '@renderer/icons/DiskIcon.vue';
+import DeleteIcon from '@renderer/icons/DeleteIcon.vue';
+import AddIcon from '@renderer/icons/AddIcon.vue';
 
 import { ref } from 'vue';
 import { useConfigStore } from '@renderer/stores/configStore';
+import { onMounted } from 'vue';
+import { invoke } from '@renderer/utils/invoke';
+import { searchParams, windowName } from '@renderer/main';
 
 const configStore = useConfigStore();
 
 const sidebarItems = [
   { icon: ComputerIcon, title: 'Interface' },
-  { icon: LibraryIcon, title: 'Library' }
+  { icon: DiskIcon, title: 'Storage' }
 ];
 
+const index = ref(0);
 const languages = ['en', 'zh'];
 
-const index = ref(0);
+const libraryPath = ref('');
+
+const resetLibraryPath = () => {
+  if (configStore.cfg.libraryPaths.length === 0) {
+    libraryPath.value = '';
+  } else if (libraryPath.value !== '') {
+    const currentPathIsDeleted = configStore.cfg.libraryPaths.indexOf(libraryPath.value) === -1;
+    if (currentPathIsDeleted) {
+      libraryPath.value = configStore.cfg.libraryPaths[0];
+    }
+  } else {
+    libraryPath.value = configStore.cfg.libraryPaths[0];
+  }
+};
+
+onMounted(() => {
+  index.value = sidebarItems.findIndex((i) => i.title === searchParams.get('startTitle'));
+
+  if (index.value === -1) {
+    index.value = 0;
+  }
+
+  resetLibraryPath();
+});
+
+const handleAddLibraryPath = async () => {
+  let path = await invoke('open-file-dialog', windowName, {
+    properties: ['openDirectory']
+  });
+
+  if (!path) {
+    return;
+  }
+
+  path = await invoke('path-resolve', path[0]);
+  const pathLowerCase = path.toLowerCase();
+
+  let exists: string | undefined = undefined;
+
+  for (const p of configStore.cfg.libraryPaths) {
+    if ((await invoke('path-resolve', p)).toLowerCase() === pathLowerCase) {
+      exists = p;
+      break;
+    }
+  }
+
+  if (!exists) {
+    configStore.set((cfg) => cfg.libraryPaths.push(path));
+    libraryPath.value = path;
+  } else {
+    libraryPath.value = exists;
+  }
+};
+
+const handleDeleteLibraryPath = () => {
+  if (libraryPath.value === '') {
+    return;
+  }
+
+  const index = configStore.cfg.libraryPaths.indexOf(libraryPath.value);
+
+  configStore.set((cfg) => cfg.libraryPaths.splice(index, 1));
+
+  resetLibraryPath();
+};
 </script>
 
 <style scoped>
@@ -64,6 +160,7 @@ const index = ref(0);
   width: 200px;
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
 }
 .sidebar-content {
   display: flex;
@@ -108,6 +205,14 @@ const index = ref(0);
   flex-direction: column;
 }
 
+.flex {
+  display: flex;
+}
+
+.detail-row {
+  margin-bottom: 10px;
+}
+
 .detail-title {
   font-size: 24px;
   font-weight: bold;
@@ -115,13 +220,54 @@ const index = ref(0);
   padding-bottom: 24px;
 }
 
-.detail-row {
+.column-1 {
+  display: flex;
+  align-items: center;
+}
+
+.column-2 {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
+.column-stack {
+  display: flex;
+}
+
 .detail-row-title {
   color: #dcdedf;
+}
+
+.storage-combo {
+  width: 100%;
+  flex-grow: 1;
+}
+
+.storage-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 32px;
+  height: 32px;
+  background-color: #292e36;
+  padding: 4px;
+  transition: all 0.3s;
+  cursor: pointer;
+  flex-shrink: 0;
+  border-radius: 4px;
+  margin-right: 10px;
+
+  &:nth-last-child(1) {
+    margin-right: 0;
+  }
+
+  &:hover {
+    background-color: #464d58;
+  }
+}
+
+.description {
+  margin-bottom: 10px;
 }
 </style>

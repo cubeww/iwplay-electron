@@ -1,35 +1,32 @@
-import { app, shell, BrowserWindow } from 'electron';
+import { app, shell, BrowserWindow, BrowserWindowConstructorOptions } from 'electron';
 import { join } from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
-import icon from '../../resources/icon.png?asset';
 import log from 'electron-log/main';
 import { initMainAPI } from './api';
 
 export const windows: { [name: string]: BrowserWindow } = {};
 
-export function createWindow(type: string, name: string, width: number, height: number): BrowserWindow {
-  const exists = windows[name];
+export function createWindow(params: { [key: string]: string }, options?: BrowserWindowConstructorOptions): BrowserWindow {
+  const exists = windows[params.name];
   if (exists) {
     exists.show();
     return exists;
   }
 
   const window = new BrowserWindow({
-    minWidth: width,
-    minHeight: height,
-    width: width,
-    height: height,
     show: false,
     frame: false,
     autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
       webSecurity: false,
       webviewTag: true,
       nodeIntegration: true
-    }
+    },
+    minWidth: options?.width,
+    minHeight: options?.height,
+    ...options
   });
 
   window.on('ready-to-show', () => {
@@ -49,18 +46,22 @@ export function createWindow(type: string, name: string, width: number, height: 
     return { action: 'deny' };
   });
 
-  const queryString = `?type=${type}&name=${name}`;
+  const queryString = '?' + new URLSearchParams(params).toString();
+
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     window.loadURL(process.env['ELECTRON_RENDERER_URL'] + queryString);
+
+    window.webContents.openDevTools();
   } else {
-    window.loadFile(join(__dirname, '../renderer/index.html' + queryString));
+    // window.loadFile(join(__dirname, '../renderer/index.html' + queryString));
+    window.loadURL(join('file://', __dirname, '../renderer/index.html' + queryString));
+
+    window.webContents.openDevTools();
   }
 
-  window.webContents.openDevTools();
-
-  windows[name] = window;
+  windows[params.name] = window;
   return window;
 }
 
@@ -88,8 +89,7 @@ app.whenReady().then(() => {
   log.initialize({ preload: true });
 
   // Create the main window.
-  const mainWindow = createWindow('main', 'main', 1000, 600);
-  // mainWindow.webContents.openDevTools();
+  const mainWindow = createWindow({ type: 'main', name: 'main' }, { width: 1000, height: 600 });
 
   // Register IPC handlers
   initMainAPI();

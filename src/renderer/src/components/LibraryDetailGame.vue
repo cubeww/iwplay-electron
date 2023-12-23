@@ -5,7 +5,7 @@
     </div>
     <div class="content">
       <div class="header">
-        <ButtonGradient class="header-button"> <InstallGameIcon />{{ $t('INSTALL') }}</ButtonGradient>
+        <ButtonGradient @click="handleClickInstall" class="header-button"> <InstallGameIcon />{{ $t('INSTALL') }}</ButtonGradient>
         <div class="header-item">
           <div class="header-item-title">{{ $t('LAST PLAYED') }}</div>
           <div class="header-item-content">
@@ -35,6 +35,7 @@ import { ref } from 'vue';
 import InstallGameIcon from '@renderer/icons/InstallGameIcon.vue';
 import ButtonGradient from './ButtonGradient.vue';
 import SettingsIcon from '@renderer/icons/SettingsIcon.vue';
+import PopupViewInstallGame from './PopupViewInstallGame.vue';
 
 const props = defineProps<{ item: FangameItem }>();
 
@@ -48,6 +49,10 @@ const handleScroll = (e: any) => {
 const handleToDelFruit = () => {
   appStore.toggleBrowserAndLoadURL('https://delicious-fruit.com/ratings/game_details.php?id=' + props.item.id);
 };
+
+const handleClickInstall = () => {
+  appStore.showPopup(PopupViewInstallGame, { id: props.item.id, name: props.item.name });
+};
 </script>
 
 <style scoped>
@@ -58,7 +63,7 @@ const handleToDelFruit = () => {
   flex-grow: 1;
   overflow-y: scroll;
 
-  background: url('src/images/game-detail.png');
+  background: url('/game-detail.png');
   background-repeat: no-repeat;
   background-position-y: v-bind(backgroundY + 'px');
 

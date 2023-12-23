@@ -29,15 +29,14 @@ export const useConfigStore = defineStore('ConfigStore', () => {
     language: 'en'
   });
 
-  window.electron.ipcRenderer.on('renderer-sync-config', (_event, data) => {
+  window.electron.ipcRenderer.on('sync-config-to-renderer', (_event, data) => {
     cfg.value = data;
   });
 
-  const set = <K extends keyof AppConfig>(key: K, value: AppConfig[K]) => {
-    cfg.value[key] = value;
-
+  const set = (patch: (cfg: AppConfig) => void) => {
+    patch(cfg.value);
     invoke('write-file', configFile, JSON.stringify(cfg.value, undefined, 4));
-    invoke('main-sync-config', toRaw(cfg.value));
+    invoke('sync-config-to-main', toRaw(cfg.value));
   };
 
   watch(

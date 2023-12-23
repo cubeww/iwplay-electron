@@ -1,7 +1,7 @@
 import { execSync } from 'child_process';
 import { app, dialog, ipcMain } from 'electron';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, unlinkSync, writeFileSync } from 'fs';
-import { dirname, join } from 'path';
+import { dirname, join, resolve } from 'path';
 import { createWindow, windows } from '.';
 
 function getFiles(dir: string, dir2: string, files: string[] = []) {
@@ -93,6 +93,10 @@ export function initMainAPI() {
     return app.getPath(name);
   });
 
+  ipcMain.handle('path-resolve', (_event, path) => {
+    return resolve(path);
+  });
+
   ////////////
   // Window //
   ////////////
@@ -121,8 +125,8 @@ export function initMainAPI() {
     Object.values(windows).forEach((window) => window.close());
   });
 
-  ipcMain.handle('create-window', (_event, type, name, width, height) => {
-    createWindow(type, name, width, height);
+  ipcMain.handle('create-window', (_event, params, options) => {
+    createWindow(params, options);
   });
 
   /////////////
@@ -137,10 +141,10 @@ export function initMainAPI() {
   // Config //
   ////////////
 
-  ipcMain.handle('main-sync-config', (event, data) => {
+  ipcMain.handle('sync-config-to-main', (event, data) => {
     for (const window of Object.values(windows)) {
       if (window.webContents !== event.sender) {
-        window.webContents.send('renderer-sync-config', data);
+        window.webContents.send('sync-config-to-renderer', data);
       }
     }
   });

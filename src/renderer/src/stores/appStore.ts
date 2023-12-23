@@ -4,14 +4,14 @@ import { DelFruitFangameItem, delFruit } from '@renderer/utils/delFruit';
 import { join } from 'path-browserify';
 import { defineStore } from 'pinia';
 import { ref, shallowRef } from 'vue';
-import { useFetch } from '@renderer/hooks/useFetch';
+import { useFetch, useFetchShallow } from '@renderer/hooks/useFetch';
 
 export type TabName = 'browser' | 'library' | 'user';
 
 export interface BackableState {
   tab: TabName;
   targetBrowserURL?: string;
-  fangameItem?: FangameItem;
+  fangameItemId?: string;
 }
 
 export interface FangameItem {
@@ -98,7 +98,7 @@ export const useAppStore = defineStore('AppStore', () => {
   // Library //
   /////////////
 
-  const [fetchFangameItems, fangameItems, fetchFangameItemsStatus, fetchFangameItemsError] = useFetch([], async (forceDownload: boolean = false) => {
+  const [fetchFangameItems, fangameItems, fetchFangameItemsStatus, fetchFangameItemsError] = useFetchShallow([], async (forceDownload: boolean = false) => {
     const cacheFile = join(await invoke('get-path', 'userData'), 'appcache', 'delfruit-fangamelist.json');
 
     let items: DelFruitFangameItem[] = [];
@@ -152,8 +152,8 @@ export const useAppStore = defineStore('AppStore', () => {
     return items as FangameItem[];
   });
 
-  const selectFangameItem = backable((item?: FangameItem) => {
-    present.value = { tab: 'library', fangameItem: item };
+  const selectFangameItem = backable((id?: string) => {
+    present.value = { tab: 'library', fangameItemId: id };
   });
 
   ///////////

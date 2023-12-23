@@ -1,14 +1,14 @@
 <template>
   <div class="popup-background" />
   <div class="popup-wrapper">
-    <WindowCloseIcon class="close-button" @click="close" />
+    <WindowCloseIcon class="close-button" @click="emit('closePopup')" />
     <slot />
   </div>
 </template>
 
 <script lang="ts" setup>
 import WindowCloseIcon from '@renderer/icons/WindowCloseIcon.vue';
-defineProps<{ close: () => void }>();
+const emit = defineEmits<{ closePopup: [] }>();
 </script>
 
 <style scoped>
@@ -26,7 +26,7 @@ defineProps<{ close: () => void }>();
   color: #b8bcbf;
 
   min-width: 600px;
-  min-height: 400px;
+  min-height: 300px;
 
   box-sizing: border-box;
   padding: 24px;

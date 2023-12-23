@@ -13,7 +13,7 @@ import zh from './i18n/zh';
 import en from './i18n/en';
 import { useConfigStore } from './stores/configStore';
 
-const searchParams = new URLSearchParams(window.location.search);
+export const searchParams = new URLSearchParams(window.location.search);
 export const windowType = searchParams.get('type') as string;
 export const windowName = searchParams.get('name') as string;
 

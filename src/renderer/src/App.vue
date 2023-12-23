@@ -7,7 +7,7 @@
     <ViewUser />
     <AppFooter />
     <ContextMenu v-if="appStore.contextMenu" :options="appStore.contextMenu" :hide="appStore.hideContextMenu" />
-    <Component v-for="popup in appStore.popups" :is="popup.component" :context="popup.context" :close="() => appStore.closePopup(popup.context)" />
+    <Component v-for="popup in appStore.popups" :is="popup.component" :context="popup.context" @closePopup="appStore.closePopup(popup.context)" />
   </div>
 </template>
 
@@ -22,6 +22,7 @@ import ContextMenu from './components/ContextMenu.vue';
 import { useAppStore } from './stores/appStore';
 
 const appStore = useAppStore();
+
 </script>
 
 <style scoped>
