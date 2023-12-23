@@ -24,8 +24,8 @@
       </div>
       <div class="nav">
         <div class="nav-button" @click="handleToDelFruit">{{ $t('DelFruit Page') }}</div>
-        <div class="nav-button">{{ $t('Download Page') }}</div>
-        <div class="nav-button">{{ $t('Game Directory') }}</div>
+        <div class="nav-button" :class="{ disabled: !hasDownloadLink }" @click="handleToDownload">{{ $t('Download Page') }}</div>
+        <div class="nav-button" @click="handleToGameDirectory" v-if="item.isInstalled">{{ $t('Game Directory') }}</div>
       </div>
     </div>
   </div>
@@ -40,9 +40,28 @@ import SettingsIcon from '@renderer/icons/SettingsIcon.vue';
 import PopupViewInstallGame from './PopupViewInstallGame.vue';
 import PlayIcon from '@renderer/icons/PlayIcon.vue';
 import DeleteIcon from '@renderer/icons/DeleteIcon.vue';
-import { library } from '@renderer/utils/library';
+import { getGamePath, library } from '@renderer/utils/library';
+import { invoke } from '@renderer/utils/invoke';
+import { useFetch } from '@renderer/hooks/useFetch';
+import { DelFruitFangameDetail, delFruit } from '@renderer/utils/delFruit';
+import { watch } from 'vue';
+import { computed } from 'vue';
 
 const props = defineProps<{ item: FangameItem }>();
+
+const [fetchDetails, details, fetchDetailsStatus, fetchDetailsError] = useFetch({} as DelFruitFangameDetail, () => {
+  return delFruit.fetchFangameDetail(props.item.id);
+});
+
+watch(
+  props,
+  () => {
+    fetchDetails();
+  },
+  { immediate: true }
+);
+
+const hasDownloadLink = computed(() => fetchDetailsStatus.value === 'ok' && details.value.downloadLink);
 
 const appStore = useAppStore();
 const backgroundY = ref(0);
@@ -70,6 +89,16 @@ const handleClickDelete = () => {
     }
     appStore.fetchFangameItems();
   });
+};
+
+const handleToDownload = () => {
+  if (hasDownloadLink.value) {
+    appStore.toggleBrowserAndLoadURL(details.value.downloadLink);
+  }
+};
+
+const handleToGameDirectory = () => {
+  invoke('exec', `explorer "${getGamePath(props.item.libraryPath, props.item.id).replaceAll('/', '\\')}"`);
 };
 </script>
 
@@ -204,9 +233,15 @@ const handleClickDelete = () => {
   cursor: pointer;
   font-size: 15px;
 
-  &:hover {
+  &:not(.disabled):hover {
     background-color: rgba(255, 255, 255, 0.1);
     color: white;
+  }
+
+  &.disabled {
+    color: gray;
+    cursor: default;
+    background-color: none;
   }
 }
 </style>
