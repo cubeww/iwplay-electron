@@ -1,10 +1,15 @@
 # IWPLAY
 
-![Discord Shield](https://discordapp.com/api/guilds/1187726851855106148/widget.png?style=shield)
+[![Join the chat at https://discord.gg/xW4mY652hC](https://img.shields.io/discord/1187726851855106148?color=%237289DA&label=IWPlay&logo=discord&logoColor=white)](https://discord.gg/xW4mY652hC)
+
 
 Experimental "I Wanna Fangames" Management Software
 
 ![](./preview.jpg)
+
+## Contributing
+
+Please use the Github Issue tracker, or join the IWPlay discord channel.
 
 ## Development
 
