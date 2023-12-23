@@ -8,6 +8,7 @@
 
 <script lang="ts" setup>
 import WindowCloseIcon from '@renderer/icons/WindowCloseIcon.vue';
+withDefaults(defineProps<{ width?: number; color1?: string; color2?: string }>(), { width: 600, color1: '#00ccff', color2: '#3366ff' });
 const emit = defineEmits<{ closePopup: [] }>();
 </script>
 
@@ -25,8 +26,8 @@ const emit = defineEmits<{ closePopup: [] }>();
 
   color: #b8bcbf;
 
-  min-width: 600px;
-  min-height: 300px;
+  min-width: v-bind(width + 'px');
+  min-height: 0;
 
   box-sizing: border-box;
   padding: 24px;
@@ -37,7 +38,7 @@ const emit = defineEmits<{ closePopup: [] }>();
   transform: translate(-50%, -50%);
 
   border-top: 2px solid transparent;
-  border-image: linear-gradient(to right, #00ccff, #3366ff);
+  border-image: linear-gradient(to right, v-bind(color1), v-bind(color2));
   border-image-slice: 1;
 
   background: linear-gradient(to right bottom, #343941, #25282e);

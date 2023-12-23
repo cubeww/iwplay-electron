@@ -10,12 +10,11 @@
 <script lang="ts" setup>
 import AddGameIcon from '@renderer/icons/AddGameIcon.vue';
 import { useAppStore } from '@renderer/stores/appStore';
-import PopupViewInstallGame, { InstallPopupContext } from './PopupViewInstallGame.vue';
 
 const appStore = useAppStore();
 
 const handleAddGame = () => {
-  appStore.showPopup(PopupViewInstallGame, { id: '114514', name: 'I Wanna Be The Beast' } as InstallPopupContext);
+  if (appStore.present.tab !== 'library') appStore.toggleTab('library');
 };
 </script>
 

@@ -20,9 +20,13 @@ import ViewUser from './components/ViewUser.vue';
 import AppFooter from './components/AppFooter.vue';
 import ContextMenu from './components/ContextMenu.vue';
 import { useAppStore } from './stores/appStore';
+import { onMounted } from 'vue';
 
 const appStore = useAppStore();
 
+onMounted(() => {
+
+});
 </script>
 
 <style scoped>

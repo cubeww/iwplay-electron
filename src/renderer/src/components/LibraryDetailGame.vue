@@ -5,7 +5,8 @@
     </div>
     <div class="content">
       <div class="header">
-        <ButtonGradient @click="handleClickInstall" class="header-button"> <InstallGameIcon />{{ $t('INSTALL') }}</ButtonGradient>
+        <ButtonGradient v-if="!item.isInstalled" @click="handleClickInstall" class="header-button"> <InstallGameIcon />{{ $t('INSTALL') }}</ButtonGradient>
+        <ButtonGradient v-if="item.isInstalled" color1="#4ade80" color2="#16a34a" @click="handleClickPlay" class="header-button"> <PlayIcon />{{ $t('PLAY') }}</ButtonGradient>
         <div class="header-item">
           <div class="header-item-title">{{ $t('LAST PLAYED') }}</div>
           <div class="header-item-content">
@@ -16,8 +17,9 @@
           <div class="header-item-title">{{ $t('PLAY TIME') }}</div>
           <div class="header-item-content">{{ '10.1' + $t(' hours') }}</div>
         </div>
-        <div class="header-toolbox">
-          <SettingsIcon class="header-toolbox-button" />
+        <div class="header-toolbox" v-if="item.isInstalled">
+          <DeleteIcon class="header-toolbox-button" @click="handleClickDelete" />
+          <SettingsIcon class="header-toolbox-button" @click="" />
         </div>
       </div>
       <div class="nav">
@@ -36,6 +38,9 @@ import InstallGameIcon from '@renderer/icons/InstallGameIcon.vue';
 import ButtonGradient from './ButtonGradient.vue';
 import SettingsIcon from '@renderer/icons/SettingsIcon.vue';
 import PopupViewInstallGame from './PopupViewInstallGame.vue';
+import PlayIcon from '@renderer/icons/PlayIcon.vue';
+import DeleteIcon from '@renderer/icons/DeleteIcon.vue';
+import { library } from '@renderer/utils/library';
 
 const props = defineProps<{ item: FangameItem }>();
 
@@ -52,6 +57,19 @@ const handleToDelFruit = () => {
 
 const handleClickInstall = () => {
   appStore.showPopup(PopupViewInstallGame, { id: props.item.id, name: props.item.name });
+};
+
+const handleClickPlay = () => {};
+
+const handleClickDelete = () => {
+  appStore.showConfirm('Are you sure you want to uninstall this fangame? This will delete all game files, possibly even SAVE files!', async () => {
+    try {
+      await library.uninstall(props.item.libraryPath, props.item.id);
+    } catch (err) {
+      appStore.showError((err as Error).message);
+    }
+    appStore.fetchFangameItems();
+  });
 };
 </script>
 

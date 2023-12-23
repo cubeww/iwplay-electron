@@ -46,13 +46,15 @@ import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useConfigStore } from '@renderer/stores/configStore';
 import { onMounted } from 'vue';
+import { library } from '@renderer/utils/library';
+import { useAppStore } from '@renderer/stores/appStore';
 
 export interface InstallPopupContext {
   id: string;
   name: string;
 }
 
-defineProps<{ context: InstallPopupContext }>();
+const props = defineProps<{ context: InstallPopupContext }>();
 const emit = defineEmits<{ closePopup: [] }>();
 
 const configStore = useConfigStore();
@@ -62,9 +64,11 @@ const filesize = ref(0);
 
 const i18n = useI18n();
 
-const installStatus = ref<'pending' | 'installing' | 'error'>('pending');
+const installStatus = ref<'pending' | 'installing' | 'error' | 'ok'>('pending');
 
 const selectedLibraryPath = ref('');
+
+const appStore = useAppStore();
 
 onMounted(() => {
   if (configStore.cfg.libraryPaths.length > 0) {
@@ -87,8 +91,15 @@ const handleSelectZip = async () => {
   }
 };
 
-const handleInstall = () => {
+const handleInstall = async () => {
   installStatus.value = 'installing';
+  try {
+    await library.install(selectedLibraryPath.value, props.context.id, filename.value);
+    appStore.fetchFangameItems();
+    emit('closePopup');
+  } catch (err) {
+    appStore.showError((err as Error).message);
+  }
 };
 
 const filesizeStr = computed(() => (filesize.value / 1048576.0).toFixed(2) + ' MB');

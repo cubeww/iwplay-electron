@@ -4,7 +4,11 @@ import { DelFruitFangameItem, delFruit } from '@renderer/utils/delFruit';
 import { join } from 'path-browserify';
 import { defineStore } from 'pinia';
 import { ref, shallowRef } from 'vue';
-import { useFetch, useFetchShallow } from '@renderer/hooks/useFetch';
+import { useFetchShallow } from '@renderer/hooks/useFetch';
+import { useConfigStore } from './configStore';
+import { library } from '@renderer/utils/library';
+import PopupViewError from '@renderer/components/PopupViewError.vue';
+import PopupViewConfirm from '@renderer/components/PopupViewConfirm.vue';
 
 export type TabName = 'browser' | 'library' | 'user';
 
@@ -19,9 +23,12 @@ export interface FangameItem {
   name: string;
   isRunning: boolean;
   isInstalled: boolean;
+  libraryPath: string;
 }
 
 export const useAppStore = defineStore('AppStore', () => {
+  const configStore = useConfigStore();
+
   ////////////////////
   // Backable State //
   ////////////////////
@@ -101,7 +108,7 @@ export const useAppStore = defineStore('AppStore', () => {
   const [fetchFangameItems, fangameItems, fetchFangameItemsStatus, fetchFangameItemsError] = useFetchShallow([], async (forceDownload: boolean = false) => {
     const cacheFile = join(await invoke('get-path', 'userData'), 'appcache', 'delfruit-fangamelist.json');
 
-    let items: DelFruitFangameItem[] = [];
+    let items: any[] = [];
 
     let loadCacheOK = false;
 
@@ -140,12 +147,22 @@ export const useAppStore = defineStore('AppStore', () => {
       );
     }
 
-    for (const i of items as FangameItem[]) {
+    for (const i of items) {
       i.isInstalled = false;
       i.isRunning = false;
     }
 
-    // TODO: Get installed fangames
+    // Get installed fangames
+    for (const path of configStore.cfg.libraryPaths) {
+      const installedIds = await library.getFangameIDsByManifest(path);
+      installedIds.forEach((id) => {
+        const index = items.findIndex((item) => item.id === id);
+        if (index !== -1) {
+          items[index].isInstalled = true;
+          items[index].libraryPath = path;
+        }
+      });
+    }
 
     // TODO: Get running fangames
 
@@ -173,6 +190,14 @@ export const useAppStore = defineStore('AppStore', () => {
     }
   };
 
+  const showError = (message: string, ok?: () => void) => {
+    showPopup(PopupViewError, { message, ok });
+  };
+
+  const showConfirm = (message: string, yes?: () => void, no?: () => void) => {
+    showPopup(PopupViewConfirm, { message, yes, no });
+  };
+
   //////////
   // Misc //
   //////////
@@ -197,6 +222,8 @@ export const useAppStore = defineStore('AppStore', () => {
     popups,
     showPopup,
     closePopup,
+    showError,
+    showConfirm,
     fangameItems,
     fetchFangameItems,
     fetchFangameItemsStatus,

@@ -108,7 +108,7 @@ export const library = {
 
     const manifestPath = getManifestPath(libraryPath, id)
     if (await invoke('path-exists', manifestPath)) {
-      await invoke('remove-dir', manifestPath)
+      await invoke('remove-file', manifestPath)
     }
 
     const gamePath = getGamePath(libraryPath, id)
