@@ -1,6 +1,10 @@
 # IWPLAY
 
+![Discord Shield](https://discordapp.com/api/guilds/1187726851855106148/widget.png?style=shield)
+
 Experimental "I Wanna Fangames" Management Software
+
+![](./preview.jpg)
 
 ## Development
 
