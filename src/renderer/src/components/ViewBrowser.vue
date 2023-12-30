@@ -1,7 +1,7 @@
 <template>
   <TabView name="browser">
     <div class="url-bar">
-      <RefreshIcon v-if="!loading" class="url-bar-refresh-button" @click="webviewEl.reload()"></RefreshIcon>
+      <RefreshIcon v-if="!loading" class="url-bar-refresh-button" @click="webviewEl?.reload()"></RefreshIcon>
       <div class="url-box">
         <LoadingIcon v-if="loading" class="url-box-loading-icon" :size="14" />
         <div class="url-box-text">{{ url }}</div>
@@ -17,12 +17,13 @@ import TabView from './TabView.vue';
 import RefreshIcon from '@renderer/icons/RefreshIcon.vue';
 import LoadingIcon from '@renderer/icons/LoadingIcon.vue';
 import { useAppStore } from '@renderer/stores/appStore';
+import { WebviewTag } from 'electron';
 
 const appStore = useAppStore();
 
 const loading = ref(true);
 const url = ref('https://delicious-fruit.com/');
-const webviewEl: any = ref();
+const webviewEl = ref<WebviewTag>();
 
 const webviewCSS = `
   ::-webkit-scrollbar {
@@ -49,6 +50,7 @@ const webviewCSS = `
 `;
 
 onMounted(() => {
+  if (!webviewEl.value) return;
   webviewEl.value.addEventListener('did-navigate', handleDidNavigate);
   webviewEl.value.addEventListener('did-start-loading', handleDidStartLoading);
   webviewEl.value.addEventListener('did-stop-loading', handleDidStopLoading);
@@ -57,6 +59,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+  if (!webviewEl.value) return;
   webviewEl.value.removeEventListener('did-navigate', handleDidNavigate);
   webviewEl.value.removeEventListener('did-start-loading', handleDidStartLoading);
   webviewEl.value.removeEventListener('did-stop-loading', handleDidStopLoading);
@@ -65,18 +68,21 @@ onUnmounted(() => {
 });
 
 watchEffect(() => {
-  if (appStore.shouldLoadURL) {
+  if (!webviewEl.value) return;
+  if (appStore.shouldLoadURL && appStore.present.targetBrowserURL) {
     appStore.setShouldLoadURL(false);
     webviewEl.value.loadURL(appStore.present.targetBrowserURL);
   }
 });
 
 const handleDidNavigate = (event: any) => {
+  if (!webviewEl.value) return;
   webviewEl.value.insertCSS(webviewCSS);
   url.value = event.url;
 };
 
 const handleDidStopLoading = () => {
+  if (!webviewEl.value) return;
   loading.value = false;
 
   webviewEl.value.executeJavaScript(`

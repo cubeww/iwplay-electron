@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, defineEmits } from 'vue';
+import { computed } from 'vue';
 import CheckIcon from '@renderer/icons/CheckIcon.vue';
 const props = defineProps<{
   modelValue: boolean;
