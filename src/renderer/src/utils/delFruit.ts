@@ -22,7 +22,8 @@ export const delFruit = {
     const links = tbody.getElementsByTagName('a');
     const items: DelFruitFangameItem[] = [];
     for (const a of links) {
-      const id = a.getAttribute('href')!.split('=')[1];
+      const id = a.getAttribute('href')?.split('=')[1];
+      if (!id) continue;
       const name = a.innerText;
       items.push({ id, name });
     }
@@ -33,11 +34,11 @@ export const delFruit = {
     const html = await res.text();
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
-    const auther = doc.getElementById('creator-label')!.getElementsByTagName('a')[0].innerText!;
-    const name = doc.getElementById('content')!.getElementsByTagName('h1')[0].innerText!;
-    const downloadLink = doc.getElementById('game-link')!.getAttribute('href')!;
-    const rating = doc.getElementById('avgRating')!.innerText!;
-    const difficulty = doc.getElementById('avgDifficulty')!.innerText!;
+    const auther = doc.getElementById('creator-label')?.getElementsByTagName('a')[0].innerText;
+    const name = doc.getElementById('content')?.getElementsByTagName('h1')[0].innerText;
+    const downloadLink = doc.getElementById('game-link')?.getAttribute('href');
+    const rating = doc.getElementById('avgRating')?.innerText;
+    const difficulty = doc.getElementById('avgDifficulty')?.innerText;
     return { auther, difficulty, downloadLink, id, name, rating } as DelFruitFangameDetail;
   }
 };
