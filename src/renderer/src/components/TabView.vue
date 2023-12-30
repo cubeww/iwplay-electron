@@ -1,5 +1,5 @@
 <template>
-  <div class="tab-view" v-show="show">
+  <div v-show="show" class="tab-view">
     <slot />
   </div>
 </template>

@@ -1,5 +1,5 @@
 <template>
-  <div class="context-menu" ref="contextMenuEl">
+  <div ref="contextMenuEl" class="context-menu">
     <ContextMenuContent :x="options.x" :y="options.y" :items="options.items" :hide="hide" />
   </div>
 </template>
@@ -39,7 +39,7 @@ const props = defineProps<{
   hide: () => void;
 }>();
 
-const contextMenuEl = ref<HTMLDivElement>(undefined!);
+const contextMenuEl = ref<HTMLDivElement>();
 
 onMounted(() => {
   window.addEventListener('mousedown', handleWindowClick);
@@ -52,19 +52,19 @@ onUnmounted(() => {
 });
 
 const handleWindowClick = (e: MouseEvent) => {
+  if (!contextMenuEl.value) return;
   // When clicking outside the context menu, hide the menu.
-  const el = e.target as HTMLDivElement;
-  if (props.options.triggerEl.contains(el)) return;
-  if (contextMenuEl.value.contains(el)) return;
+  if (props.options.triggerEl.contains(e.target as HTMLDivElement)) return;
+  if (contextMenuEl.value.contains(e.target as HTMLDivElement)) return;
   props.hide();
 };
 
 const handleWindowMouseMove = (e: MouseEvent) => {
+  if (!contextMenuEl.value) return;
   // (Optional) Hide the menu when the mouse is moved out of it.
   if (!props.options.outsideAutoClose) return;
-  const el = e.target as HTMLDivElement;
-  if (props.options.triggerEl.contains(el)) return;
-  if (contextMenuEl.value.contains(el)) return;
+  if (props.options.triggerEl.contains(e.target as HTMLDivElement)) return;
+  if (contextMenuEl.value.contains(e.target as HTMLDivElement)) return;
   props.hide();
 };
 </script>

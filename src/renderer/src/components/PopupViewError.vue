@@ -1,5 +1,5 @@
 <template>
-  <PopupView :width="450" @closePopup="handleOK" color1="#ff0000" color2="#b90000">
+  <PopupView :width="450" color1="#ff0000" color2="#b90000" @close-popup="handleOK">
     <PopupTitle>{{ $t('Error') }}</PopupTitle>
     <div class="error-message">{{ $t(context.message) }}</div>
     <ButtonPure class="ok-button" @click="handleOK">{{ $t('OK') }}</ButtonPure>

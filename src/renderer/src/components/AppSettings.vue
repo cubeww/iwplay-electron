@@ -3,7 +3,7 @@
     <div class="sidebar">
       <div class="sidebar-title">{{ $t('IWPLAY SETTINGS') }}</div>
       <div class="sidebar-content">
-        <div class="sidebar-item" :class="{ selected: i === index }" @click="index = i" v-for="(item, i) in sidebarItems">
+        <div v-for="(item, i) in sidebarItems" :key="i" class="sidebar-item" :class="{ selected: i === index }" @click="index = i">
           <Component :is="item.icon" class="icon" />
           <div>{{ $t(item.title) }}</div>
         </div>

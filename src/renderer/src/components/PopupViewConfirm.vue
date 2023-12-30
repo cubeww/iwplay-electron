@@ -1,5 +1,5 @@
 <template>
-  <PopupView :width="450" @closePopup="handleNo">
+  <PopupView :width="450" @close-popup="handleNo">
     <PopupTitle>{{ $t('Confirm') }}</PopupTitle>
     <div class="confirm-message">{{ $t(context.message) }}</div>
     <div class="buttons">

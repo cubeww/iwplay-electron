@@ -1,6 +1,6 @@
 <template>
   <label class="check-box">
-    <input class="builtin-input" type="checkbox" v-model="model" :value="value" />
+    <input v-model="model" class="builtin-input" type="checkbox" :value="value" />
     <div class="input">
       <CheckIcon class="check-icon" :class="{ show: modelValue }" />
     </div>

@@ -10,10 +10,11 @@ import { ref } from 'vue';
 import { ContextMenuItemData } from './ContextMenu.vue';
 
 const props = defineProps<{ items: ContextMenuItemData[] }>();
-const itemEl = ref<HTMLDivElement>(undefined!);
+const itemEl = ref<HTMLDivElement>();
 const appStore = useAppStore();
 
 const showMenu = () => {
+  if (!itemEl.value) return;
   const rect = itemEl.value.getBoundingClientRect();
   appStore.showContextMenu({ x: rect.left + 10, y: rect.bottom, items: props.items, triggerEl: itemEl.value });
 };

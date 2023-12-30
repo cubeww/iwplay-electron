@@ -1,9 +1,9 @@
 <template>
   <TabView name="browser">
     <div class="url-bar">
-      <RefreshIcon class="url-bar-refresh-button" v-if="!loading" @click="webviewEl.reload()"></RefreshIcon>
+      <RefreshIcon v-if="!loading" class="url-bar-refresh-button" @click="webviewEl.reload()"></RefreshIcon>
       <div class="url-box">
-        <LoadingIcon class="url-box-loading-icon" :size="14" v-if="loading" />
+        <LoadingIcon v-if="loading" class="url-box-loading-icon" :size="14" />
         <div class="url-box-text">{{ url }}</div>
       </div>
     </div>

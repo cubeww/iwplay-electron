@@ -7,10 +7,10 @@
       </button>
     </div>
     <div class="search">
-      <div class="search-icon" @click="searchInputEl.focus">
+      <div class="search-icon" @click="searchInputEl?.focus">
         <SearchIcon />
       </div>
-      <input class="search-input" v-model="searchText" ref="searchInputEl" :placeholder="$t('Search by Name')" type="text" />
+      <input ref="searchInputEl" v-model="searchText" class="search-input" :placeholder="$t('Search by Name')" type="text" />
       <button class="search-filter-button" :class="{ show: showFilter, has: hasFilter }" @click="showFilter = !showFilter">
         <FilterIcon />
       </button>
@@ -18,19 +18,19 @@
         <div class="filter-occluder"></div>
         <div class="filter-content">
           <div class="filter-title">{{ $t('FILTER') }}</div>
-          <CheckBox class="filter-check-box" v-model="filters.installed" :value="false" :label="$t('Installed')" />
-          <CheckBox class="filter-check-box" v-model="filters.running" :value="false" :label="$t('Running')" />
+          <CheckBox v-model="filters.installed" class="filter-check-box" :value="false" :label="$t('Installed')" />
+          <CheckBox v-model="filters.running" class="filter-check-box" :value="false" :label="$t('Running')" />
         </div>
       </div>
     </div>
-    <div class="fangame-list-with-scroll" v-show="fetchStatus === 'ok'" @scroll="handleScroll">
+    <div v-show="fetchStatus === 'ok'" class="fangame-list-with-scroll" @scroll="handleScroll">
       <div class="fangame-list-with-height" :style="{ height: filteredItems.length * itemHeight + 'px' }">
-        <div v-for="item in displayItems" class="fangame-list-item" :class="{ select: appStore.present.fangameItemId === item.id, installed: item.isInstalled }" :style="{ transform: `translateY(${translateY}px)` }" @click="appStore.selectFangameItem(item.id)">
+        <div v-for="(item, index) in displayItems" :key="index" class="fangame-list-item" :class="{ select: appStore.present.fangameItemId === item.id, installed: item.isInstalled }" :style="{ transform: `translateY(${translateY}px)` }" @click="appStore.selectFangameItem(item.id)">
           {{ item.name }}
         </div>
       </div>
     </div>
-    <div class="fangame-list-error" v-show="fetchStatus === 'error'">
+    <div v-show="fetchStatus === 'error'" class="fangame-list-error">
       {{ appStore.fetchFangameItemsError }}
       <ButtonPure @click="fetchItems(true)">{{ $t('Retry') }}</ButtonPure>
     </div>
@@ -49,7 +49,7 @@ import CheckBox from './CheckBox.vue';
 
 const itemHeight = 25; // px
 
-const searchInputEl = ref<HTMLInputElement>(undefined!);
+const searchInputEl = ref<HTMLInputElement>();
 const searchText = ref('');
 
 const displayCount = ref(36);

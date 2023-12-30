@@ -1,8 +1,8 @@
 <template>
   <div class="control-buttons">
     <WindowMinimizeIcon class="control-button minimize" @click="invoke('minimize', windowName)" />
-    <WindowMaximizeIcon class="control-button maximize" @click="invoke('maximize', windowName)" v-if="!isMaximize" />
-    <WindowRestoreIcon class="control-button maximize" @click="invoke('maximize', windowName)" v-else />
+    <WindowMaximizeIcon v-if="!isMaximize" class="control-button maximize" @click="invoke('maximize', windowName)" />
+    <WindowRestoreIcon v-else class="control-button maximize" @click="invoke('maximize', windowName)" />
     <WindowCloseIcon class="control-button close" @click="invoke('close', windowName)" />
   </div>
 </template>

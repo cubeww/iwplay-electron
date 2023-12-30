@@ -1,5 +1,5 @@
 <template>
-  <div class="app-tab-bar-item" ref="tabBarItemEl" :class="{ selected }" @click="handleClick" @mouseenter="handleMouseEnter">
+  <div ref="tabBarItemEl" class="app-tab-bar-item" :class="{ selected }" @click="handleClick" @mouseenter="handleMouseEnter">
     <slot />
     <div class="underline" :class="{ selected }" />
     <div class="placeholder"></div>
@@ -16,7 +16,7 @@ const props = defineProps<{ to: TabName; items?: ContextMenuItemData[] }>();
 const appStore = useAppStore();
 const selected = computed(() => props.to === appStore.present.tab);
 
-const tabBarItemEl = ref<HTMLDivElement>(undefined!);
+const tabBarItemEl = ref<HTMLDivElement>();
 
 const handleClick = () => {
   if (appStore.present && appStore.present.tab !== props.to) {
@@ -25,10 +25,10 @@ const handleClick = () => {
 };
 
 const handleMouseEnter = () => {
-  if (props.items) {
-    const rect = tabBarItemEl.value.getBoundingClientRect();
-    appStore.showContextMenu({ x: rect.left, y: rect.bottom + 8, items: props.items, triggerEl: tabBarItemEl.value, outsideAutoClose: true });
-  }
+  if (!tabBarItemEl.value) return;
+  if (!props.items) return;
+  const rect = tabBarItemEl.value.getBoundingClientRect();
+  appStore.showContextMenu({ x: rect.left, y: rect.bottom + 8, items: props.items, triggerEl: tabBarItemEl.value, outsideAutoClose: true });
 };
 </script>
 

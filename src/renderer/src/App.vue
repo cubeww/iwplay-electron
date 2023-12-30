@@ -7,7 +7,7 @@
     <ViewUser />
     <AppFooter />
     <ContextMenu v-if="appStore.contextMenu" :options="appStore.contextMenu" :hide="appStore.hideContextMenu" />
-    <Component v-for="popup in appStore.popups" :is="popup.component" :context="popup.context" @closePopup="appStore.closePopup(popup.context)" />
+    <Component :is="popup.component" v-for="(popup, index) in appStore.popups" :key="index" :context="popup.context" @close-popup="appStore.closePopup(popup.context)" />
   </div>
 </template>
 
@@ -24,9 +24,7 @@ import { onMounted } from 'vue';
 
 const appStore = useAppStore();
 
-onMounted(() => {
-
-});
+onMounted(() => {});
 </script>
 
 <style scoped>

@@ -29,13 +29,13 @@ const menuItems: ContextMenuItemData[][] = [
 ];
 
 const handleBack = () => {
-  if (canBack) {
+  if (canBack.value) {
     appStore.back();
   }
 };
 
 const handleForward = () => {
-  if (canForward) {
+  if (canForward.value) {
     appStore.forward();
   }
 };

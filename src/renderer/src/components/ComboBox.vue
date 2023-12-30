@@ -5,8 +5,8 @@
       <ArrowVIcon class="button-arrow" />
     </div>
 
-    <div class="combo-list" ref="comboListEl" v-show="showList">
-      <div class="combo-list-item" @click="handleClickItem(item)" v-for="item in list">
+    <div v-show="showList" ref="comboListEl" class="combo-list">
+      <div v-for="(item, index) in list" :key="index" class="combo-list-item" @click="handleClickItem(item)">
         {{ item }}
       </div>
     </div>
@@ -21,7 +21,7 @@ defineProps<{ list: string[]; value: string }>();
 const emit = defineEmits<{ update: [value: string] }>();
 
 const showList = ref(false);
-const comboListEl = ref<HTMLDivElement>(undefined!);
+const comboListEl = ref<HTMLDivElement>();
 
 onMounted(() => {
   window.addEventListener('mousedown', handleMouseDown);
@@ -32,6 +32,7 @@ onUnmounted(() => {
 });
 
 const handleMouseDown = (e: MouseEvent) => {
+  if (!comboListEl.value) return;
   if (!comboListEl.value.contains(e.target as HTMLDivElement)) {
     showList.value = false;
   }

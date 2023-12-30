@@ -1,10 +1,10 @@
 <template>
-  <PopupView @closePopup="emit('closePopup')">
+  <PopupView @close-popup="emit('closePopup')">
     <PopupTitle>{{ $t('Install') }}</PopupTitle>
     <PopupSeparator />
     <div>{{ context.name }} (ID: {{ context.id }})</div>
     <PopupSeparator />
-    <ButtonGradient style="width: 120px" @click="handleSelectZip" color1="#4ade80" color2="#16a34a">{{ $t('Select ZIP') }}</ButtonGradient>
+    <ButtonGradient style="width: 120px" color1="#4ade80" color2="#16a34a" @click="handleSelectZip">{{ $t('Select ZIP') }}</ButtonGradient>
     <template v-if="filename">
       <div class="bold">{{ $t('File Name: ') }} {{ filename }}</div>
       <div class="bold">{{ $t('File Size: ') }} {{ filesizeStr }}</div>
@@ -17,14 +17,14 @@
       <div class="bold white">{{ $t('INSTALL TO: ') }}</div>
       <SettingsIcon class="settings-button" @click="handleClickSettings" />
     </div>
-    <div class="warning-message" v-if="configStore.cfg.libraryPaths.length === 0">
+    <div v-if="configStore.cfg.libraryPaths.length === 0" class="warning-message">
       {{ $t('Library path not added! Please click the settings button in the upper right corner to add one.') }}
     </div>
-    <div class="library-path-item" v-for="path in configStore.cfg.libraryPaths" :class="{ selected: selectedLibraryPath === path }" @click="selectedLibraryPath = path">
+    <div v-for="(path, index) in configStore.cfg.libraryPaths" :key="index" class="library-path-item" :class="{ selected: selectedLibraryPath === path }" @click="selectedLibraryPath = path">
       <DiskIcon class="library-path-item-icon" />
       {{ path }}
     </div>
-    <div class="installing-row" v-if="installStatus === 'installing'"><LoadingIcon :size="32" />{{ $t('INSTALLING...') }}</div>
+    <div v-if="installStatus === 'installing'" class="installing-row"><LoadingIcon :size="32" />{{ $t('INSTALLING...') }}</div>
     <div class="bottom">
       <ButtonGradient class="bottom-button" :enabled="filename !== '' && installStatus !== 'installing' && selectedLibraryPath !== ''" @click="handleInstall">{{ $t('Install') }}</ButtonGradient>
       <ButtonPure class="bottom-button" @click="emit('closePopup')">{{ $t('Cancel') }}</ButtonPure>

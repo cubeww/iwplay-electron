@@ -5,8 +5,8 @@
     </div>
     <div class="content">
       <div class="header">
-        <ButtonGradient v-if="!item.isInstalled" @click="handleClickInstall" class="header-button"> <InstallGameIcon />{{ $t('INSTALL') }}</ButtonGradient>
-        <ButtonGradient v-if="item.isInstalled" color1="#4ade80" color2="#16a34a" @click="handleClickPlay" class="header-button"> <PlayIcon />{{ $t('PLAY') }}</ButtonGradient>
+        <ButtonGradient v-if="!item.isInstalled" class="header-button" @click="handleClickInstall"> <InstallGameIcon />{{ $t('INSTALL') }}</ButtonGradient>
+        <ButtonGradient v-if="item.isInstalled" color1="#4ade80" color2="#16a34a" class="header-button" @click="handleClickPlay"> <PlayIcon />{{ $t('PLAY') }}</ButtonGradient>
         <div class="header-item">
           <div class="header-item-title">{{ $t('LAST PLAYED') }}</div>
           <div class="header-item-content">
@@ -17,15 +17,15 @@
           <div class="header-item-title">{{ $t('PLAY TIME') }}</div>
           <div class="header-item-content">{{ '0.0' + $t(' hours') }}</div>
         </div>
-        <div class="header-toolbox" v-if="item.isInstalled">
+        <div v-if="item.isInstalled" class="header-toolbox">
           <DeleteIcon class="header-toolbox-button" @click="handleClickDelete" />
-          <SettingsIcon class="header-toolbox-button" @click="" />
+          <SettingsIcon class="header-toolbox-button" />
         </div>
       </div>
       <div class="nav">
         <div class="nav-button" @click="handleToDelFruit">{{ $t('DelFruit Page') }}</div>
         <div class="nav-button" :class="{ disabled: !hasDownloadLink }" @click="handleToDownload">{{ $t('Download Page') }}</div>
-        <div class="nav-button" @click="handleToGameDirectory" v-if="item.isInstalled">{{ $t('Game Directory') }}</div>
+        <div v-if="item.isInstalled" class="nav-button" @click="handleToGameDirectory">{{ $t('Game Directory') }}</div>
       </div>
     </div>
   </div>

@@ -1,14 +1,14 @@
 <template>
   <div class="context-menu-content" :style="{ left: x + 'px', top: y + 'px' }">
-    <template v-for="item in items">
-      <div class="item-text" v-if="item.type === 'text'" @mouseenter="handleEnterOthers" @click="handleClickText(item.onClick)">{{ $t(item.text) }}</div>
-      <hr class="item-separator" v-if="item.type === 'separator'" @mouseenter="handleEnterOthers" />
-      <div class="item-submenu" v-if="item.type === 'submenu'" @mouseenter="handleEnterSubMenu">
+    <div v-for="(item, index) in items" :key="index">
+      <div v-if="item.type === 'text'" class="item-text" @mouseenter="handleEnterOthers" @click="handleClickText(item.onClick)">{{ $t(item.text) }}</div>
+      <hr v-if="item.type === 'separator'" class="item-separator" @mouseenter="handleEnterOthers" />
+      <div v-if="item.type === 'submenu'" class="item-submenu" @mouseenter="handleEnterSubMenu">
         {{ $t(item.text) }}
         <MenuRightIcon class="item-submenu-right" />
-        <ContextMenuContent :x="subMenuX" :y="subMenuY" :items="item.submenu" :hide="hide" v-if="enterSubMenu" />
+        <ContextMenuContent v-if="enterSubMenu" :x="subMenuX" :y="subMenuY" :items="item.submenu" :hide="hide" />
       </div>
-    </template>
+    </div>
   </div>
 </template>
 
