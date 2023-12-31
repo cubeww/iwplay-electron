@@ -90,11 +90,23 @@ app.whenReady().then(() => {
 
   log.initialize({ preload: true });
 
-  // Create the main window.
+  // Create the main window
   const mainWindow = createWindow({ type: 'main', name: 'main' }, { width: 1000, height: 600 });
 
   // Register IPC handlers
   initMainAPI();
+
+  // Download
+  mainWindow.webContents.session.on('will-download', (_downloadEvent, item) => {
+    console.log('Download: ' + item.getFilename());
+    item.setSavePath('D:\\' + item.getFilename());
+    item.on('updated', (_updateEvent, updateState) => {
+      console.log(updateState);
+    });
+    item.on('done', (_itemEvent, itemState) => {
+      console.log(itemState);
+    });
+  });
 });
 
 app.on('window-all-closed', () => {
