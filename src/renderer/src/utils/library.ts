@@ -9,41 +9,41 @@ export interface FangameManifest {
   sizeOnDisk: number;
 }
 
-function getAppsPath(libraryPath: string) {
-  return join(libraryPath, 'iwapps');
-}
-
-function getCommonPath(libraryPath: string) {
-  return join(libraryPath, 'iwapps', 'common');
-}
-
-export function getGamePath(libraryPath: string, id: string) {
-  return join(libraryPath, 'iwapps', 'common', id);
-}
-
-function getManifestPath(libraryPath: string, id: string) {
-  return join(libraryPath, 'iwapps', 'iwmanifest_' + id + '.json');
-}
-
 export const library = {
+  getAppsPath(libraryPath: string) {
+    return join(libraryPath, 'iwapps');
+  },
+
+  getCommonPath(libraryPath: string) {
+    return join(libraryPath, 'iwapps', 'common');
+  },
+
+  getGamePath(libraryPath: string, id: string) {
+    return join(libraryPath, 'iwapps', 'common', id);
+  },
+
+  getManifestPath(libraryPath: string, id: string) {
+    return join(libraryPath, 'iwapps', 'iwmanifest_' + id + '.json');
+  },
+
   async initializeLibrary(path: string) {
     if (await invoke('path-exists', path)) {
       await invoke('remove-dir', path);
       await invoke('create-dir', path);
     }
-    await invoke('create-dir', getCommonPath(path));
+    await invoke('create-dir', this.getCommonPath(path));
   },
 
   async checkLibrary(path: string) {
-    if (!(await invoke('path-exists', getCommonPath(path)))) {
-      await invoke('create-dir', getCommonPath(path));
+    if (!(await invoke('path-exists', this.getCommonPath(path)))) {
+      await invoke('create-dir', this.getCommonPath(path));
     }
   },
 
   async install(libraryPath: string, id: string, file: string) {
     await this.checkLibrary(libraryPath);
 
-    const gamePath = getGamePath(libraryPath, id);
+    const gamePath = this.getGamePath(libraryPath, id);
 
     if (await invoke('path-exists', gamePath)) {
       await this.uninstall(libraryPath, id);
@@ -58,19 +58,19 @@ export const library = {
   async uninstall(libraryPath: string, id: string) {
     await this.checkLibrary(libraryPath);
 
-    if (await invoke('path-exists', getGamePath(libraryPath, id))) {
-      await invoke('remove-dir', getGamePath(libraryPath, id));
+    if (await invoke('path-exists', this.getGamePath(libraryPath, id))) {
+      await invoke('remove-dir', this.getGamePath(libraryPath, id));
     }
 
-    if (await invoke('path-exists', getManifestPath(libraryPath, id))) {
-      await invoke('remove-file', getManifestPath(libraryPath, id));
+    if (await invoke('path-exists', this.getManifestPath(libraryPath, id))) {
+      await invoke('remove-file', this.getManifestPath(libraryPath, id));
     }
   },
 
   async getFangameIDsByManifest(libraryPath: string) {
     await this.checkLibrary(libraryPath);
 
-    const appsPath = getAppsPath(libraryPath);
+    const appsPath = this.getAppsPath(libraryPath);
     const files = await invoke('read-dir', appsPath);
 
     const ids: string[] = [];
@@ -90,7 +90,7 @@ export const library = {
   async getFangameIDsByGameDir(libraryPath: string) {
     await this.checkLibrary(libraryPath);
 
-    const commonPath = getCommonPath(libraryPath);
+    const commonPath = this.getCommonPath(libraryPath);
     const files = await invoke('read-dir', commonPath);
 
     const ids: string[] = [];
@@ -106,12 +106,12 @@ export const library = {
   async createManifest(libraryPath: string, id: string) {
     await this.checkLibrary(libraryPath);
 
-    const manifestPath = getManifestPath(libraryPath, id);
+    const manifestPath = this.getManifestPath(libraryPath, id);
     if (await invoke('path-exists', manifestPath)) {
       await invoke('remove-file', manifestPath);
     }
 
-    const gamePath = getGamePath(libraryPath, id);
+    const gamePath = this.getGamePath(libraryPath, id);
     if (!(await invoke('path-exists', gamePath))) {
       throw new Error('game not installed');
     }
@@ -148,5 +148,16 @@ export const library = {
     for (const id of ids) {
       await this.createManifest(libraryPath, id);
     }
+  },
+
+  async getManifest(libraryPath: string, id: string) {
+    await this.checkLibrary(libraryPath);
+
+    const manifestPath = this.getManifestPath(libraryPath, id);
+    if (!(await invoke('path-exists', manifestPath))) {
+      throw new Error('Manifest not exists');
+    }
+
+    return JSON.parse(await invoke('read-file', manifestPath)) as FangameManifest;
   }
 };

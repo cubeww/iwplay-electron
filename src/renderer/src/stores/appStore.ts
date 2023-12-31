@@ -9,6 +9,7 @@ import { useConfigStore } from './configStore';
 import { library } from '@renderer/utils/library';
 import PopupViewError from '@renderer/components/PopupViewError.vue';
 import PopupViewConfirm from '@renderer/components/PopupViewConfirm.vue';
+import { useProcess } from '@renderer/hooks/useProcess';
 
 export type TabName = 'browser' | 'library' | 'user';
 
@@ -164,7 +165,14 @@ export const useAppStore = defineStore('AppStore', () => {
       });
     }
 
-    // TODO: Get running fangames
+    // Get running fangames
+    const runningIds: string[] = await invoke('get-running');
+    runningIds.forEach((id) => {
+      const index = items.findIndex((item) => item.id === id);
+      if (index !== -1) {
+        items[index].isRunning = true;
+      }
+    });
 
     return items as FangameItem[];
   });
@@ -172,6 +180,16 @@ export const useAppStore = defineStore('AppStore', () => {
   const selectFangameItem = backable((id?: string) => {
     present.value = { tab: 'library', fangameItemId: id };
   });
+
+  // Make sure fangame items are updated on every game process launch/exit
+  useProcess(
+    () => {
+      fetchFangameItems();
+    },
+    () => {
+      fetchFangameItems();
+    }
+  );
 
   ///////////
   // Popup //

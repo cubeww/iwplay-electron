@@ -3,8 +3,10 @@ import { join } from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import log from 'electron-log/main';
 import { initMainAPI } from './api';
+import { ChildProcess } from 'child_process';
 
 export const windows: { [name: string]: BrowserWindow } = {};
+export const processes: { [id: string]: ChildProcess } = {};
 
 export function createWindow(params: { [key: string]: string }, options?: BrowserWindowConstructorOptions): BrowserWindow {
   const exists = windows[params.name];

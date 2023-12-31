@@ -6,7 +6,8 @@
     <div class="content">
       <div class="header">
         <ButtonGradient v-if="!item.isInstalled" class="header-button" @click="handleClickInstall"> <InstallGameIcon />{{ $t('INSTALL') }}</ButtonGradient>
-        <ButtonGradient v-if="item.isInstalled" color1="#4ade80" color2="#16a34a" class="header-button" @click="handleClickPlay"> <PlayIcon />{{ $t('PLAY') }}</ButtonGradient>
+        <ButtonGradient v-if="item.isInstalled && !item.isRunning" color1="#4ade80" color2="#16a34a" class="header-button" @click="handleClickPlay"> <PlayIcon />{{ $t('PLAY') }}</ButtonGradient>
+        <ButtonGradient v-if="item.isInstalled && item.isRunning" class="header-button" @click="handleClickStop"> <WindowCloseIcon />{{ $t('STOP') }}</ButtonGradient>
         <div class="header-item">
           <div class="header-item-title">{{ $t('LAST PLAYED') }}</div>
           <div class="header-item-content">
@@ -40,12 +41,14 @@ import SettingsIcon from '@renderer/icons/SettingsIcon.vue';
 import PopupViewInstallGame from './PopupViewInstallGame.vue';
 import PlayIcon from '@renderer/icons/PlayIcon.vue';
 import DeleteIcon from '@renderer/icons/DeleteIcon.vue';
-import { getGamePath, library } from '@renderer/utils/library';
+import { library } from '@renderer/utils/library';
 import { invoke } from '@renderer/utils/invoke';
 import { useFetch } from '@renderer/hooks/useFetch';
 import { DelFruitFangameDetail, delFruit } from '@renderer/utils/delFruit';
 import { watch } from 'vue';
 import { computed } from 'vue';
+import { join } from 'path-browserify';
+import WindowCloseIcon from '@renderer/icons/WindowCloseIcon.vue';
 
 const props = defineProps<{ item: FangameItem }>();
 
@@ -78,7 +81,16 @@ const handleClickInstall = () => {
   appStore.showPopup(PopupViewInstallGame, { id: props.item.id, name: props.item.name });
 };
 
-const handleClickPlay = () => {};
+const handleClickPlay = async () => {
+  const manifest = await library.getManifest(props.item.libraryPath, props.item.id);
+  const exePath = join(library.getGamePath(props.item.libraryPath, props.item.id), manifest.startupPath).replaceAll('/', '\\');
+
+  invoke('run', props.item.id, '"' + exePath + '"');
+};
+
+const handleClickStop = () => {
+  invoke('kill', props.item.id);
+};
 
 const handleClickDelete = () => {
   appStore.showConfirm('Are you sure you want to uninstall this fangame? This will delete all game files, possibly even SAVE files!', async () => {
@@ -98,7 +110,7 @@ const handleToDownload = () => {
 };
 
 const handleToGameDirectory = () => {
-  invoke('exec', `explorer "${getGamePath(props.item.libraryPath, props.item.id).replaceAll('/', '\\')}"`);
+  invoke('exec', `explorer "${library.getGamePath(props.item.libraryPath, props.item.id).replaceAll('/', '\\')}"`);
 };
 </script>
 

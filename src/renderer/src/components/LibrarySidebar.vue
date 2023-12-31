@@ -25,8 +25,12 @@
     </div>
     <div v-show="fetchStatus === 'ok'" class="fangame-list-with-scroll" @scroll="handleScroll">
       <div class="fangame-list-with-height" :style="{ height: filteredItems.length * itemHeight + 'px' }">
-        <div v-for="(item, index) in displayItems" :key="index" class="fangame-list-item" :class="{ select: appStore.present.fangameItemId === item.id, installed: item.isInstalled }" :style="{ transform: `translateY(${translateY}px)` }" @click="appStore.selectFangameItem(item.id)">
+        <div v-for="(item, index) in displayItems" :key="index" class="fangame-list-item" :class="{ select: appStore.present.fangameItemId === item.id, installed: item.isInstalled, running: item.isRunning }" :style="{ transform: `translateY(${translateY}px)` }" @click="appStore.selectFangameItem(item.id)">
           {{ item.name }}
+          <template v-if="item.isRunning">
+            <div style="color: #a9a9a9">&nbsp;-&nbsp;</div>
+            <div style="color: #7cb927">Running</div>
+          </template>
         </div>
       </div>
     </div>
@@ -344,6 +348,10 @@ const isInHome = computed(() => !appStore.present.fangameItemId);
 
   &.installed {
     color: white;
+  }
+
+  &.running {
+    color: #aafa31;
   }
 }
 

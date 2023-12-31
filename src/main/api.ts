@@ -1,8 +1,8 @@
-import { execSync } from 'child_process';
+import { exec, execSync, spawnSync } from 'child_process';
 import { app, dialog, ipcMain } from 'electron';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, unlinkSync, writeFileSync } from 'fs';
 import { dirname, join, resolve } from 'path';
-import { createWindow, windows } from '.';
+import { createWindow, processes, windows } from '.';
 
 function getFiles(dir: string, dir2: string, files: string[] = []) {
   const fileList = readdirSync(dir);
@@ -135,6 +135,30 @@ export function initMainAPI() {
 
   ipcMain.handle('exec', (_event, command, options) => {
     return execSync(command, options);
+  });
+
+  ipcMain.handle('run', (_event, id, file) => {
+    if (id in processes) {
+      execSync(`taskkill /pid ${processes[id].pid} /F /T`);
+      delete processes[id];
+    }
+    const p = exec(file);
+    p.on('close', () => {
+      delete processes[id];
+      windows['main'].webContents.send('process-close', id);
+    });
+    processes[id] = p;
+    windows['main'].webContents.send('process-run', id);
+  });
+
+  ipcMain.handle('kill', (_event, id) => {
+    if (id in processes) {
+      execSync(`taskkill /pid ${processes[id].pid} /F /T`);
+    }
+  });
+
+  ipcMain.handle('get-running', (_event) => {
+    return Object.keys(processes);
   });
 
   ////////////
