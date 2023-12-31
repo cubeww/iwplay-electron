@@ -1,6 +1,6 @@
 import { onMounted, onUnmounted } from 'vue';
 
-export function useProcess(onRun, onClose) {
+export function useProcess(onRun: (id: string) => void, onClose: (id: string) => void) {
   let offRun: () => void;
   let offClose: () => void;
 

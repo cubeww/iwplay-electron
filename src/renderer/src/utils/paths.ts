@@ -12,7 +12,7 @@
     userdata/
       {user-id}/
         {fangame-id}/
-          remotecache.json
+          profile.json
     appcache/
       delfruit-fangamelist.json
     iwplay-config.json
@@ -65,5 +65,9 @@ export const paths = {
 
   delFruitFangameList() {
     return userdata + '/appcache/delfruit-fangamelist.json';
+  },
+
+  fangameProfile(userid: string, id: string) {
+    return userdata + '/userdata/' + userid + '/' + id + '/profile.json';
   }
 };

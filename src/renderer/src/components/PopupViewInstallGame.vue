@@ -99,6 +99,7 @@ const handleInstall = async () => {
     emit('closePopup');
   } catch (err) {
     appStore.showError((err as Error).message);
+    installStatus.value = 'error';
   }
 };
 

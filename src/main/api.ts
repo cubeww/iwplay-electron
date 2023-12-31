@@ -1,4 +1,4 @@
-import { exec, execSync, spawnSync } from 'child_process';
+import { exec, execSync } from 'child_process';
 import { app, dialog, ipcMain } from 'electron';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, unlinkSync, writeFileSync } from 'fs';
 import { dirname, join, resolve } from 'path';
@@ -121,7 +121,7 @@ export function initMainAPI() {
     window.close();
   });
 
-  ipcMain.handle('quit', (_event) => {
+  ipcMain.handle('quit', () => {
     Object.values(windows).forEach((window) => window.close());
   });
 
@@ -159,7 +159,7 @@ export function initMainAPI() {
     }
   });
 
-  ipcMain.handle('get-running', (_event) => {
+  ipcMain.handle('get-running', () => {
     return Object.keys(processes);
   });
 

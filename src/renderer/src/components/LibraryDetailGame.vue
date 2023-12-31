@@ -8,15 +8,17 @@
         <ButtonGradient v-if="!item.isInstalled" class="header-button" @click="handleClickInstall"> <InstallGameIcon />{{ $t('INSTALL') }}</ButtonGradient>
         <ButtonGradient v-if="item.isInstalled && !item.isRunning" color1="#4ade80" color2="#16a34a" class="header-button" @click="handleClickPlay"> <PlayIcon />{{ $t('PLAY') }}</ButtonGradient>
         <ButtonGradient v-if="item.isInstalled && item.isRunning" class="header-button" @click="handleClickStop"> <WindowCloseIcon />{{ $t('STOP') }}</ButtonGradient>
-        <div class="header-item">
+        <div v-if="profile" class="header-item">
           <div class="header-item-title">{{ $t('LAST PLAYED') }}</div>
           <div class="header-item-content">
-            {{ $d(new Date(), 'short') }}
+            {{ $d(profile.lastPlayed, 'short') }}
           </div>
         </div>
-        <div class="header-item">
+        <div v-if="profile" class="header-item">
           <div class="header-item-title">{{ $t('PLAY TIME') }}</div>
-          <div class="header-item-content">{{ '0.0' + $t(' hours') }}</div>
+          <div class="header-item-content">
+            {{ playTime + $t(profile.playTime >= 3600 ? ' hours' : ' minutes') }}
+          </div>
         </div>
         <div v-if="item.isInstalled" class="header-toolbox">
           <DeleteIcon class="header-toolbox-button" @click="handleClickDelete" />
@@ -52,13 +54,40 @@ import { paths } from '@renderer/utils/paths';
 
 const props = defineProps<{ item: FangameItem }>();
 
-const [fetchDetails, details, fetchDetailsStatus, fetchDetailsError] = useFetch({} as DelFruitFangameDetail, () => {
+const [fetchDetails, details, fetchDetailsStatus, _fetchDetailsError] = useFetch({} as DelFruitFangameDetail, () => {
   return delFruit.fetchFangameDetail(props.item.id);
 });
+
+export interface FangameProfile {
+  playTime: number;
+  lastPlayed: Date;
+}
+
+const profile = ref<FangameProfile>();
+const playTime = computed(() => {
+  if (!profile.value) return 0;
+  const t = profile.value.playTime;
+  return t < 3600 ? Math.ceil(t / 60) : (t / 3600.0).toFixed(1);
+});
+
+const fetchProfile = async () => {
+  const profileFile = paths.fangameProfile('guest', props.item.id);
+  if (await invoke('path-exists', profileFile)) {
+    try {
+      profile.value = JSON.parse(await invoke('read-file', profileFile));
+    } catch (err) {
+      appStore.showError((err as Error).message);
+      profile.value = undefined;
+    }
+  } else {
+    profile.value = undefined;
+  }
+};
 
 watch(
   props,
   () => {
+    fetchProfile();
     fetchDetails();
   },
   { immediate: true }
@@ -85,11 +114,19 @@ const handleClickPlay = async () => {
   const manifest = await library.getManifest(props.item.libraryPath, props.item.id);
   const exePath = paths.gameExe(props.item.libraryPath, props.item.id, manifest.startupPath).replaceAll('/', '\\');
 
-  invoke('run', props.item.id, exePath);
+  try {
+    await invoke('run', props.item.id, exePath);
+  } catch (err) {
+    appStore.showError((err as Error).message);
+  }
 };
 
-const handleClickStop = () => {
-  invoke('kill', props.item.id);
+const handleClickStop = async () => {
+  try {
+    await invoke('kill', props.item.id);
+  } catch (err) {
+    appStore.showError((err as Error).message);
+  }
 };
 
 const handleClickDelete = () => {

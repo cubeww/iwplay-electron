@@ -10,6 +10,7 @@ import PopupViewError from '@renderer/components/PopupViewError.vue';
 import PopupViewConfirm from '@renderer/components/PopupViewConfirm.vue';
 import { useProcess } from '@renderer/hooks/useProcess';
 import { paths } from '@renderer/utils/paths';
+import { FangameProfile } from '@renderer/components/LibraryDetailGame.vue';
 
 export type TabName = 'browser' | 'library' | 'user';
 
@@ -181,12 +182,39 @@ export const useAppStore = defineStore('AppStore', () => {
     present.value = { ...present.value, tab: 'library', fangameItemId: id };
   });
 
+  interface FangamePlayingStatus {
+    playTime: number;
+    timer: NodeJS.Timeout;
+  }
+
+  const playingFangames: { [id: string]: FangamePlayingStatus } = {};
+
   // Make sure fangame items are updated on every game process run/close
   useProcess(
-    () => {
+    (id) => {
       fetchFangameItems();
+
+      const status = { playTime: 0 } as FangamePlayingStatus;
+      status.timer = setInterval(() => {
+        status.playTime += 1;
+      }, 1000);
+
+      playingFangames[id] = status;
     },
-    () => {
+    async (id) => {
+      clearInterval(playingFangames[id].timer);
+
+      // Update fangame profile
+      const playTime = playingFangames[id].playTime;
+      const profileFile = paths.fangameProfile('guest', id);
+      const profile: FangameProfile = { lastPlayed: new Date(), playTime: playTime };
+      if (await invoke('path-exists', profileFile)) {
+        const oldProfile: FangameProfile = JSON.parse(await invoke('read-file', profileFile));
+        profile.playTime += oldProfile.playTime;
+      }
+      await invoke('write-file', profileFile, JSON.stringify(profile));
+      delete playingFangames[id];
+
       fetchFangameItems();
     }
   );
