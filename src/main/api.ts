@@ -142,7 +142,9 @@ export function initMainAPI() {
       execSync(`taskkill /pid ${processes[id].pid} /F /T`);
       delete processes[id];
     }
-    const p = exec(file);
+
+    const p = exec(`"${file}"`, { cwd: dirname(file) });
+
     p.on('close', () => {
       delete processes[id];
       windows['main'].webContents.send('process-close', id);

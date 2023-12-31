@@ -178,10 +178,10 @@ export const useAppStore = defineStore('AppStore', () => {
   });
 
   const selectFangameItem = backable((id?: string) => {
-    present.value = { tab: 'library', fangameItemId: id };
+    present.value = { ...present.value, tab: 'library', fangameItemId: id };
   });
 
-  // Make sure fangame items are updated on every game process launch/exit
+  // Make sure fangame items are updated on every game process run/close
   useProcess(
     () => {
       fetchFangameItems();
@@ -216,12 +216,6 @@ export const useAppStore = defineStore('AppStore', () => {
     showPopup(PopupViewConfirm, { message, yes, no });
   };
 
-  //////////
-  // Misc //
-  //////////
-
-  const isMaximize = ref(false);
-
   return {
     past,
     future,
@@ -236,7 +230,6 @@ export const useAppStore = defineStore('AppStore', () => {
     showContextMenu,
     hideContextMenu,
     contextMenu,
-    isMaximize,
     popups,
     showPopup,
     closePopup,

@@ -85,7 +85,7 @@ const handleClickPlay = async () => {
   const manifest = await library.getManifest(props.item.libraryPath, props.item.id);
   const exePath = join(library.getGamePath(props.item.libraryPath, props.item.id), manifest.startupPath).replaceAll('/', '\\');
 
-  invoke('run', props.item.id, '"' + exePath + '"');
+  invoke('run', props.item.id, exePath);
 };
 
 const handleClickStop = () => {

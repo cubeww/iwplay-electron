@@ -30,7 +30,7 @@ const handleClick = () => {
   align-items: center;
   width: fit-content;
   height: fit-content;
-  font-weight: lighter;
+  font-weight: 400;
   color: #dfe3e6;
   padding: 8px;
   border-radius: 3px;
