@@ -22,7 +22,7 @@
         </div>
         <div v-if="item.isInstalled" class="header-toolbox">
           <DeleteIcon class="header-toolbox-button" @click="handleClickDelete" />
-          <SettingsIcon class="header-toolbox-button" />
+          <SettingsIcon class="header-toolbox-button" @click="handleClickProperties" />
         </div>
       </div>
       <div class="nav">
@@ -112,6 +112,10 @@ const handleClickInstall = () => {
 
 const handleClickPlay = async () => {
   const manifest = await library.getManifest(props.item.libraryPath, props.item.id);
+  if (!manifest.startupPath) {
+    appStore.showError('This game contains multiple executable files, please go to the game properties to select one.', showGameProperties);
+    return;
+  }
   const exePath = paths.gameExe(props.item.libraryPath, props.item.id, manifest.startupPath).replaceAll('/', '\\');
 
   try {
@@ -138,6 +142,24 @@ const handleClickDelete = () => {
     }
     appStore.fetchFangameItems();
   });
+};
+
+const showGameProperties = () => {
+  invoke(
+    'create-window',
+    {
+      type: 'gameprop',
+      name: props.item.id,
+      id: props.item.id,
+      gameName: props.item.name,
+      libraryPath: props.item.libraryPath
+    },
+    { width: 800, height: 600 }
+  );
+};
+
+const handleClickProperties = () => {
+  showGameProperties();
 };
 
 const handleToDownload = () => {

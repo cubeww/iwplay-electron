@@ -12,6 +12,7 @@ import { createI18n } from 'vue-i18n';
 import zh from './i18n/zh';
 import en from './i18n/en';
 import { useConfigStore } from './stores/configStore';
+import GameProperties from './components/GameProperties.vue';
 
 export const searchParams = new URLSearchParams(window.location.search);
 export const windowType = searchParams.get('type') as string;
@@ -19,7 +20,8 @@ export const windowName = searchParams.get('name') as string;
 
 const typeToComponentMap = {
   main: App,
-  settings: AppSettings
+  settings: AppSettings,
+  gameprop: GameProperties
 };
 
 export const mainI18n = createI18n({

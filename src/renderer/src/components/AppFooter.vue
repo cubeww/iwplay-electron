@@ -27,6 +27,8 @@ const handleAddGame = () => {
   align-items: center;
   box-sizing: border-box;
   padding: 10px;
+
+  -webkit-app-region: drag;
 }
 
 .button {
@@ -40,6 +42,8 @@ const handleAddGame = () => {
     color: white;
     cursor: pointer;
   }
+
+  -webkit-app-region: no-drag;
 }
 
 .button-image {

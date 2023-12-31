@@ -30,6 +30,7 @@ export default {
   'Delicious Fruit': '美味水果',
   'I wanna Wiki': 'I wanna 维基',
   ' hours': '小时',
+  ' minutes': '分钟',
   'Storage': '存储',
   'Library Paths': '库路径',
   'The library path is used to store installed fangame files. It is recommended to choose an empty folder with ample remaining space on the hard drive. Example: D:\\IWPlayLibrary': '库路径用于存放安装的I Wanna游戏。推荐选择一个硬盘空间富裕的空文件夹，例如：D:\\IWPlayLibrary。',
@@ -37,5 +38,9 @@ export default {
   'Installed': '已安装',
   'Running': '运行中',
   'FILTER': '筛选',
-  'INSTALL TO: ': '安装至：'
+  'INSTALL TO: ': '安装至：',
+  'PLAY': '启动',
+  'General': '常规',
+  'Startup Path': '启动文件路径',
+  'STOP': '停止'
 };
