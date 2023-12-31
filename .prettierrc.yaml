@@ -3,3 +3,4 @@ semi: true
 printWidth: 999
 trailingComma: none
 endOfLine: auto
+quoteProps: consistent

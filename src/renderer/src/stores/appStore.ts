@@ -42,7 +42,7 @@ export const useAppStore = defineStore('AppStore', () => {
 
   const shouldLoadURL = ref(false);
 
-  const backable = <T extends Function>(action: T) => {
+  const backable = <T extends (...args: any) => void>(action: T) => {
     return ((...args: any) => {
       future.value = [];
       past.value.push(present.value);
@@ -105,7 +105,7 @@ export const useAppStore = defineStore('AppStore', () => {
   // Library //
   /////////////
 
-  const [fetchFangameItems, fangameItems, fetchFangameItemsStatus, fetchFangameItemsError] = useFetchShallow([], async (forceDownload: boolean = false) => {
+  const [fetchFangameItems, fangameItems, fetchFangameItemsStatus, fetchFangameItemsError] = useFetchShallow([], async (forceDownload = false) => {
     const cacheFile = join(await invoke('get-path', 'userData'), 'appcache', 'delfruit-fangamelist.json');
 
     let items: any[] = [];

@@ -33,9 +33,9 @@ export default {
   'Storage': '存储',
   'Library Paths': '库路径',
   'The library path is used to store installed fangame files. It is recommended to choose an empty folder with ample remaining space on the hard drive. Example: D:\\IWPlayLibrary': '库路径用于存放安装的I Wanna游戏。推荐选择一个硬盘空间富裕的空文件夹，例如：D:\\IWPlayLibrary。',
-  "You can add multiple library paths at the same time, but it's best to use just one.":'你可以添加多个库目录，但最好只使用一个。',
+  "You can add multiple library paths at the same time, but it's best to use just one.": '你可以添加多个库目录，但最好只使用一个。',
   'Installed': '已安装',
   'Running': '运行中',
   'FILTER': '筛选',
-  'INSTALL TO: ': '安装至：',
+  'INSTALL TO: ': '安装至：'
 };
