@@ -1,7 +1,6 @@
 import { ContextMenuOptions } from '@renderer/components/ContextMenu.vue';
 import { invoke } from '@renderer/utils/invoke';
 import { DelFruitFangameItem, delFruit } from '@renderer/utils/delFruit';
-import { join } from 'path-browserify';
 import { defineStore } from 'pinia';
 import { ref, shallowRef } from 'vue';
 import { useFetchShallow } from '@renderer/hooks/useFetch';
@@ -10,6 +9,7 @@ import { library } from '@renderer/utils/library';
 import PopupViewError from '@renderer/components/PopupViewError.vue';
 import PopupViewConfirm from '@renderer/components/PopupViewConfirm.vue';
 import { useProcess } from '@renderer/hooks/useProcess';
+import { paths } from '@renderer/utils/paths';
 
 export type TabName = 'browser' | 'library' | 'user';
 
@@ -107,7 +107,7 @@ export const useAppStore = defineStore('AppStore', () => {
   /////////////
 
   const [fetchFangameItems, fangameItems, fetchFangameItemsStatus, fetchFangameItemsError] = useFetchShallow([], async (forceDownload = false) => {
-    const cacheFile = join(await invoke('get-path', 'userData'), 'appcache', 'delfruit-fangamelist.json');
+    const cacheFile = paths.delFruitFangameList();
 
     let items: any[] = [];
 

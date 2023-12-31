@@ -47,8 +47,8 @@ import { useFetch } from '@renderer/hooks/useFetch';
 import { DelFruitFangameDetail, delFruit } from '@renderer/utils/delFruit';
 import { watch } from 'vue';
 import { computed } from 'vue';
-import { join } from 'path-browserify';
 import WindowCloseIcon from '@renderer/icons/WindowCloseIcon.vue';
+import { paths } from '@renderer/utils/paths';
 
 const props = defineProps<{ item: FangameItem }>();
 
@@ -83,7 +83,7 @@ const handleClickInstall = () => {
 
 const handleClickPlay = async () => {
   const manifest = await library.getManifest(props.item.libraryPath, props.item.id);
-  const exePath = join(library.getGamePath(props.item.libraryPath, props.item.id), manifest.startupPath).replaceAll('/', '\\');
+  const exePath = paths.gameExe(props.item.libraryPath, props.item.id, manifest.startupPath).replaceAll('/', '\\');
 
   invoke('run', props.item.id, exePath);
 };
@@ -110,7 +110,7 @@ const handleToDownload = () => {
 };
 
 const handleToGameDirectory = () => {
-  invoke('exec', `explorer "${library.getGamePath(props.item.libraryPath, props.item.id).replaceAll('/', '\\')}"`);
+  invoke('exec', `explorer "${paths.gameDir(props.item.libraryPath, props.item.id).replaceAll('/', '\\')}"`);
 };
 </script>
 

@@ -1,6 +1,6 @@
 import { mainI18n } from '@renderer/main';
 import { invoke } from '@renderer/utils/invoke';
-import { join } from 'path-browserify';
+import { paths } from '@renderer/utils/paths';
 import { defineStore } from 'pinia';
 import { watch } from 'vue';
 import { ref, toRaw } from 'vue';
@@ -12,9 +12,8 @@ interface AppConfig {
   language: Language;
 }
 
-const configFile = join(await invoke('get-path', 'userData'), 'iwplay-config.json');
-
 export const useConfigStore = defineStore('ConfigStore', () => {
+  const configFile = paths.config();
   const init = async () => {
     try {
       const json = await invoke('read-file', configFile);
