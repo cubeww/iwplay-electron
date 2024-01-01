@@ -21,10 +21,13 @@ import AppFooter from './components/AppFooter.vue';
 import ContextMenu from './components/ContextMenu.vue';
 import { useAppStore } from './stores/appStore';
 import { onMounted } from 'vue';
+import PopupViewDownload from './components/PopupViewDownload.vue';
 
 const appStore = useAppStore();
 
-onMounted(() => {});
+onMounted(() => {
+  appStore.showPopup(PopupViewDownload, {});
+});
 </script>
 
 <style scoped>
