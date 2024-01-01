@@ -8,6 +8,10 @@ import { ChildProcess } from 'child_process';
 export const windows: { [name: string]: BrowserWindow } = {};
 export const processes: { [id: string]: ChildProcess } = {};
 
+export const downloadContext = {
+  savePath: ''
+};
+
 export function createWindow(params: { [key: string]: string }, options?: BrowserWindowConstructorOptions): BrowserWindow {
   const exists = windows[params.name];
   if (exists) {
@@ -84,6 +88,25 @@ app.whenReady().then(() => {
       // to facilitate sending IPC messages from within the webviews to their parent.
       webPreferences.preload = join(__dirname, '../preload/index.js');
     });
+    contents.on('did-attach-webview', (_e, wb) => {
+      wb.openDevTools();
+
+      wb.setWindowOpenHandler((details) => {
+        wb.loadURL(details.url);
+        return {
+          action: 'deny'
+        };
+      });
+    });
+  });
+
+  app.on('web-contents-created', (_e, wc) => {
+    wc.setWindowOpenHandler((details) => {
+      console.log(details.url);
+      return {
+        action: 'allow'
+      };
+    });
   });
 
   process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
@@ -97,15 +120,29 @@ app.whenReady().then(() => {
   initMainAPI();
 
   // Download
-  mainWindow.webContents.session.on('will-download', (_downloadEvent, item) => {
-    console.log('Download: ' + item.getFilename());
-    item.setSavePath('D:\\' + item.getFilename());
-    item.on('updated', (_updateEvent, updateState) => {
-      console.log(updateState);
-    });
-    item.on('done', (_itemEvent, itemState) => {
-      console.log(itemState);
-    });
+  mainWindow.webContents.session.on('will-download', (_downloadEvent, item, webContents) => {
+    if (webContents.getType() === 'webview') {
+      item.cancel();
+      mainWindow.webContents.send('webview-download', {
+        url: item.getURL(),
+        filename: item.getFilename(),
+        filesize: item.getTotalBytes()
+      });
+    } else {
+      item.setSavePath(downloadContext.savePath);
+      item.on('updated', (_updateEvent, updateState) => {
+        if (updateState === 'progressing') {
+          mainWindow.webContents.send('download-updated', item.getURL(), item.getReceivedBytes());
+        }
+      });
+      item.on('done', (_itemEvent, itemState) => {
+        if (itemState === 'completed') {
+          mainWindow.webContents.send('download-successfully', item.getURL());
+        } else {
+          mainWindow.webContents.send('download-failed', item.getURL());
+        }
+      });
+    }
   });
 });
 

@@ -2,7 +2,7 @@ import { exec, execSync } from 'child_process';
 import { app, dialog, ipcMain } from 'electron';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, unlinkSync, writeFileSync } from 'fs';
 import { dirname, join, resolve } from 'path';
-import { createWindow, processes, windows } from '.';
+import { createWindow, downloadContext, processes, windows } from '.';
 
 function getFiles(dir: string, dir2: string, files: string[] = []) {
   const fileList = readdirSync(dir);
@@ -173,5 +173,14 @@ export function initMainAPI() {
         window.webContents.send('sync-config-to-renderer', data);
       }
     }
+  });
+
+  //////////////
+  // Download //
+  //////////////
+
+  ipcMain.handle('download-file', (_event, url, path) => {
+    downloadContext.savePath = path;
+    windows['main'].webContents.downloadURL(url);
   });
 }

@@ -11,6 +11,9 @@ import PopupViewConfirm from '@renderer/components/PopupViewConfirm.vue';
 import { useProcess } from '@renderer/hooks/useProcess';
 import { paths } from '@renderer/utils/paths';
 import { FangameProfile } from '@renderer/components/LibraryDetailGame.vue';
+import { useWebviewDownload } from '@renderer/hooks/useWebviewDownload';
+import PopupViewDownload from '@renderer/components/PopupViewDownload.vue';
+import { useDownload } from '@renderer/hooks/useDownload';
 
 export type TabName = 'browser' | 'library' | 'user';
 
@@ -219,6 +222,82 @@ export const useAppStore = defineStore('AppStore', () => {
     }
   );
 
+  //////////////
+  // Download //
+  //////////////
+
+  const lastVisitedFangameId = ref('');
+
+  const updateLastVisitedFangameId = (id: string) => {
+    lastVisitedFangameId.value = id;
+  };
+
+  useWebviewDownload((params) => {
+    showPopup(PopupViewDownload, { url: params.url, filename: params.filename, filesize: params.filesize, possibleId: lastVisitedFangameId });
+  });
+
+  interface DownloadItem {
+    url: string;
+    received: number;
+    size: number;
+    status: DownloadStatus;
+    libraryPath: string;
+    gameId: string;
+    filePath: string;
+  }
+
+  type DownloadStatus = 'downloading' | 'succeed' | 'failed';
+
+  const downloadItems = ref<DownloadItem[]>([]);
+
+  const addDownloadItem = async (url: string, filename: string, size: number, libraryPath: string, gameId: string) => {
+    const index = downloadItems.value.findIndex((i) => i.gameId === gameId && i.status === 'downloading');
+    if (index !== -1) {
+      throw new Error('The game with the specified ID is already being downloaded! Please cancel it first.');
+    }
+
+    const dir = paths.downloading(libraryPath, gameId);
+    if (!(await invoke('path-exists', dir))) {
+      await invoke('create-dir', dir);
+    }
+
+    const downloadPath = (dir + '/' + filename).replaceAll('/', '\\');
+    downloadItems.value.push({ gameId, libraryPath, size, url, filePath: downloadPath, received: 0, status: 'downloading' });
+
+    invoke('download-file', url, downloadPath);
+  };
+
+  useDownload(
+    (url, received) => {
+      const index = downloadItems.value.findIndex((i) => i.url === url);
+      if (index === -1) {
+        console.log('WARNING: A download item has been updated, but it has not entered the download items.');
+        return;
+      }
+      downloadItems.value[index].received = received;
+    },
+    async (url) => {
+      const index = downloadItems.value.findIndex((i) => i.url === url);
+      if (index === -1) {
+        console.log('WARNING: A download item has been updated, but it has not entered the download items.');
+        return;
+      }
+      downloadItems.value[index].status = 'succeed';
+
+      // Perform installation
+      await library.install(downloadItems.value[index].libraryPath, downloadItems.value[index].gameId, downloadItems.value[index].filePath);
+      fetchFangameItems();
+    },
+    (url) => {
+      const index = downloadItems.value.findIndex((i) => i.url === url);
+      if (index === -1) {
+        console.log('WARNING: A download item has been updated, but it has not entered the download items.');
+        return;
+      }
+      downloadItems.value[index].status = 'failed';
+    }
+  );
+
   ///////////
   // Popup //
   ///////////
@@ -267,6 +346,9 @@ export const useAppStore = defineStore('AppStore', () => {
     fetchFangameItems,
     fetchFangameItemsStatus,
     fetchFangameItemsError,
-    selectFangameItem
+    selectFangameItem,
+    updateLastVisitedFangameId,
+    downloadItems,
+    addDownloadItem
   };
 });

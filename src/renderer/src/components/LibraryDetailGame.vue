@@ -164,6 +164,7 @@ const handleClickProperties = () => {
 
 const handleToDownload = () => {
   if (hasDownloadLink.value) {
+    appStore.updateLastVisitedFangameId(props.item.id);
     appStore.toggleBrowserAndLoadURL(details.value.downloadLink);
   }
 };

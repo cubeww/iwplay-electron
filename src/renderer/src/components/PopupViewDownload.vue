@@ -2,8 +2,8 @@
   <PopupView @close-popup="emit('closePopup')">
     <PopupTitle>{{ $t('Download And Install') }}</PopupTitle>
     <PopupSeparator />
-    <div>File Name: 哈吉米.zip</div>
-    <div>File Size: 16.0 MB</div>
+    <div>{{ $t('File Name: ') }} {{ context.filename }}</div>
+    <div>{{ $t('File Size: ') }} {{ (context.filesize / 1048576.0).toFixed(2) }} MB</div>
     <div class="bold white">{{ $t('TARGET FANGAME DELFRUIT ID:') }}</div>
     <div class="target">
       <div class="target-input-row">
@@ -26,7 +26,7 @@
       {{ path }}
     </div>
     <div class="bottom">
-      <ButtonGradient class="bottom-button" :enabled="selectedLibraryPath !== '' && targetFangameValid" @click="">{{ $t('Install') }}</ButtonGradient>
+      <ButtonGradient class="bottom-button" :enabled="selectedLibraryPath !== '' && targetFangameValid" @click="handleClickInstall">{{ $t('Install') }}</ButtonGradient>
       <ButtonPure class="bottom-button" @click="emit('closePopup')">{{ $t('Cancel') }}</ButtonPure>
     </div>
   </PopupView>
@@ -49,15 +49,20 @@ import { computed } from 'vue';
 import { useAppStore } from '@renderer/stores/appStore';
 
 export interface DownloadPopupContext {
-  id: string;
-  name: string;
+  url: string;
+  filename: string;
+  filesize: number;
+  possibleId: string;
 }
+
+const props = defineProps<{ context: DownloadPopupContext }>();
+const emit = defineEmits<{ closePopup: [] }>();
 
 const appStore = useAppStore();
 const configStore = useConfigStore();
 
 const selectedLibraryPath = ref('');
-const targetFangameId = ref('');
+const targetFangameId = ref(props.context.possibleId);
 
 const targetFangameName = computed(() => {
   const item = appStore.fangameItems.find((i) => i.id === targetFangameId.value);
@@ -65,9 +70,6 @@ const targetFangameName = computed(() => {
 });
 
 const targetFangameValid = computed(() => targetFangameName.value !== '');
-
-const props = defineProps<{ context: DownloadPopupContext }>();
-const emit = defineEmits<{ closePopup: [] }>();
 
 onMounted(() => {
   if (configStore.cfg.libraryPaths.length > 0) {
@@ -85,6 +87,15 @@ const handleClickHelpID = () => {
     title: 'ABOUT DELFRUIT ID',
     message: `Fangame's DELFRUIT ID can be found at the URL of the Delicious Fruit game details page, for example: "https://delicious-fruit.com/ratings/game_details.php?id=14681" The DELFRUIT ID of this game is 14681.`
   });
+};
+
+const handleClickInstall = async () => {
+  try {
+    appStore.addDownloadItem(props.context.url, props.context.filename, props.context.filesize, selectedLibraryPath.value, targetFangameId.value);
+    emit('closePopup');
+  } catch (err) {
+    appStore.showError((err as Error).message);
+  }
 };
 </script>
 

@@ -7,7 +7,7 @@
         <div class="url-box-text">{{ url }}</div>
       </div>
     </div>
-    <webview ref="webviewEl" style="flex-grow: 1" src="https://delicious-fruit.com/" nodeintegration />
+    <webview ref="webviewEl" style="flex-grow: 1" src="https://delicious-fruit.com/" allowpopups disablewebsecurity nodeintegration />
   </TabView>
 </template>
 
@@ -79,17 +79,21 @@ const handleDidNavigate = (event: any) => {
   if (!webviewEl.value) return;
   webviewEl.value.insertCSS(webviewCSS);
   url.value = event.url;
+
+  const prefix = 'https://delicious-fruit.com/ratings/game_details.php?id=';
+  const index = event.url.indexOf(prefix);
+  if (index !== -1) {
+    const id = event.url.substring(index + prefix.length);
+    appStore.updateLastVisitedFangameId(id);
+  }
 };
 
 const handleDidStopLoading = () => {
   if (!webviewEl.value) return;
   loading.value = false;
 
+  // Get mouse input and use it to close the context menu if needed
   webviewEl.value.executeJavaScript(`
-    // Prevent website from opening new page
-    document.querySelectorAll('a').forEach(a => a.removeAttribute('target'))
-    
-    // Get mouse input and use it to close the context menu if needed
     document.addEventListener('mousedown', () => {
       window.electron.ipcRenderer.sendToHost('mousedown')
     })

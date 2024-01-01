@@ -51,6 +51,10 @@ export const paths = {
     return libraryPath + '/iwapps/iwmanifest_' + id + '.json';
   },
 
+  downloading(libraryPath: string, id: string) {
+    return libraryPath + '/iwapps/downloading/' + id;
+  },
+
   /////////////
   // AppData //
   /////////////
