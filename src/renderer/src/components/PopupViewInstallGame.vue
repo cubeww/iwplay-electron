@@ -4,13 +4,13 @@
     <PopupSeparator />
     <div>{{ context.name }} (ID: {{ context.id }})</div>
     <PopupSeparator />
-    <ButtonGradient style="width: 120px" color1="#4ade80" color2="#16a34a" @click="handleSelectZip">{{ $t('Select ZIP') }}</ButtonGradient>
+    <ButtonGradient style="width: 120px" color1="#4ade80" color2="#16a34a" @click="handleSelectGameFile">{{ $t('Select File') }}</ButtonGradient>
     <template v-if="filename">
       <div class="bold">{{ $t('File Name: ') }} {{ filename }}</div>
       <div class="bold">{{ $t('File Size: ') }} {{ filesizeStr }}</div>
     </template>
     <template v-else>
-      <div class="bold">{{ $t('No ZIP Selected') }}</div>
+      <div class="bold">{{ $t('No Game File Selected') }}</div>
     </template>
     <PopupSeparator />
     <div class="install-to-row">
@@ -76,11 +76,12 @@ onMounted(() => {
   }
 });
 
-const handleSelectZip = async () => {
+const handleSelectGameFile = async () => {
   const f = await invoke('open-file-dialog', 'main', {
-    title: i18n.t('Select Game ZIP'),
+    title: i18n.t('Select Game File'),
     filters: [
       { name: 'Compress Files', extensions: ['zip', 'rar', '7z'] },
+      { name: 'Executable File', extensions: ['exe'] },
       { name: 'All Files', extensions: ['*'] }
     ]
   });

@@ -83,7 +83,7 @@ app.whenReady().then(() => {
   });
 
   app.on('web-contents-created', (_event, contents) => {
-    contents.on('will-attach-webview', (_wawevent, webPreferences, _params) => {
+    contents.on('will-attach-webview', (_wawevent, webPreferences) => {
       // Inject a preload file into all webviews
       // to facilitate sending IPC messages from within the webviews to their parent.
       webPreferences.preload = join(__dirname, '../preload/index.js');
@@ -100,13 +100,8 @@ app.whenReady().then(() => {
     });
   });
 
-  app.on('web-contents-created', (_e, wc) => {
-    wc.setWindowOpenHandler((details) => {
-      console.log(details.url);
-      return {
-        action: 'allow'
-      };
-    });
+  app.on('window-all-closed', () => {
+    app.quit();
   });
 
   process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
@@ -119,7 +114,7 @@ app.whenReady().then(() => {
   // Register IPC handlers
   initMainAPI();
 
-  // Download
+  // Handle download events
   mainWindow.webContents.session.on('will-download', (_downloadEvent, item, webContents) => {
     if (webContents.getType() === 'webview') {
       item.cancel();
@@ -144,8 +139,4 @@ app.whenReady().then(() => {
       });
     }
   });
-});
-
-app.on('window-all-closed', () => {
-  app.quit();
 });

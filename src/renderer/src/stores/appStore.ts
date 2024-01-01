@@ -159,8 +159,8 @@ export const useAppStore = defineStore('AppStore', () => {
 
     // Get installed fangames
     for (const path of configStore.cfg.libraryPaths) {
-      const installedIds = await library.getFangameIDsByManifest(path);
-      installedIds.forEach((id) => {
+      const installedIDs = await library.getFangameIDsByManifest(path);
+      installedIDs.forEach((id) => {
         const index = items.findIndex((item) => item.id === id);
         if (index !== -1) {
           items[index].isInstalled = true;
@@ -170,8 +170,8 @@ export const useAppStore = defineStore('AppStore', () => {
     }
 
     // Get running fangames
-    const runningIds: string[] = await invoke('get-running');
-    runningIds.forEach((id) => {
+    const runningIDs: string[] = await invoke('get-running');
+    runningIDs.forEach((id) => {
       const index = items.findIndex((item) => item.id === id);
       if (index !== -1) {
         items[index].isRunning = true;

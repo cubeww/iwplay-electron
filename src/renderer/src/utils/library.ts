@@ -34,7 +34,13 @@ export const library = {
     }
 
     await invoke('create-dir', gamePath);
-    await invoke('exec', `"resources/7z.exe" x "${file}" -o"${gamePath}"`);
+
+    if (file.split('.').pop() === 'exe') {
+      const filename = file.replaceAll('\\', '/').split('/').pop();
+      await invoke('exec', `copy "${file}" "${gamePath}/${filename}"`);
+    } else {
+      await invoke('exec', `"resources/7z.exe" x "${file}" -o"${gamePath}"`);
+    }
 
     await this.createManifest(libraryPath, id);
   },
