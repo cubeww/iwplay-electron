@@ -61,7 +61,6 @@ export function createWindow(params: { [key: string]: string }, options?: Browse
 
     window.webContents.openDevTools();
   } else {
-    // window.loadFile(join(__dirname, '../renderer/index.html' + queryString));
     window.loadURL(join('file://', __dirname, '../renderer/index.html' + queryString));
 
     window.webContents.openDevTools();
@@ -73,7 +72,7 @@ export function createWindow(params: { [key: string]: string }, options?: Browse
 
 app.whenReady().then(() => {
   // Set app user model id for windows
-  electronApp.setAppUserModelId('com.electron');
+  electronApp.setAppUserModelId('com.iwplay');
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
@@ -89,10 +88,19 @@ app.whenReady().then(() => {
       webPreferences.preload = join(__dirname, '../preload/index.js');
     });
     contents.on('did-attach-webview', (_e, wb) => {
-      wb.openDevTools();
+      // wb.openDevTools();
 
+      // When the webview opens a new tab, load it directly instead of opening the new tab
       wb.setWindowOpenHandler((details) => {
+        // Mediafire may have ads pop-ups, so prevent it from loading ads.
+        if (wb.getURL().includes('www.mediafire.com/file/')) {
+          return {
+            action: 'deny'
+          };
+        }
+
         wb.loadURL(details.url);
+
         return {
           action: 'deny'
         };

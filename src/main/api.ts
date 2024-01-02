@@ -39,9 +39,8 @@ function dirSize(dir: string) {
 }
 
 export function initMainAPI() {
-  /////////////////
-  // File System //
-  /////////////////
+  // File System
+  // -----------
 
   ipcMain.handle('read-file', (_event, file) => {
     return readFileSync(file, { encoding: 'utf8' });
@@ -97,9 +96,8 @@ export function initMainAPI() {
     return resolve(path);
   });
 
-  ////////////
-  // Window //
-  ////////////
+  // Window
+  // ------
 
   ipcMain.handle('maximize', (_event, name) => {
     const window = windows[name];
@@ -129,9 +127,8 @@ export function initMainAPI() {
     createWindow(params, options);
   });
 
-  /////////////
-  // Process //
-  /////////////
+  // Process
+  // -------
 
   ipcMain.handle('exec', (_event, command, options) => {
     return execSync(command, options);
@@ -163,9 +160,8 @@ export function initMainAPI() {
     return Object.keys(processes);
   });
 
-  ////////////
-  // Config //
-  ////////////
+  // Config
+  // ------
 
   ipcMain.handle('sync-config-to-main', (event, data) => {
     for (const window of Object.values(windows)) {
@@ -175,9 +171,8 @@ export function initMainAPI() {
     }
   });
 
-  //////////////
-  // Download //
-  //////////////
+  // Download
+  // --------
 
   ipcMain.handle('download-file', (_event, url, path) => {
     downloadContext.savePath = path;

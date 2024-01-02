@@ -40,7 +40,7 @@ export const paths = {
   },
 
   gameDir(libraryPath: string, id: string) {
-    return libraryPath + '/iwapps/common/' + id + '/';
+    return libraryPath + '/iwapps/common/' + id;
   },
 
   gameExe(libraryPath: string, id: string, startup: string) {

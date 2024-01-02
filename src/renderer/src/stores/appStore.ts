@@ -34,9 +34,8 @@ export interface FangameItem {
 export const useAppStore = defineStore('AppStore', () => {
   const configStore = useConfigStore();
 
-  ////////////////////
-  // Backable State //
-  ////////////////////
+  // Backable State
+  // --------------
 
   const past = ref<BackableState[]>([]);
   const present = ref<BackableState>({
@@ -92,9 +91,8 @@ export const useAppStore = defineStore('AppStore', () => {
     }
   };
 
-  //////////////////
-  // Context Menu //
-  //////////////////
+  // Context Menu
+  // ------------
 
   const contextMenu = ref<ContextMenuOptions>();
 
@@ -106,9 +104,8 @@ export const useAppStore = defineStore('AppStore', () => {
     contextMenu.value = undefined;
   };
 
-  /////////////
-  // Library //
-  /////////////
+  // Library
+  // -------
 
   const [fetchFangameItems, fangameItems, fetchFangameItemsStatus, fetchFangameItemsError] = useFetchShallow([], async (forceDownload = false) => {
     const cacheFile = paths.delFruitFangameList();
@@ -222,9 +219,8 @@ export const useAppStore = defineStore('AppStore', () => {
     }
   );
 
-  //////////////
-  // Download //
-  //////////////
+  // Download
+  // --------
 
   const lastVisitedFangameId = ref('');
 
@@ -298,9 +294,8 @@ export const useAppStore = defineStore('AppStore', () => {
     }
   );
 
-  ///////////
-  // Popup //
-  ///////////
+  // Popup
+  // -----
 
   const popups = ref<{ component: any; context: any }[]>([]);
 

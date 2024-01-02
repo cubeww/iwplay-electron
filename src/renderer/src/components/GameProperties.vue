@@ -16,7 +16,11 @@
         <!--  -->
         <div class="detail-row column-2">
           <div class="detail-row-title">{{ $t('Startup Path') }}</div>
-          <ComboBox :list="manifest.executablePaths" :value="manifest.startupPath" @update="(value) => setManifest((m) => (m.startupPath = value))" />
+          <ComboBox :list="manifest.executablePaths" :value="manifest.startupPath" @update="(value) => updateManifest((m) => (m.startupPath = value))" />
+        </div>
+        <div class="detail-row column-2">
+          <div class="detail-row-title">{{ $t('Debugger Helper') }}</div>
+          <ButtonPure @click="handlePatchDebugger">{{ $t('Patch') }}</ButtonPure>
         </div>
       </template>
     </div>
@@ -28,6 +32,7 @@
 <script lang="ts" setup>
 import ComboBox from './ComboBox.vue';
 import ControlButtons from './ControlButtons.vue';
+import ButtonPure from './ButtonPure.vue';
 
 import { ref } from 'vue';
 import { onMounted } from 'vue';
@@ -43,7 +48,7 @@ const sidebarItems = [{ title: 'General' }];
 const index = ref(0);
 
 const manifest = ref<FangameManifest>();
-const setManifest = (patch: (m: FangameManifest) => void) => {
+const updateManifest = (patch: (m: FangameManifest) => void) => {
   if (!manifest.value) return;
   patch(manifest.value);
   const manifestPath = paths.manifest(libraryPath, id);
@@ -53,6 +58,14 @@ const setManifest = (patch: (m: FangameManifest) => void) => {
 onMounted(async () => {
   manifest.value = await library.getManifest(libraryPath, id);
 });
+
+const handlePatchDebugger = async () => {
+  await invoke('exec', `"resources/dbghelper.exe" "${paths.gameDir(libraryPath, id)}"`);
+
+  // The game's executable file path may have changed, so regenerate the manifest
+  await library.createManifest(libraryPath, id);
+  manifest.value = await library.getManifest(libraryPath, id);
+};
 </script>
 
 <style scoped>

@@ -89,12 +89,20 @@ const handleClickHelpID = () => {
   });
 };
 
-const handleClickInstall = async () => {
+const downloadGame = async () => {
   try {
-    appStore.addDownloadItem(props.context.url, props.context.filename, props.context.filesize, selectedLibraryPath.value, targetFangameId.value);
+    await appStore.addDownloadItem(props.context.url, props.context.filename, props.context.filesize, selectedLibraryPath.value, targetFangameId.value);
     emit('closePopup');
   } catch (err) {
     appStore.showError((err as Error).message);
+  }
+};
+
+const handleClickInstall = () => {
+  if (appStore.fangameItems.findIndex((i) => i.id === targetFangameId.value && i.isInstalled) !== -1) {
+    appStore.showConfirm('The current game is already installed. If you continue, the existing game will be uninstalled first (save files may be lost !!!). Are you sure you want to do this?', () => downloadGame());
+  } else {
+    downloadGame();
   }
 };
 </script>
