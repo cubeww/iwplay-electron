@@ -8,7 +8,6 @@
 </template>
 
 <script lang="ts" setup>
-import { useMaximize } from '@renderer/hooks/useMaximize';
 import WindowCloseIcon from '@renderer/icons/WindowCloseIcon.vue';
 import WindowMaximizeIcon from '@renderer/icons/WindowMaximizeIcon.vue';
 import WindowMinimizeIcon from '@renderer/icons/WindowMinimizeIcon.vue';
@@ -16,8 +15,11 @@ import WindowRestoreIcon from '@renderer/icons/WindowRestoreIcon.vue';
 
 import { invoke } from '@renderer/utils/invoke';
 import { windowName } from '@renderer/main';
+import { ref } from 'vue';
+import { useMainEventHandler } from '@renderer/hooks/useMainEventHandler';
 
-const isMaximize = useMaximize();
+const isMaximize = ref(false);
+useMainEventHandler('maximize', (value) => (isMaximize.value = value));
 
 const handleClickClose = () => {
   if (windowName === 'main') {

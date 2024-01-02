@@ -8,13 +8,10 @@ import { useConfigStore } from './configStore';
 import { library } from '@renderer/utils/library';
 import PopupViewError from '@renderer/components/PopupViewError.vue';
 import PopupViewConfirm from '@renderer/components/PopupViewConfirm.vue';
-import { useProcess } from '@renderer/hooks/useProcess';
 import { paths } from '@renderer/utils/paths';
 import { FangameProfile } from '@renderer/components/LibraryDetailGame.vue';
-import { useWebviewDownload } from '@renderer/hooks/useWebviewDownload';
 import PopupViewDownload from '@renderer/components/PopupViewDownload.vue';
-import { useDownload } from '@renderer/hooks/useDownload';
-import { useShow } from '@renderer/hooks/useShow';
+import { useMainEventHandler } from '@renderer/hooks/useMainEventHandler';
 
 export type TabName = 'browser' | 'library' | 'user';
 
@@ -93,7 +90,8 @@ export const useAppStore = defineStore('AppStore', () => {
   };
 
   // Parse the show event from the main process
-  useShow((action) => {
+
+  useMainEventHandler('show', (action) => {
     if (action === 'delfruit') {
       toggleBrowserAndLoadURL('https://delicious-fruit.com/');
     }
@@ -201,34 +199,34 @@ export const useAppStore = defineStore('AppStore', () => {
   const playingFangames: { [id: string]: FangamePlayingStatus } = {};
 
   // Make sure fangame items are updated on every game process run/close
-  useProcess(
-    (id) => {
-      fetchFangameItems();
 
-      const status = { playTime: 0 } as FangamePlayingStatus;
-      status.timer = setInterval(() => {
-        status.playTime += 1;
-      }, 1000);
+  useMainEventHandler('process-run', (id) => {
+    fetchFangameItems();
 
-      playingFangames[id] = status;
-    },
-    async (id) => {
-      clearInterval(playingFangames[id].timer);
+    const status = { playTime: 0 } as FangamePlayingStatus;
+    status.timer = setInterval(() => {
+      status.playTime += 1;
+    }, 1000);
 
-      // Update fangame profile
-      const playTime = playingFangames[id].playTime;
-      const profileFile = paths.fangameProfile('guest', id);
-      const profile: FangameProfile = { lastPlayed: new Date(), playTime: playTime };
-      if (await invoke('path-exists', profileFile)) {
-        const oldProfile: FangameProfile = JSON.parse(await invoke('read-file', profileFile));
-        profile.playTime += oldProfile.playTime;
-      }
-      await invoke('write-file', profileFile, JSON.stringify(profile));
-      delete playingFangames[id];
+    playingFangames[id] = status;
+  });
 
-      fetchFangameItems();
+  useMainEventHandler('process-close', async (id) => {
+    clearInterval(playingFangames[id].timer);
+
+    // Update fangame profile
+    const playTime = playingFangames[id].playTime;
+    const profileFile = paths.fangameProfile('guest', id);
+    const profile: FangameProfile = { lastPlayed: new Date(), playTime: playTime };
+    if (await invoke('path-exists', profileFile)) {
+      const oldProfile: FangameProfile = JSON.parse(await invoke('read-file', profileFile));
+      profile.playTime += oldProfile.playTime;
     }
-  );
+    await invoke('write-file', profileFile, JSON.stringify(profile));
+    delete playingFangames[id];
+
+    fetchFangameItems();
+  });
 
   // Download
   // --------
@@ -239,7 +237,13 @@ export const useAppStore = defineStore('AppStore', () => {
     lastVisitedFangameId.value = id;
   };
 
-  useWebviewDownload((params) => {
+  interface WebviewDownloadParams {
+    url: string;
+    filename: string;
+    filesize: number;
+  }
+
+  useMainEventHandler('webview-download', (params: WebviewDownloadParams) => {
     showPopup(PopupViewDownload, { url: params.url, filename: params.filename, filesize: params.filesize, possibleId: lastVisitedFangameId });
   });
 
@@ -275,37 +279,37 @@ export const useAppStore = defineStore('AppStore', () => {
     invoke('download-file', url, downloadPath);
   };
 
-  useDownload(
-    (url, received) => {
-      const index = downloadItems.value.findIndex((i) => i.url === url);
-      if (index === -1) {
-        console.log('WARNING: A download item has been updated, but it has not entered the download items.');
-        return;
-      }
-      downloadItems.value[index].received = received;
-    },
-    async (url) => {
-      const index = downloadItems.value.findIndex((i) => i.url === url);
-      if (index === -1) {
-        console.log('WARNING: A download item has been updated, but it has not entered the download items.');
-        return;
-      }
-      downloadItems.value[index].status = 'succeed';
-
-      // Perform installation
-      await library.install(downloadItems.value[index].libraryPath, downloadItems.value[index].gameId, downloadItems.value[index].filePath);
-      fetchFangameItems();
-      await invoke('display-balloon', { title: 'IWPlay', content: 'Fangame Installed: ' + downloadItems.value[index].gameName });
-    },
-    (url) => {
-      const index = downloadItems.value.findIndex((i) => i.url === url);
-      if (index === -1) {
-        console.log('WARNING: A download item has been updated, but it has not entered the download items.');
-        return;
-      }
-      downloadItems.value[index].status = 'failed';
+  useMainEventHandler('download-updated', (url, received) => {
+    const index = downloadItems.value.findIndex((i) => i.url === url);
+    if (index === -1) {
+      console.log('WARNING: A download item has been updated, but it has not entered the download items.');
+      return;
     }
-  );
+    downloadItems.value[index].received = received;
+  });
+
+  useMainEventHandler('download-successfully', async (url) => {
+    const index = downloadItems.value.findIndex((i) => i.url === url);
+    if (index === -1) {
+      console.log('WARNING: A download item has been updated, but it has not entered the download items.');
+      return;
+    }
+    downloadItems.value[index].status = 'succeed';
+
+    // Perform installation
+    await library.install(downloadItems.value[index].libraryPath, downloadItems.value[index].gameId, downloadItems.value[index].filePath);
+    fetchFangameItems();
+    await invoke('display-balloon', { title: 'IWPlay', content: 'Fangame Installed: ' + downloadItems.value[index].gameName });
+  });
+
+  useMainEventHandler('download-failed', async (url) => {
+    const index = downloadItems.value.findIndex((i) => i.url === url);
+    if (index === -1) {
+      console.log('WARNING: A download item has been updated, but it has not entered the download items.');
+      return;
+    }
+    downloadItems.value[index].status = 'failed';
+  });
 
   // Popup
   // -----
