@@ -5,6 +5,8 @@ import log from 'electron-log/main';
 import { initMainAPI } from './api';
 import { ChildProcess } from 'child_process';
 
+import sevenz from '../../resources/7z.exe?asset'
+
 export const windows: { [name: string]: BrowserWindow } = {};
 export const processes: { [id: string]: ChildProcess } = {};
 
@@ -62,8 +64,6 @@ export function createWindow(params: { [key: string]: string }, options?: Browse
     window.webContents.openDevTools();
   } else {
     window.loadURL(join('file://', __dirname, '../renderer/index.html' + queryString));
-
-    window.webContents.openDevTools();
   }
 
   windows[params.name] = window;
@@ -147,4 +147,7 @@ app.whenReady().then(() => {
       });
     }
   });
+
+  console.log(sevenz);
+  
 });

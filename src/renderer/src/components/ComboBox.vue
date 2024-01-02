@@ -91,7 +91,7 @@ const handleClickItem = (item: string) => {
 }
 
 .combo-list-item {
-  line-height: 20px;
+  line-height: 32px;
   padding-left: 10px;
   cursor: pointer;
 

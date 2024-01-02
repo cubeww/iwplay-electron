@@ -4,6 +4,9 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, unl
 import { dirname, join, resolve } from 'path';
 import { createWindow, downloadContext, processes, windows } from '.';
 
+import sevenz from '../../resources/7z.exe?asset&asarUnpack';
+import dbghelper from '../../resources/dbghelper.exe?asset&asarUnpack';
+
 function getFiles(dir: string, dir2: string, files: string[] = []) {
   const fileList = readdirSync(dir);
   for (const file of fileList) {
@@ -96,6 +99,10 @@ export function initMainAPI() {
     return resolve(path);
   });
 
+  ipcMain.handle('copy', (_event, src, dist) => {
+    return execSync(`copy "${src}" "${dist}"`);
+  });
+
   // Window
   // ------
 
@@ -127,12 +134,23 @@ export function initMainAPI() {
     createWindow(params, options);
   });
 
+  // External Tools
+  // --------------
+
+  ipcMain.handle('unzip', (_event, src, dist) => {
+    return execSync(`"${sevenz}" x "${src}" -o"${dist}"`);
+  });
+
+  ipcMain.handle('dbghelper', (_event, dist) => {
+    return execSync(`"${dbghelper}" "${dist}"`, { cwd: dist });
+  });
+
+  ipcMain.handle('explorer', (_event, path) => {
+    return execSync(`explorer "${path.replaceAll('/', '\\')}"`);
+  });
+
   // Process
   // -------
-
-  ipcMain.handle('exec', (_event, command, options) => {
-    return execSync(command, options);
-  });
 
   ipcMain.handle('run', (_event, id, file) => {
     if (id in processes) {

@@ -37,9 +37,9 @@ export const library = {
 
     if (file.split('.').pop() === 'exe') {
       const filename = file.replaceAll('\\', '/').split('/').pop();
-      await invoke('exec', `copy "${file}" "${gamePath}/${filename}"`);
+      await invoke('copy', file, gamePath + '/' + filename);
     } else {
-      await invoke('exec', `"resources/7z.exe" x "${file}" -o"${gamePath}"`);
+      await invoke('unzip', file, gamePath);
     }
 
     await this.createManifest(libraryPath, id);

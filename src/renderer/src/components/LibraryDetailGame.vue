@@ -170,7 +170,7 @@ const handleToDownload = () => {
 };
 
 const handleToGameDirectory = () => {
-  invoke('exec', `explorer "${paths.gameDir(props.item.libraryPath, props.item.id).replaceAll('/', '\\')}"`);
+  invoke('explorer', paths.gameDir(props.item.libraryPath, props.item.id));
 };
 </script>
 

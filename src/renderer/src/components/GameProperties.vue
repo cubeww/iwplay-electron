@@ -60,7 +60,8 @@ onMounted(async () => {
 });
 
 const handlePatchDebugger = async () => {
-  await invoke('exec', `"resources/dbghelper.exe" "${paths.gameDir(libraryPath, id)}"`);
+  const gameDir = paths.gameDir(libraryPath, id);
+  await invoke('dbghelper', gameDir);
 
   // The game's executable file path may have changed, so regenerate the manifest
   await library.createManifest(libraryPath, id);
