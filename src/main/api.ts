@@ -1,8 +1,16 @@
+/**
+ * api.ts
+ * Define all APIs available to the renderer process.
+ *
+ * Call an API from the rendering process:
+ *   invoke('an-api-name', arg1, arg2...)
+ */
+
 import { exec, execSync } from 'child_process';
 import { app, dialog, ipcMain } from 'electron';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, unlinkSync, writeFileSync } from 'fs';
 import { dirname, join, resolve } from 'path';
-import { createWindow, downloadContext, processes, windows } from '.';
+import { createWindow, downloadContext, processes, tray, trayMenuSize, trayWidth, windows } from '.';
 
 import sevenz from '../../resources/7z.exe?asset&asarUnpack';
 import dbghelper from '../../resources/dbghelper.exe?asset&asarUnpack';
@@ -126,12 +134,36 @@ export function initMainAPI() {
     window.close();
   });
 
+  ipcMain.handle('hide', (_event, name) => {
+    const window = windows[name];
+    window.hide();
+  });
+
   ipcMain.handle('quit', () => {
     Object.values(windows).forEach((window) => window.close());
   });
 
   ipcMain.handle('create-window', (_event, params, options) => {
     createWindow(params, options);
+  });
+
+  // Tray
+  // ----
+
+  ipcMain.handle('display-balloon', (_event, options) => {
+    tray.displayBalloon(options);
+  });
+
+  ipcMain.handle('resize-tray-menu', (_event, w, h) => {
+    // Will be resized when displayed
+    trayMenuSize.x = w;
+    trayMenuSize.y = h;
+  });
+
+  ipcMain.handle('main-show', (_event, action) => {
+    const window = windows['main'];
+    window.show();
+    window.webContents.send('show', action);
   });
 
   // External Tools

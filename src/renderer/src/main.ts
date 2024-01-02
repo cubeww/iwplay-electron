@@ -1,3 +1,9 @@
+/**
+ * main.ts
+ * Entry point for all renderer processes.
+ * Different components will be entered based on searchParams.type.
+ */
+
 import './main.css';
 
 import { createApp } from 'vue';
@@ -13,6 +19,7 @@ import zh from './i18n/zh';
 import en from './i18n/en';
 import { useConfigStore } from './stores/configStore';
 import GameProperties from './components/GameProperties.vue';
+import TrayMenu from './components/TrayMenu.vue';
 
 export const searchParams = new URLSearchParams(window.location.search);
 export const windowType = searchParams.get('type') as string;
@@ -21,7 +28,8 @@ export const windowName = searchParams.get('name') as string;
 const typeToComponentMap = {
   main: App,
   settings: AppSettings,
-  gameprop: GameProperties
+  gameprop: GameProperties,
+  traymenu: TrayMenu
 };
 
 export const mainI18n = createI18n({

@@ -91,7 +91,7 @@ const handleClickHelpID = () => {
 
 const downloadGame = async () => {
   try {
-    await appStore.addDownloadItem(props.context.url, props.context.filename, props.context.filesize, selectedLibraryPath.value, targetFangameId.value);
+    await appStore.addDownloadItem(props.context.url, props.context.filename, props.context.filesize, selectedLibraryPath.value, targetFangameId.value, targetFangameName.value);
     emit('closePopup');
   } catch (err) {
     appStore.showError((err as Error).message);

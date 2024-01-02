@@ -4,4 +4,5 @@ body {
   color: #858c99;
   user-select: none;
   position: relative;
+  overflow: hidden;
 }

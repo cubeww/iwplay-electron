@@ -97,6 +97,7 @@ const handleInstall = async () => {
   try {
     await library.install(selectedLibraryPath.value, props.context.id, filename.value);
     appStore.fetchFangameItems();
+    await invoke('display-balloon', { title: 'IWPlay', content: 'Fangame Installed: ' + props.context.name });
     emit('closePopup');
   } catch (err) {
     appStore.showError((err as Error).message);

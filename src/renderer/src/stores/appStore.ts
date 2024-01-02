@@ -14,6 +14,7 @@ import { FangameProfile } from '@renderer/components/LibraryDetailGame.vue';
 import { useWebviewDownload } from '@renderer/hooks/useWebviewDownload';
 import PopupViewDownload from '@renderer/components/PopupViewDownload.vue';
 import { useDownload } from '@renderer/hooks/useDownload';
+import { useShow } from '@renderer/hooks/useShow';
 
 export type TabName = 'browser' | 'library' | 'user';
 
@@ -90,6 +91,16 @@ export const useAppStore = defineStore('AppStore', () => {
       }
     }
   };
+
+  // Parse the show event from the main process
+  useShow((action) => {
+    if (action === 'delfruit') {
+      toggleBrowserAndLoadURL('https://delicious-fruit.com/');
+    }
+    if (action === 'library') {
+      if (present.value.tab !== 'library') toggleTab('library');
+    }
+  });
 
   // Context Menu
   // ------------
@@ -239,6 +250,7 @@ export const useAppStore = defineStore('AppStore', () => {
     status: DownloadStatus;
     libraryPath: string;
     gameId: string;
+    gameName: string;
     filePath: string;
   }
 
@@ -246,7 +258,7 @@ export const useAppStore = defineStore('AppStore', () => {
 
   const downloadItems = ref<DownloadItem[]>([]);
 
-  const addDownloadItem = async (url: string, filename: string, size: number, libraryPath: string, gameId: string) => {
+  const addDownloadItem = async (url: string, filename: string, size: number, libraryPath: string, gameId: string, gameName: string) => {
     const index = downloadItems.value.findIndex((i) => i.gameId === gameId && i.status === 'downloading');
     if (index !== -1) {
       throw new Error('The game with the specified ID is already being downloaded! Please cancel it first.');
@@ -258,7 +270,7 @@ export const useAppStore = defineStore('AppStore', () => {
     }
 
     const downloadPath = (dir + '/' + filename).replaceAll('/', '\\');
-    downloadItems.value.push({ gameId, libraryPath, size, url, filePath: downloadPath, received: 0, status: 'downloading' });
+    downloadItems.value.push({ gameId, libraryPath, size, url, filePath: downloadPath, received: 0, status: 'downloading', gameName });
 
     invoke('download-file', url, downloadPath);
   };
@@ -283,6 +295,7 @@ export const useAppStore = defineStore('AppStore', () => {
       // Perform installation
       await library.install(downloadItems.value[index].libraryPath, downloadItems.value[index].gameId, downloadItems.value[index].filePath);
       fetchFangameItems();
+      await invoke('display-balloon', { title: 'IWPlay', content: 'Fangame Installed: ' + downloadItems.value[index].gameName });
     },
     (url) => {
       const index = downloadItems.value.findIndex((i) => i.url === url);

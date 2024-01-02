@@ -1,11 +1,15 @@
-import { app, shell, BrowserWindow, BrowserWindowConstructorOptions } from 'electron';
+/**
+ * index.ts
+ * Main process entry.
+ */
+
+import { app, shell, BrowserWindow, BrowserWindowConstructorOptions, Tray, screen } from 'electron';
 import { join } from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
-import log from 'electron-log/main';
 import { initMainAPI } from './api';
 import { ChildProcess } from 'child_process';
-
-import sevenz from '../../resources/7z.exe?asset'
+import log from 'electron-log/main';
+import icon from '../../resources/icon.png?asset&asarUnpack';
 
 export const windows: { [name: string]: BrowserWindow } = {};
 export const processes: { [id: string]: ChildProcess } = {};
@@ -14,7 +18,10 @@ export const downloadContext = {
   savePath: ''
 };
 
-export function createWindow(params: { [key: string]: string }, options?: BrowserWindowConstructorOptions): BrowserWindow {
+export let tray: Tray;
+export const trayMenuSize = { x: 250, y: 400 };
+
+export function createWindow<T extends { type: string; name: string }>(params: T, options?: BrowserWindowConstructorOptions): BrowserWindow {
   const exists = windows[params.name];
   if (exists) {
     exists.show();
@@ -38,7 +45,7 @@ export function createWindow(params: { [key: string]: string }, options?: Browse
   });
 
   window.on('ready-to-show', () => {
-    window.show();
+    if (!options || options.show !== false) window.show();
   });
 
   window.on('maximize', () => {
@@ -60,7 +67,6 @@ export function createWindow(params: { [key: string]: string }, options?: Browse
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     window.loadURL(process.env['ELECTRON_RENDERER_URL'] + queryString);
-
     window.webContents.openDevTools();
   } else {
     window.loadURL(join('file://', __dirname, '../renderer/index.html' + queryString));
@@ -148,6 +154,36 @@ app.whenReady().then(() => {
     }
   });
 
-  console.log(sevenz);
-  
+  // Tray
+  tray = new Tray(icon);
+  tray.setToolTip('IWPlay');
+  tray.on('click', () => {
+    mainWindow.show();
+  });
+
+  const trayMenu = createWindow(
+    { type: 'traymenu', name: 'traymenu' },
+    {
+      width: 250,
+      height: 400,
+      minWidth: 250,
+      minHeight: 0,
+      show: false,
+      skipTaskbar: true,
+      resizable: false,
+      movable: false,
+      transparent: true,
+      alwaysOnTop: true
+    }
+  );
+  trayMenu.on('blur', () => {
+    trayMenu.hide();
+  });
+
+  tray.on('right-click', () => {
+    const mousePos = screen.getCursorScreenPoint();
+    trayMenu.setSize(trayMenuSize.x, trayMenuSize.y);
+    trayMenu.setPosition(mousePos.x, mousePos.y - trayMenuSize.y);
+    trayMenu.show();
+  });
 });

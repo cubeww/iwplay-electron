@@ -3,7 +3,7 @@
     <WindowMinimizeIcon class="control-button minimize" @click="invoke('minimize', windowName)" />
     <WindowMaximizeIcon v-if="!isMaximize" class="control-button maximize" @click="invoke('maximize', windowName)" />
     <WindowRestoreIcon v-else class="control-button maximize" @click="invoke('maximize', windowName)" />
-    <WindowCloseIcon class="control-button close" @click="invoke('close', windowName)" />
+    <WindowCloseIcon class="control-button close" @click="handleClickClose" />
   </div>
 </template>
 
@@ -18,6 +18,14 @@ import { invoke } from '@renderer/utils/invoke';
 import { windowName } from '@renderer/main';
 
 const isMaximize = useMaximize();
+
+const handleClickClose = () => {
+  if (windowName === 'main') {
+    invoke('hide', windowName);
+  } else {
+    invoke('close', windowName);
+  }
+};
 </script>
 
 <style scoped>
