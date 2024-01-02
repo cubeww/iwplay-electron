@@ -298,7 +298,7 @@ export const useAppStore = defineStore('AppStore', () => {
 
     // Perform installation
     await library.install(downloadItems.value[index].libraryPath, downloadItems.value[index].gameId, downloadItems.value[index].filePath);
-    fetchFangameItems();
+    await fetchFangameItems();
     await invoke('display-balloon', { title: 'IWPlay', content: 'Fangame Installed: ' + downloadItems.value[index].gameName });
   });
 
@@ -309,6 +309,7 @@ export const useAppStore = defineStore('AppStore', () => {
       return;
     }
     downloadItems.value[index].status = 'failed';
+    showError(`Fangame "${downloadItems.value[index].gameName}" download failed`);
   });
 
   // Popup
