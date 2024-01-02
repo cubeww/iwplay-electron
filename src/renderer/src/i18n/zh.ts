@@ -42,5 +42,12 @@ export default {
   'PLAY': '启动',
   'General': '常规',
   'Startup Path': '启动文件路径',
-  'STOP': '停止'
+  'STOP': '停止',
+  'TARGET FANGAME DELFRUIT ID:': '游戏美味水果ID',
+  'Download And Install': '下载并安装',
+  [`Fangame's DELFRUIT ID can be found at the URL of the Delicious Fruit game details page, for example: "https://delicious-fruit.com/ratings/game_details.php?id=14681" The DELFRUIT ID of this game is 14681.`]: '游戏的“美味水果ID”可以在游戏详情页的网址栏找到。例如，https://delicious-fruit.com/ratings/game_details.php?id=14681 所对应的美味水果ID就是14681',
+  'ABOUT DELFRUIT ID': '关于美味水果ID',
+  'OK': '好的',
+  'Debugger Helper': '防掉帧补丁',
+  'Patch': '应用'
 };

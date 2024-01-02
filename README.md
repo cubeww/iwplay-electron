@@ -7,13 +7,23 @@ Experimental "I Wanna Fangames" Management Software
 
 ![](./preview.jpg)
 
+## Features (Current)
+
+- Manage your fangames, install, uninstall, update...
+- Browse the Delicious Fruit and I wanna wiki in the built-in browser
+- Download and install fangames directly from the built-in browser
+- Record your game time and play dates
+- Apply Debugger Helper patch with one click
+
 ## Contributing
+
+This project is still in the early stages of development and may be extremely unstable.
 
 Please use the Github Issue tracker, or join the IWPlay discord channel.
 
 ## Development
 
-vscode + typescript + electron-vite + vue3 + pinia
+vscode + typescript + electron-vite + vue3
 
 ## Build
 
@@ -34,6 +44,10 @@ vscode + typescript + electron-vite + vue3 + pinia
    ```sh
    npm run dev
    ```
+
+## Additional Credits
+
+- [renex's dbghelper](https://github.com/omicronrex/dbghelper)
 
 ## License
 

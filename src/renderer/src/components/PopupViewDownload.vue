@@ -100,7 +100,7 @@ const downloadGame = async () => {
 
 const handleClickInstall = () => {
   if (appStore.fangameItems.findIndex((i) => i.id === targetFangameId.value && i.isInstalled) !== -1) {
-    appStore.showConfirm('The current game is already installed. If you continue, the existing game will be uninstalled first (save files may be lost !!!). Are you sure you want to do this?', () => downloadGame());
+    appStore.showConfirm('The current fangame is already installed. If you continue, the existing fangame will be uninstalled first (save files may be lost !!!). Are you sure you want to do this?', () => downloadGame());
   } else {
     downloadGame();
   }
