@@ -20,6 +20,7 @@ import en from './i18n/en';
 import { useConfigStore } from './stores/configStore';
 import GameProperties from './components/GameProperties.vue';
 import TrayMenu from './components/TrayMenu.vue';
+import AboutView from './components/AboutView.vue';
 
 export const searchParams = new URLSearchParams(window.location.search);
 export const windowType = searchParams.get('type') as string;
@@ -29,7 +30,8 @@ const typeToComponentMap = {
   main: App,
   settings: AppSettings,
   gameprop: GameProperties,
-  traymenu: TrayMenu
+  traymenu: TrayMenu,
+  about: AboutView
 };
 
 export const mainI18n = createI18n({

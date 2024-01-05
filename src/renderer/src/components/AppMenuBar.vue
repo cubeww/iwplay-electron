@@ -20,9 +20,17 @@ const hasContextMenu = computed(() => appStore.contextMenu !== undefined);
 
 const menuItems: ContextMenuItemData[][] = [
   // IWPlay
-  [{ type: 'text', text: 'Settings', onClick: () => invoke('create-window', { type: 'settings', name: 'settings' }, { width: 800, height: 600 }) }, { type: 'separator' }, { type: 'text', text: 'Quit', onClick: () => invoke('quit') }],
+  [
+    { type: 'text', text: 'Settings', onClick: () => invoke('create-window', { type: 'settings', name: 'settings' }, { width: 800, height: 600 }) }, //
+    { type: 'separator' },
+    { type: 'text', text: 'Quit', onClick: () => invoke('quit') }
+  ],
   // Help
-  [{ type: 'text', text: 'Github', onClick: () => {} }, { type: 'separator' }, { type: 'text', text: 'About', onClick: () => {} }]
+  [
+    { type: 'text', text: 'Github', onClick: () => invoke('open-external', `https://github.com/cubeww/iwplay-electron`) }, //
+    { type: 'separator' },
+    { type: 'text', text: 'About', onClick: () => invoke('create-window', { type: 'about', name: 'about' }, { width: 450, height: 300 }) }
+  ]
 ];
 </script>
 

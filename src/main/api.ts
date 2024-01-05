@@ -7,10 +7,10 @@
  */
 
 import { exec, execSync } from 'child_process';
-import { app, dialog, ipcMain } from 'electron';
+import { app, dialog, ipcMain, shell } from 'electron';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, unlinkSync, writeFileSync } from 'fs';
 import { dirname, join, resolve } from 'path';
-import { createWindow, downloadContext, processes, tray, trayMenuSize, trayWidth, windows } from '.';
+import { createWindow, downloadContext, processes, tray, trayMenuSize, windows } from '.';
 
 import sevenz from '../../resources/7z.exe?asset&asarUnpack';
 import dbghelper from '../../resources/dbghelper.exe?asset&asarUnpack';
@@ -185,6 +185,10 @@ export function initMainAPI() {
     return execSync(`notepad "${path.replaceAll('/', '\\')}"`);
   });
 
+  ipcMain.handle('open-external', (_event, url) => {
+    return shell.openExternal(url);
+  });
+
   // Process
   // -------
 
@@ -231,5 +235,12 @@ export function initMainAPI() {
   ipcMain.handle('download-file', (_event, url, path) => {
     downloadContext.savePath = path;
     windows['main'].webContents.downloadURL(url);
+  });
+
+  // Misc
+  // ----
+
+  ipcMain.handle('app-version', () => {
+    return app.getVersion();
   });
 }
