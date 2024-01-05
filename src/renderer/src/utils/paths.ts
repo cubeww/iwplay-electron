@@ -43,8 +43,8 @@ export const paths = {
     return libraryPath + '/iwapps/common/' + id;
   },
 
-  gameExe(libraryPath: string, id: string, startup: string) {
-    return libraryPath + '/iwapps/common/' + id + '/' + startup;
+  gameFile(libraryPath: string, id: string, filePath: string) {
+    return libraryPath + '/iwapps/common/' + id + '/' + filePath;
   },
 
   manifest(libraryPath: string, id: string) {

@@ -4,7 +4,7 @@ import { paths } from './paths';
 export interface FangameManifest {
   id: string;
   installedAt: Date;
-  executablePaths: string[];
+  // executablePaths: string[];
   startupPath: string;
   sizeOnDisk: number;
 }
@@ -93,6 +93,32 @@ export const library = {
     return ids;
   },
 
+  async getExecutablePaths(gamePath: string) {
+    const files = await invoke('read-dir', gamePath, true);
+    const executablePaths: string[] = [];
+
+    for (const f of files) {
+      if (f.split('.').pop() === 'exe') {
+        executablePaths.push(f);
+      }
+    }
+
+    return executablePaths;
+  },
+
+  async getReadmePaths(gamePath: string) {
+    const files = await invoke('read-dir', gamePath, true);
+    const executablePaths: string[] = [];
+
+    for (const f of files) {
+      if (f.split('.').pop() === 'txt') {
+        executablePaths.push(f);
+      }
+    }
+
+    return executablePaths;
+  },
+
   async createManifest(libraryPath: string, id: string) {
     await this.checkLibrary(libraryPath);
 
@@ -106,21 +132,14 @@ export const library = {
       throw new Error('game not installed');
     }
 
-    const files = await invoke('read-dir', gamePath, true);
-    const executablePaths: string[] = [];
-
-    for (const f of files) {
-      if (f.split('.').pop() === 'exe') {
-        executablePaths.push(f);
-      }
-    }
+    const executablePaths = await this.getExecutablePaths(gamePath);
 
     const startupPath = executablePaths.length === 1 ? executablePaths[0] : '';
     const sizeOnDisk = await invoke('dir-size', gamePath);
 
     const manifest: FangameManifest = {
       id,
-      executablePaths,
+      // executablePaths,
       installedAt: new Date(),
       sizeOnDisk,
       startupPath

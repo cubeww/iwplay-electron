@@ -16,7 +16,7 @@
         <!--  -->
         <div class="detail-row column-2">
           <div class="detail-row-title">{{ $t('Startup Path') }}</div>
-          <ComboBox :list="manifest.executablePaths" :value="manifest.startupPath" @update="(value) => updateManifest((m) => (m.startupPath = value))" />
+          <ComboBox :list="executablePaths" :value="manifest.startupPath" @update="(value) => updateManifest((m) => (m.startupPath = value))" />
         </div>
         <div class="detail-row column-2">
           <div class="detail-row-title">{{ $t('Debugger Helper') }}</div>
@@ -55,8 +55,11 @@ const updateManifest = (patch: (m: FangameManifest) => void) => {
   invoke('write-file', manifestPath, JSON.stringify(manifest.value, null, 4));
 };
 
+const executablePaths = ref<string[]>([]);
+
 onMounted(async () => {
   manifest.value = await library.getManifest(libraryPath, id);
+  executablePaths.value = await library.getExecutablePaths(paths.gameDir(libraryPath, id));
 });
 
 const handlePatchDebugger = async () => {

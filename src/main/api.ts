@@ -181,6 +181,10 @@ export function initMainAPI() {
     return execSync(`explorer "${path.replaceAll('/', '\\')}"`);
   });
 
+  ipcMain.handle('notepad', (_event, path) => {
+    return execSync(`notepad "${path.replaceAll('/', '\\')}"`);
+  });
+
   // Process
   // -------
 

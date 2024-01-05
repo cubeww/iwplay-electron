@@ -30,6 +30,14 @@
         <div class="nav-button" :class="{ disabled: !hasDownloadLink }" @click="handleToDownload">{{ $t('Download Page') }}</div>
         <div v-if="item.isInstalled" class="nav-button" @click="handleToGameDirectory">{{ $t('Game Directory') }}</div>
       </div>
+      <div v-for="(rm, index) of readmeList" class="readme" :key="index">
+        <div class="readme-title">
+          {{ rm.name }}
+        </div>
+        <div class="readme-content" @click="handleClickReadme(rm.path)">
+          {{ rm.content }}
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -84,11 +92,34 @@ const fetchProfile = async () => {
   }
 };
 
+interface ReadmeItem {
+  name: string;
+  content: string;
+  path: string;
+}
+
+const readmeList = ref<ReadmeItem[]>([]);
+
+const fetchReadme = async () => {
+  readmeList.value = [];
+  if (!props.item.isInstalled) return;
+  const readmeFiles = await library.getReadmePaths(paths.gameDir(props.item.libraryPath, props.item.id));
+  const list: ReadmeItem[] = [];
+  for (const f of readmeFiles) {
+    const path = paths.gameFile(props.item.libraryPath, props.item.id, f);
+    const name = f.replaceAll('/', '\\').split('\\').pop() as string;
+    const content = (await invoke('read-file', path)) as string;
+    list.push({ name, content, path });
+  }
+  readmeList.value = list;
+};
+
 watch(
   props,
   () => {
     fetchProfile();
     fetchDetails();
+    fetchReadme();
   },
   { immediate: true }
 );
@@ -113,10 +144,10 @@ const handleClickInstall = () => {
 const handleClickPlay = async () => {
   const manifest = await library.getManifest(props.item.libraryPath, props.item.id);
   if (!manifest.startupPath) {
-    appStore.showError('This game contains multiple executable files, please go to the game properties to select one.', showGameProperties);
+    appStore.showError('The game startup path is not set. Maybe the game has no or multiple startup path. Please go to the game properties to configure it first.', showGameProperties);
     return;
   }
-  const exePath = paths.gameExe(props.item.libraryPath, props.item.id, manifest.startupPath).replaceAll('/', '\\');
+  const exePath = paths.gameFile(props.item.libraryPath, props.item.id, manifest.startupPath).replaceAll('/', '\\');
 
   try {
     await invoke('run', props.item.id, exePath);
@@ -171,6 +202,10 @@ const handleToDownload = () => {
 
 const handleToGameDirectory = () => {
   invoke('explorer', paths.gameDir(props.item.libraryPath, props.item.id));
+};
+
+const handleClickReadme = (path: string) => {
+  invoke('notepad', path);
 };
 </script>
 
@@ -290,6 +325,7 @@ const handleToGameDirectory = () => {
   display: flex;
   align-items: center;
   margin-top: 10px;
+  margin-bottom: 20px;
   background-color: rgba(255, 255, 255, 0.05);
   height: 24px;
   padding: 8px;
@@ -315,5 +351,28 @@ const handleToGameDirectory = () => {
     cursor: default;
     background-color: none;
   }
+}
+
+.readme {
+  background-color: #343940;
+  border: 1px solid #1a9af5;
+  margin-bottom: 10px;
+  box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+}
+
+.readme-title {
+  color: white;
+  background: rgb(255, 149, 96);
+  background: linear-gradient(90deg, rgba(255, 149, 96, 1) 0%, rgba(25, 157, 251, 1) 0%, rgba(28, 109, 170, 1) 5%, rgba(28, 84, 131, 1) 100%);
+  padding: 4px;
+  padding-left: 10px;
+}
+
+.readme-content {
+  color: #8e9395;
+  padding: 10px;
+  text-shadow: 1px 1px 2px black;
+  white-space: pre-line;
+  cursor: pointer;
 }
 </style>
