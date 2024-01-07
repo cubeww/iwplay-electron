@@ -6,7 +6,7 @@
  *   invoke('an-api-name', arg1, arg2...)
  */
 
-import { exec, execSync } from 'child_process';
+import { exec, execFile, execSync, spawn } from 'child_process';
 import { app, dialog, ipcMain, shell } from 'electron';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, unlinkSync, writeFileSync } from 'fs';
 import { dirname, join, resolve } from 'path';
@@ -14,6 +14,7 @@ import { createWindow, downloadContext, processes, tray, trayMenuSize, windows }
 
 import sevenz from '../../resources/7z.exe?asset&asarUnpack';
 import dbghelper from '../../resources/dbghelper.exe?asset&asarUnpack';
+import resizer from '../../resources/resizer.exe?asset&asarUnpack';
 
 function getFiles(dir: string, dir2: string, files: string[] = []) {
   const fileList = readdirSync(dir);
@@ -192,13 +193,17 @@ export function initMainAPI() {
   // Process
   // -------
 
-  ipcMain.handle('run', (_event, id, file) => {
+  ipcMain.handle('run', (_event, id, file, resize) => {
     if (id in processes) {
       execSync(`taskkill /pid ${processes[id].pid} /F /T`);
       delete processes[id];
     }
 
-    const p = exec(`"${file}"`, { cwd: dirname(file) });
+    const p = execFile(file, { cwd: dirname(file) });
+
+    if (resize) {
+      execFile(resizer, [`${p.pid}`, '800', '608']);
+    }
 
     p.on('close', () => {
       delete processes[id];

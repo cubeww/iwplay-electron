@@ -150,7 +150,7 @@ const handleClickPlay = async () => {
   const exePath = paths.gameFile(props.item.libraryPath, props.item.id, manifest.startupPath).replaceAll('/', '\\');
 
   try {
-    await invoke('run', props.item.id, exePath);
+    await invoke('run', props.item.id, exePath, manifest.resize);
   } catch (err) {
     appStore.showError((err as Error).message);
   }

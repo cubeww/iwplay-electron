@@ -22,6 +22,10 @@
           <div class="detail-row-title">{{ $t('Debugger Helper') }}</div>
           <ButtonPure @click="handlePatchDebugger">{{ $t('Patch') }}</ButtonPure>
         </div>
+        <div class="detail-row column-2">
+          <div class="detail-row-title">{{ $t('Resize Window With DPI (Experimental)') }}</div>
+          <SwitchButton :value="manifest.resize" @update="(value) => updateManifest((m) => (m.resize = value))" />
+        </div>
       </template>
     </div>
     <div class="drag-area"></div>
@@ -33,6 +37,7 @@
 import ComboBox from './ComboBox.vue';
 import ControlButtons from './ControlButtons.vue';
 import ButtonPure from './ButtonPure.vue';
+import SwitchButton from './SwitchButton.vue';
 
 import { ref } from 'vue';
 import { onMounted } from 'vue';
@@ -141,7 +146,7 @@ const handlePatchDebugger = async () => {
 }
 
 .detail-row {
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 }
 
 .detail-title {

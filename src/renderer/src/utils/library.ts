@@ -7,6 +7,7 @@ export interface FangameManifest {
   // executablePaths: string[];
   startupPath: string;
   sizeOnDisk: number;
+  resize: boolean;
 }
 
 export const library = {
@@ -142,7 +143,8 @@ export const library = {
       // executablePaths,
       installedAt: new Date(),
       sizeOnDisk,
-      startupPath
+      startupPath,
+      resize: false
     };
 
     await invoke('write-file', manifestPath, JSON.stringify(manifest, null, 4));
