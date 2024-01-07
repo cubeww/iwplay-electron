@@ -6,7 +6,7 @@
  *   invoke('an-api-name', arg1, arg2...)
  */
 
-import { exec, execFile, execSync, spawn } from 'child_process';
+import { execFile, execSync } from 'child_process';
 import { app, dialog, ipcMain, shell } from 'electron';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, unlinkSync, writeFileSync } from 'fs';
 import { dirname, join, resolve } from 'path';

@@ -77,6 +77,12 @@ export function createWindow<T extends { type: string; name: string }>(params: T
 }
 
 app.whenReady().then(() => {
+  /** Check if single instance, if not, simply quit new instance */
+  const isSingleInstance = app.requestSingleInstanceLock();
+  if (!isSingleInstance) {
+    app.quit();
+  }
+
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.iwplay');
 
@@ -124,6 +130,12 @@ app.whenReady().then(() => {
 
   // Create the main window
   const mainWindow = createWindow({ type: 'main', name: 'main' }, { width: 1000, height: 600 });
+
+  app.on('second-instance', (_event, _argv, _cwd) => {
+    if (mainWindow) {
+      mainWindow.show();
+    }
+  });
 
   // Register IPC handlers
   initMainAPI();
