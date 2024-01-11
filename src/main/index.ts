@@ -6,17 +6,64 @@
 import { app, shell, BrowserWindow, BrowserWindowConstructorOptions, Tray, screen } from 'electron';
 import { join } from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
-import { initMainAPI } from './api';
-import { ChildProcess } from 'child_process';
 import log from 'electron-log/main';
 import icon from '../../resources/icon.png?asset&asarUnpack';
+import { registerMainAPIs } from './api';
+import { sendEvent } from './event';
+import { mkdirSync } from 'fs';
+import { loadSettings } from './services/settings';
+
+export interface GameDownloadItem {
+  url: string;
+  received: number;
+  size: number;
+  status: 'downloading' | 'succeed' | 'failed';
+  libraryPath: string;
+  gameID: string;
+  gameName: string;
+  filePath: string;
+}
+
+interface AddDownloadItemOptions {
+  url: string;
+  filename: string;
+  size: number;
+  libraryPath: string;
+  gameID: string;
+  gameName: string;
+}
 
 export const windows: { [name: string]: BrowserWindow } = {};
-export const processes: { [id: string]: ChildProcess } = {};
 
+export const downloadItems: GameDownloadItem[] = [];
 export const downloadContext = {
-  savePath: ''
+  savePath: '',
 };
+
+export function addDownloadItem({ filename, gameID, gameName, libraryPath, size, url }: AddDownloadItemOptions) {
+  const index = downloadItems.findIndex((i) => i.gameID === gameID && i.status === 'downloading');
+  if (index !== -1) {
+    throw new Error('The game with the specified ID is already being downloaded! Please cancel it first.');
+  }
+
+  const dir = join(libraryPath, 'iwapps', 'downloading', gameID);
+  mkdirSync(dir, { recursive: true });
+
+  const downloadPath = join(dir, filename);
+  downloadItems.push({
+    gameID,
+    gameName,
+    libraryPath,
+    size,
+    url,
+    status: 'downloading',
+    filePath: downloadPath,
+    received: 0,
+  });
+
+  downloadContext.savePath = downloadPath;
+  windows['main'].webContents.downloadURL(url);
+}
 
 export let tray: Tray;
 export const trayMenuSize = { x: 250, y: 400 };
@@ -37,11 +84,11 @@ export function createWindow<T extends { type: string; name: string }>(params: T
       sandbox: false,
       webSecurity: false,
       webviewTag: true,
-      nodeIntegration: true
+      nodeIntegration: true,
     },
     minWidth: options?.width,
     minHeight: options?.height,
-    ...options
+    ...options,
   });
 
   window.on('ready-to-show', () => {
@@ -49,11 +96,11 @@ export function createWindow<T extends { type: string; name: string }>(params: T
   });
 
   window.on('maximize', () => {
-    window.webContents.send('maximize', true);
+    sendEvent('maximize', { value: true });
   });
 
   window.on('unmaximize', () => {
-    window.webContents.send('maximize', false);
+    sendEvent('maximize', { value: false });
   });
 
   window.webContents.setWindowOpenHandler((details) => {
@@ -67,7 +114,7 @@ export function createWindow<T extends { type: string; name: string }>(params: T
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     window.loadURL(process.env['ELECTRON_RENDERER_URL'] + queryString);
-    window.webContents.openDevTools();
+    if (params.name !== 'traymenu') window.webContents.openDevTools();
   } else {
     window.loadURL(join('file://', __dirname, '../renderer/index.html' + queryString));
   }
@@ -77,7 +124,7 @@ export function createWindow<T extends { type: string; name: string }>(params: T
 }
 
 app.whenReady().then(() => {
-  /** Check if single instance, if not, simply quit new instance */
+  // Check if single instance, if not, simply quit new instance
   const isSingleInstance = app.requestSingleInstanceLock();
   if (!isSingleInstance) {
     app.quit();
@@ -107,14 +154,14 @@ app.whenReady().then(() => {
         // Mediafire may have ads pop-ups, so prevent it from loading ads.
         if (wb.getURL().includes('www.mediafire.com/file/')) {
           return {
-            action: 'deny'
+            action: 'deny',
           };
         }
 
         wb.loadURL(details.url);
 
         return {
-          action: 'deny'
+          action: 'deny',
         };
       });
     });
@@ -131,36 +178,53 @@ app.whenReady().then(() => {
   // Create the main window
   const mainWindow = createWindow({ type: 'main', name: 'main' }, { width: 1000, height: 600 });
 
-  app.on('second-instance', (_event, _argv, _cwd) => {
+  app.on('second-instance', () => {
     if (mainWindow) {
       mainWindow.show();
     }
   });
 
+  // Load app settings
+  loadSettings();
+
   // Register IPC handlers
-  initMainAPI();
+  registerMainAPIs();
 
   // Handle download events
   mainWindow.webContents.session.on('will-download', (_downloadEvent, item, webContents) => {
     if (webContents.getType() === 'webview') {
       item.cancel();
-      mainWindow.webContents.send('webview-download', {
-        url: item.getURL(),
-        filename: item.getFilename(),
-        filesize: item.getTotalBytes()
-      });
+      sendEvent('webview-download', { url: item.getURL(), filename: item.getFilename(), filesize: item.getTotalBytes() });
     } else {
       item.setSavePath(downloadContext.savePath);
       item.on('updated', (_updateEvent, updateState) => {
         if (updateState === 'progressing') {
-          mainWindow.webContents.send('download-updated', item.getURL(), item.getReceivedBytes());
+          const index = downloadItems.findIndex((i) => i.url === item.getURL());
+          if (index === -1) {
+            console.log('WARNING: A download item has been updated, but it has not entered the download items.');
+            return;
+          }
+          downloadItems[index].received = item.getReceivedBytes();
+          sendEvent('download-updated', { items: downloadItems, updateItem: downloadItems[index] });
         }
       });
       item.on('done', (_itemEvent, itemState) => {
         if (itemState === 'completed') {
-          mainWindow.webContents.send('download-successfully', item.getURL());
+          const index = downloadItems.findIndex((i) => i.url === item.getURL());
+          if (index === -1) {
+            console.log('WARNING: A download item has been updated, but it has not entered the download items.');
+            return;
+          }
+          downloadItems[index].status = 'succeed';
+          sendEvent('download-successfully', { items: downloadItems, successItem: downloadItems[index] });
         } else {
-          mainWindow.webContents.send('download-failed', item.getURL());
+          const index = downloadItems.findIndex((i) => i.url === item.getURL());
+          if (index === -1) {
+            console.log('WARNING: A download item has been updated, but it has not entered the download items.');
+            return;
+          }
+          downloadItems[index].status = 'failed';
+          sendEvent('download-failed', { items: downloadItems, failedItem: downloadItems[index] });
         }
       });
     }
@@ -185,8 +249,8 @@ app.whenReady().then(() => {
       resizable: false,
       movable: false,
       transparent: true,
-      alwaysOnTop: true
-    }
+      alwaysOnTop: true,
+    },
   );
   trayMenu.on('blur', () => {
     trayMenu.hide();

@@ -16,7 +16,7 @@
         <!--  -->
         <div class="detail-row column-2">
           <div class="detail-row-title">{{ $t('Startup Path') }}</div>
-          <ComboBox :list="executablePaths" :value="manifest.startupPath" @update="(value) => updateManifest((m) => (m.startupPath = value))" />
+          <ComboBox v-model="manifest.startupPath" :list="executablePaths" watch-item-remove />
         </div>
         <div class="detail-row column-2">
           <div class="detail-row-title">{{ $t('Debugger Helper') }}</div>
@@ -24,7 +24,7 @@
         </div>
         <div class="detail-row column-2">
           <div class="detail-row-title">{{ $t('Resize Window With DPI (Experimental)') }}</div>
-          <SwitchButton :value="manifest.resize" @update="(value) => updateManifest((m) => (m.resize = value))" />
+          <SwitchButton v-model="manifest.resize" />
         </div>
       </template>
     </div>
@@ -42,38 +42,47 @@ import SwitchButton from './SwitchButton.vue';
 import { ref } from 'vue';
 import { onMounted } from 'vue';
 import { searchParams } from '@renderer/main';
-import { FangameManifest, library } from '@renderer/utils/library';
 import { invoke } from '@renderer/utils/invoke';
-import { paths } from '@renderer/utils/paths';
+import { type FangameManifest } from 'src/main/services/library';
+import { watch } from 'vue';
 
 const libraryPath = searchParams.get('libraryPath') as string;
-const id = searchParams.get('id') as string;
+const gameID = searchParams.get('id') as string;
 
 const sidebarItems = [{ title: 'General' }];
 const index = ref(0);
 
-const manifest = ref<FangameManifest>();
-const updateManifest = (patch: (m: FangameManifest) => void) => {
-  if (!manifest.value) return;
-  patch(manifest.value);
-  const manifestPath = paths.manifest(libraryPath, id);
-  invoke('write-file', manifestPath, JSON.stringify(manifest.value, null, 4));
-};
+const manifest = ref<FangameManifest>(undefined!);
+
+let gettingManifest = false;
+
+watch(manifest, (newManifest) => {
+  if (!gettingManifest) {
+    invoke('save-manifest', { gameID, libraryPath, manifest: newManifest });
+  } else {
+    gettingManifest = false;
+  }
+});
 
 const executablePaths = ref<string[]>([]);
 
+const getManifestFromFile = async () => {
+  gettingManifest = true;
+  manifest.value = await invoke('get-manifest', { gameID, libraryPath });
+};
+
+const updateExecutablePaths = async () => {
+  executablePaths.value = await invoke('get-game-executables', { gameID, libraryPath });
+};
+
 onMounted(async () => {
-  manifest.value = await library.getManifest(libraryPath, id);
-  executablePaths.value = await library.getExecutablePaths(paths.gameDir(libraryPath, id));
+  await getManifestFromFile();
+  await updateExecutablePaths();
 });
 
 const handlePatchDebugger = async () => {
-  const gameDir = paths.gameDir(libraryPath, id);
-  await invoke('dbghelper', gameDir);
-
-  // The game's executable file path may have changed, so regenerate the manifest
-  await library.createManifest(libraryPath, id);
-  manifest.value = await library.getManifest(libraryPath, id);
+  await invoke('apply-debug-helper', { gameID, libraryPath });
+  await updateExecutablePaths();
 };
 </script>
 

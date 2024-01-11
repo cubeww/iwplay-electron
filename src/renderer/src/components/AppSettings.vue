@@ -17,7 +17,7 @@
         <!--  -->
         <div class="detail-row column-2">
           <div class="detail-row-title">{{ $t('IWPlay Language') }}</div>
-          <ComboBox :list="languages" :value="configStore.cfg.language" @update="(value) => configStore.set((cfg) => (cfg.language = value as any))" />
+          <ComboBox v-model="settingsStore.settings.language" :list="languages" />
         </div>
       </template>
       <template v-if="index === 1">
@@ -34,7 +34,7 @@
           </div>
         </div>
         <div class="detail-row column-1">
-          <ComboBox class="storage-combo" :list="configStore.cfg.libraryPaths" :value="libraryPath" @update="(value) => (libraryPath = value)" />
+          <ComboBox v-model="selectedLibraryPath" v-model:index="selectedLibraryPathIndex" class="storage-combo" :list="settingsStore.settings.libraryPaths" watch-item-add watch-item-remove />
         </div>
         <div class="description">
           {{ $t('The library path is used to store installed fangame files. It is recommended to choose an empty folder with ample remaining space on the hard drive. Example: D:\\IWPlayLibrary') }}
@@ -59,35 +59,23 @@ import DeleteIcon from '@renderer/icons/DeleteIcon.vue';
 import AddIcon from '@renderer/icons/AddIcon.vue';
 
 import { ref } from 'vue';
-import { useConfigStore } from '@renderer/stores/configStore';
 import { onMounted } from 'vue';
 import { invoke } from '@renderer/utils/invoke';
 import { searchParams, windowName } from '@renderer/main';
+import { useSettingsStore } from '@renderer/stores/settings';
 
-const configStore = useConfigStore();
+const settingsStore = useSettingsStore();
 
 const sidebarItems = [
   { icon: ComputerIcon, title: 'Interface' },
-  { icon: DiskIcon, title: 'Storage' }
+  { icon: DiskIcon, title: 'Storage' },
 ];
 
 const index = ref(0);
-const languages = ['en', 'zh'];
+const languages = ['en', 'cn'];
 
-const libraryPath = ref('');
-
-const resetLibraryPath = () => {
-  if (configStore.cfg.libraryPaths.length === 0) {
-    libraryPath.value = '';
-  } else if (libraryPath.value !== '') {
-    const currentPathIsDeleted = configStore.cfg.libraryPaths.indexOf(libraryPath.value) === -1;
-    if (currentPathIsDeleted) {
-      libraryPath.value = configStore.cfg.libraryPaths[0];
-    }
-  } else {
-    libraryPath.value = configStore.cfg.libraryPaths[0];
-  }
-};
+const selectedLibraryPath = ref();
+const selectedLibraryPathIndex = ref(-1);
 
 onMounted(() => {
   index.value = sidebarItems.findIndex((i) => i.title === searchParams.get('startTitle'));
@@ -95,49 +83,24 @@ onMounted(() => {
   if (index.value === -1) {
     index.value = 0;
   }
-
-  resetLibraryPath();
 });
 
 const handleAddLibraryPath = async () => {
-  let path = await invoke('open-file-dialog', windowName, {
-    properties: ['openDirectory']
+  const path = await invoke('open-file-dialog', windowName, {
+    properties: ['openDirectory'],
   });
 
   if (!path) {
     return;
   }
 
-  path = await invoke('path-resolve', path[0]);
-  const pathLowerCase = path.toLowerCase();
-
-  let exists: string | undefined = undefined;
-
-  for (const p of configStore.cfg.libraryPaths) {
-    if ((await invoke('path-resolve', p)).toLowerCase() === pathLowerCase) {
-      exists = p;
-      break;
-    }
-  }
-
-  if (!exists) {
-    configStore.set((cfg) => cfg.libraryPaths.push(path));
-    libraryPath.value = path;
-  } else {
-    libraryPath.value = exists;
-  }
+  await invoke('add-library', { path: path[0] });
 };
 
 const handleDeleteLibraryPath = () => {
-  if (libraryPath.value === '') {
-    return;
+  if (selectedLibraryPathIndex.value !== -1) {
+    invoke('remove-library', { index: selectedLibraryPathIndex.value });
   }
-
-  const index = configStore.cfg.libraryPaths.indexOf(libraryPath.value);
-
-  configStore.set((cfg) => cfg.libraryPaths.splice(index, 1));
-
-  resetLibraryPath();
 };
 </script>
 

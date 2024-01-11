@@ -16,10 +16,12 @@ import { onMounted, onUnmounted, ref, watchEffect } from 'vue';
 import TabView from './TabView.vue';
 import RefreshIcon from '@renderer/icons/RefreshIcon.vue';
 import LoadingIcon from '@renderer/icons/LoadingIcon.vue';
-import { useAppStore } from '@renderer/stores/appStore';
 import { WebviewTag } from 'electron';
+import { useNavigateStore } from '@renderer/stores/navigate';
+import { useContextMenuStore } from '@renderer/stores/contextMenu';
 
-const appStore = useAppStore();
+const navigateStore = useNavigateStore();
+const contextMenuStore = useContextMenuStore();
 
 const loading = ref(true);
 const url = ref('https://delicious-fruit.com/');
@@ -69,9 +71,9 @@ onUnmounted(() => {
 
 watchEffect(() => {
   if (!webviewEl.value) return;
-  if (appStore.shouldLoadURL && appStore.present.targetBrowserURL) {
-    appStore.setShouldLoadURL(false);
-    webviewEl.value.loadURL(appStore.present.targetBrowserURL);
+  if (navigateStore.shouldLoadURL && navigateStore.state.targetBrowserURL) {
+    navigateStore.setShouldLoadURL(false);
+    webviewEl.value.loadURL(navigateStore.state.targetBrowserURL);
   }
 });
 
@@ -84,7 +86,7 @@ const handleDidNavigate = (event: any) => {
   const index = event.url.indexOf(prefix);
   if (index !== -1) {
     const id = event.url.substring(index + prefix.length);
-    appStore.updateLastVisitedFangameId(id);
+    navigateStore.updateLastVisitedFangameId(id);
   }
 };
 
@@ -106,14 +108,14 @@ const handleDidStartLoading = () => {
 
 const handleWillNavigate = (event: any) => {
   // **NOT** trigger in LoadURL
-  if (event.url !== appStore.present.targetBrowserURL) {
-    appStore.recordBrowserURL(event.url);
+  if (event.url !== navigateStore.state.targetBrowserURL) {
+    navigateStore.recordBrowserURL(event.url);
   }
 };
 
 const handleIpcMessage = (event: any) => {
   if (event.channel === 'mousedown') {
-    appStore.hideContextMenu();
+    contextMenuStore.hideContextMenu();
   }
 };
 </script>

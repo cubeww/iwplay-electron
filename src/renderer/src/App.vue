@@ -6,8 +6,8 @@
     <ViewLibrary />
     <ViewUser />
     <AppFooter />
-    <ContextMenu v-if="appStore.contextMenu" :options="appStore.contextMenu" :hide="appStore.hideContextMenu" />
-    <Component :is="popup.component" v-for="(popup, index) in appStore.popups" :key="index" :context="popup.context" @close-popup="appStore.closePopup(popup.context)" />
+    <PopupViewSlot />
+    <ContextMenuSlot />
   </div>
 </template>
 
@@ -18,10 +18,8 @@ import ViewBrowser from './components/ViewBrowser.vue';
 import ViewLibrary from './components/ViewLibrary.vue';
 import ViewUser from './components/ViewUser.vue';
 import AppFooter from './components/AppFooter.vue';
-import ContextMenu from './components/ContextMenu.vue';
-import { useAppStore } from './stores/appStore';
-
-const appStore = useAppStore();
+import PopupViewSlot from './components/PopupViewSlot.vue';
+import ContextMenuSlot from './components/ContextMenuSlot.vue';
 </script>
 
 <style scoped>

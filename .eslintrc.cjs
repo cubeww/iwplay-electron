@@ -8,13 +8,14 @@ module.exports = {
     '@electron-toolkit',
     '@electron-toolkit/eslint-config-ts/eslint-recommended',
     '@vue/eslint-config-typescript/recommended',
-    '@vue/eslint-config-prettier'
+    '@vue/eslint-config-prettier',
   ],
   rules: {
     'vue/require-default-prop': 'off',
     'vue/multi-word-component-names': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
-    'quote-props': ['error', 'consistent']
-  }
+    'quote-props': ['error', 'consistent'],
+    'comma-dangle': ['error', 'only-multiline'],
+  },
 };

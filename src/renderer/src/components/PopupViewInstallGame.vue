@@ -17,10 +17,10 @@
       <div class="bold white">{{ $t('INSTALL TO: ') }}</div>
       <SettingsIcon class="settings-button" @click="handleClickSettings" />
     </div>
-    <div v-if="configStore.cfg.libraryPaths.length === 0" class="warning-message">
+    <div v-if="settingsStore.settings.libraryPaths.length === 0" class="warning-message">
       {{ $t('Library path not added! Please click the settings button in the upper right corner to add one.') }}
     </div>
-    <div v-for="(path, index) in configStore.cfg.libraryPaths" :key="index" class="library-path-item" :class="{ selected: selectedLibraryPath === path }" @click="selectedLibraryPath = path">
+    <div v-for="(path, index) in settingsStore.settings.libraryPaths" :key="index" class="library-path-item" :class="{ selected: selectedLibraryPath === path }" @click="selectedLibraryPath = path">
       <DiskIcon class="library-path-item-icon" />
       {{ path }}
     </div>
@@ -44,10 +44,9 @@ import DiskIcon from '@renderer/icons/DiskIcon.vue';
 import { invoke } from '@renderer/utils/invoke';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useConfigStore } from '@renderer/stores/configStore';
 import { onMounted } from 'vue';
-import { library } from '@renderer/utils/library';
-import { useAppStore } from '@renderer/stores/appStore';
+import { useSettingsStore } from '@renderer/stores/settings';
+import { usePopupStore } from '@renderer/stores/popup';
 
 export interface InstallPopupContext {
   id: string;
@@ -57,7 +56,8 @@ export interface InstallPopupContext {
 const props = defineProps<{ context: InstallPopupContext }>();
 const emit = defineEmits<{ closePopup: [] }>();
 
-const configStore = useConfigStore();
+const settingsStore = useSettingsStore();
+const popupStore = usePopupStore();
 
 const filename = ref('');
 const filesize = ref(0);
@@ -68,11 +68,9 @@ const installStatus = ref<'pending' | 'installing' | 'error' | 'ok'>('pending');
 
 const selectedLibraryPath = ref('');
 
-const appStore = useAppStore();
-
 onMounted(() => {
-  if (configStore.cfg.libraryPaths.length > 0) {
-    selectedLibraryPath.value = configStore.cfg.libraryPaths[0];
+  if (settingsStore.settings.libraryPaths.length > 0) {
+    selectedLibraryPath.value = settingsStore.settings.libraryPaths[0];
   }
 });
 
@@ -82,8 +80,8 @@ const handleSelectGameFile = async () => {
     filters: [
       { name: 'Compress Files', extensions: ['zip', 'rar', '7z'] },
       { name: 'Executable File', extensions: ['exe'] },
-      { name: 'All Files', extensions: ['*'] }
-    ]
+      { name: 'All Files', extensions: ['*'] },
+    ],
   });
 
   if (typeof f === 'object' && typeof f[0] === 'string') {
@@ -95,12 +93,14 @@ const handleSelectGameFile = async () => {
 const handleInstall = async () => {
   installStatus.value = 'installing';
   try {
-    await library.install(selectedLibraryPath.value, props.context.id, filename.value);
-    appStore.fetchFangameItems();
-    await invoke('display-balloon', { title: 'IWPlay', content: 'Fangame Installed: ' + props.context.name });
+    await invoke('install-game', {
+      file: filename.value,
+      gameID: props.context.id,
+      libraryPath: selectedLibraryPath.value,
+    });
     emit('closePopup');
   } catch (err) {
-    appStore.showError((err as Error).message);
+    popupStore.showError((err as Error).message);
     installStatus.value = 'error';
   }
 };

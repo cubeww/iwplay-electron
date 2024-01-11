@@ -1,12 +1,12 @@
 <template>
-  <div class="switch-button" :class="{ active: value }" @click="emit('update', !value)">
-    <div class="circle" :class="{ active: value }"></div>
+  <div class="switch-button" :class="{ active: modelValue }" @click="emit('update:modelValue', !modelValue)">
+    <div class="circle" :class="{ active: modelValue }"></div>
   </div>
 </template>
 
 <script lang="ts" setup>
-defineProps<{ value: boolean }>();
-const emit = defineEmits<{ update: [value: boolean] }>();
+defineProps<{ modelValue: boolean }>();
+const emit = defineEmits<{ 'update:modelValue': [value: boolean] }>();
 </script>
 
 <style scoped>

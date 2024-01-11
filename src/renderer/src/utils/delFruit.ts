@@ -40,5 +40,5 @@ export const delFruit = {
     const rating = doc.getElementById('avgRating')?.innerText;
     const difficulty = doc.getElementById('avgDifficulty')?.innerText;
     return { auther, difficulty, downloadLink, id, name, rating } as DelFruitFangameDetail;
-  }
+  },
 };

@@ -7,28 +7,29 @@
 </template>
 
 <script lang="ts" setup>
-import { TabName, useAppStore } from '@renderer/stores/appStore';
 import { computed, ref } from 'vue';
 import { ContextMenuItemData } from './ContextMenu.vue';
+import { TabName, useNavigateStore } from '@renderer/stores/navigate';
+import { useContextMenuStore } from '@renderer/stores/contextMenu';
 
 const props = defineProps<{ to: TabName; items?: ContextMenuItemData[] }>();
 
-const appStore = useAppStore();
-const selected = computed(() => props.to === appStore.present.tab);
+const navigateStore = useNavigateStore();
+const selected = computed(() => props.to === navigateStore.state.tab);
+
+const contextMenuStore = useContextMenuStore();
 
 const tabBarItemEl = ref<HTMLDivElement>();
 
 const handleClick = () => {
-  if (appStore.present && appStore.present.tab !== props.to) {
-    appStore.toggleTab(props.to);
-  }
+  navigateStore.toggleTab(props.to);
 };
 
 const handleMouseEnter = () => {
   if (!tabBarItemEl.value) return;
   if (!props.items) return;
   const rect = tabBarItemEl.value.getBoundingClientRect();
-  appStore.showContextMenu({ x: rect.left, y: rect.bottom + 8, items: props.items, triggerEl: tabBarItemEl.value, outsideAutoClose: true });
+  contextMenuStore.showContextMenu({ x: rect.left, y: rect.bottom + 8, items: props.items, triggerEl: tabBarItemEl.value, outsideAutoClose: true });
 };
 </script>
 

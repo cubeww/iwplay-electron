@@ -17,21 +17,24 @@ import { createI18n } from 'vue-i18n';
 
 import zh from './i18n/zh';
 import en from './i18n/en';
-import { useConfigStore } from './stores/configStore';
+
 import GameProperties from './components/GameProperties.vue';
 import TrayMenu from './components/TrayMenu.vue';
 import AboutView from './components/AboutView.vue';
+import { useSettingsStore } from './stores/settings';
+import { useDownloadStore } from './stores/download';
+import { useNavigateStore } from './stores/navigate';
 
 export const searchParams = new URLSearchParams(window.location.search);
 export const windowType = searchParams.get('type') as string;
 export const windowName = searchParams.get('name') as string;
 
-const typeToComponentMap = {
+const windowTypeToComponentMap = {
   main: App,
   settings: AppSettings,
   gameprop: GameProperties,
   traymenu: TrayMenu,
-  about: AboutView
+  about: AboutView,
 };
 
 export const mainI18n = createI18n({
@@ -44,21 +47,21 @@ export const mainI18n = createI18n({
       short: {
         year: 'numeric',
         month: 'short',
-        day: 'numeric'
-      }
+        day: 'numeric',
+      },
     },
     zh: {
       short: {
         year: 'numeric',
         month: 'short',
-        day: 'numeric'
-      }
-    }
+        day: 'numeric',
+      },
+    },
   },
   messages: {
     zh,
-    en
-  }
+    en,
+  },
 });
 
 const pinia = createPinia();
@@ -69,11 +72,15 @@ pinia.use(({ store }) => {
   });
 });
 
-const app = createApp(typeToComponentMap[windowType]);
+const app = createApp(windowTypeToComponentMap[windowType]);
 app.use(pinia);
 app.use(mainI18n);
 
-const configStore = useConfigStore();
-await configStore.init();
+await useSettingsStore().initialize();
+
+if (windowName === 'main') {
+  useNavigateStore().initialize();
+  useDownloadStore().initialize();
+}
 
 app.mount('#app');

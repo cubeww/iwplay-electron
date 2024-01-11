@@ -10,27 +10,27 @@
 import AppMenuBarItem from '@renderer/components/AppMenuBarItem.vue';
 import ControlButtons from './ControlButtons.vue';
 
-import { useAppStore } from '@renderer/stores/appStore';
 import { computed } from 'vue';
 import { invoke } from '@renderer/utils/invoke';
 import { ContextMenuItemData } from './ContextMenu.vue';
+import { useContextMenuStore } from '@renderer/stores/contextMenu';
 
-const appStore = useAppStore();
-const hasContextMenu = computed(() => appStore.contextMenu !== undefined);
+const contextMenuStore = useContextMenuStore();
+const hasContextMenu = computed(() => contextMenuStore.contextMenu !== undefined);
 
 const menuItems: ContextMenuItemData[][] = [
   // IWPlay
   [
     { type: 'text', text: 'Settings', onClick: () => invoke('create-window', { type: 'settings', name: 'settings' }, { width: 800, height: 600 }) }, //
     { type: 'separator' },
-    { type: 'text', text: 'Quit', onClick: () => invoke('quit') }
+    { type: 'text', text: 'Quit', onClick: () => invoke('quit') },
   ],
   // Help
   [
     { type: 'text', text: 'Github', onClick: () => invoke('open-external', `https://github.com/cubeww/iwplay-electron`) }, //
     { type: 'separator' },
-    { type: 'text', text: 'About', onClick: () => invoke('create-window', { type: 'about', name: 'about' }, { width: 450, height: 300 }) }
-  ]
+    { type: 'text', text: 'About', onClick: () => invoke('create-window', { type: 'about', name: 'about' }, { width: 450, height: 300 }) },
+  ],
 ];
 </script>
 

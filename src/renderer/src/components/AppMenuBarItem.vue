@@ -5,29 +5,29 @@
 </template>
 
 <script lang="ts" setup>
-import { useAppStore } from '@renderer/stores/appStore';
 import { ref } from 'vue';
 import { ContextMenuItemData } from './ContextMenu.vue';
+import { useContextMenuStore } from '@renderer/stores/contextMenu';
 
 const props = defineProps<{ items: ContextMenuItemData[] }>();
 const itemEl = ref<HTMLDivElement>();
-const appStore = useAppStore();
+const contextMenuStore = useContextMenuStore();
 
 const showMenu = () => {
   if (!itemEl.value) return;
   const rect = itemEl.value.getBoundingClientRect();
-  appStore.showContextMenu({ x: rect.left + 10, y: rect.bottom, items: props.items, triggerEl: itemEl.value });
+  contextMenuStore.showContextMenu({ x: rect.left + 10, y: rect.bottom, items: props.items, triggerEl: itemEl.value });
 };
 
 const handleClick = () => {
-  if (appStore.contextMenu && appStore.contextMenu.triggerEl === itemEl.value) {
-    appStore.hideContextMenu();
+  if (contextMenuStore.contextMenu && contextMenuStore.contextMenu.triggerEl === itemEl.value) {
+    contextMenuStore.hideContextMenu();
   } else {
     showMenu();
   }
 };
 const handleEnter = () => {
-  if (appStore.contextMenu && appStore.contextMenu.triggerEl !== itemEl.value) {
+  if (contextMenuStore.contextMenu && contextMenuStore.contextMenu.triggerEl !== itemEl.value) {
     showMenu();
   }
 };

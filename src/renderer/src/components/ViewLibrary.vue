@@ -11,12 +11,15 @@
 import TabView from './TabView.vue';
 import LibrarySidebar from './LibrarySidebar.vue';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
-import { useAppStore } from '@renderer/stores/appStore';
 import LibraryDetailGame from './LibraryDetailGame.vue';
 import LibraryDetailHome from './LibraryDetailHome.vue';
+import { useLibraryStore } from '@renderer/stores/library';
+import { useNavigateStore } from '@renderer/stores/navigate';
 
-const appStore = useAppStore();
-const item = computed(() => appStore.fangameItems.find((i) => i.id === appStore.present.fangameItemId));
+const libraryStore = useLibraryStore();
+const navigateStore = useNavigateStore();
+
+const item = computed(() => libraryStore.fangameItems.find((i) => i.id === navigateStore.state.fangameItemID));
 
 onMounted(() => {
   window.addEventListener('mouseup', handleWindowMouseUp);

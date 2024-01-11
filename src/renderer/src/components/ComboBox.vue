@@ -1,12 +1,12 @@
 <template>
   <div class="combo-box">
     <div class="button" @click="showList = !showList">
-      <div class="button-text">{{ value }}</div>
+      <div class="button-text">{{ modelValue }}</div>
       <ArrowVIcon class="button-arrow" />
     </div>
 
     <div v-show="showList" ref="comboListEl" class="combo-list">
-      <div v-for="(item, index) in list" :key="index" class="combo-list-item" @click="handleClickItem(item)">
+      <div v-for="(item, i) in list" :key="i" class="combo-list-item" @click="selectItem(item, i)">
         {{ item }}
       </div>
     </div>
@@ -15,16 +15,39 @@
 
 <script lang="ts" setup>
 import ArrowVIcon from '@renderer/icons/ArrowVIcon.vue';
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 
-defineProps<{ list: string[]; value: string }>();
-const emit = defineEmits<{ update: [value: string] }>();
+const props = defineProps<{ list: string[]; modelValue: string | undefined; index?: number; watchItemAdd?: boolean; watchItemRemove?: boolean }>();
+const emit = defineEmits<{ 'update:modelValue': [value: string | undefined]; 'update:index': [index: number] }>();
 
 const showList = ref(false);
 const comboListEl = ref<HTMLDivElement>();
 
+watch(
+  () => props.list,
+  (newList, oldList) => {
+    // List item added
+    if (props.watchItemAdd && newList.length > oldList.length) {
+      selectItem(newList[newList.length - 1], newList.length - 1);
+    }
+
+    // List item removed
+    if (props.watchItemRemove && props.modelValue !== undefined && newList.indexOf(props.modelValue) === -1) {
+      if (newList.length === 0) {
+        selectItem(undefined, -1);
+      } else {
+        selectItem(newList[0], 0);
+      }
+    }
+  },
+);
+
 onMounted(() => {
   window.addEventListener('mousedown', handleMouseDown);
+
+  if (props.modelValue === undefined && props.list.length > 0) {
+    selectItem(props.list[0], 0);
+  }
 });
 
 onUnmounted(() => {
@@ -38,8 +61,11 @@ const handleMouseDown = (e: MouseEvent) => {
   }
 };
 
-const handleClickItem = (item: string) => {
-  emit('update', item);
+const selectItem = (item: string | undefined, index: number) => {
+  emit('update:modelValue', item);
+  if (props.index !== undefined) {
+    emit('update:index', index);
+  }
   showList.value = false;
 };
 </script>

@@ -49,5 +49,5 @@ export default {
   'ABOUT DELFRUIT ID': '关于美味水果ID',
   'OK': '好的',
   'Debugger Helper': '防掉帧补丁',
-  'Patch': '应用'
+  'Patch': '应用',
 };

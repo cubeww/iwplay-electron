@@ -16,10 +16,13 @@ import WindowRestoreIcon from '@renderer/icons/WindowRestoreIcon.vue';
 import { invoke } from '@renderer/utils/invoke';
 import { windowName } from '@renderer/main';
 import { ref } from 'vue';
-import { useMainEventHandler } from '@renderer/hooks/useMainEventHandler';
+import { useListenEvent } from '@renderer/utils/listenEvent';
 
 const isMaximize = ref(false);
-useMainEventHandler('maximize', (value) => (isMaximize.value = value));
+
+useListenEvent('maximize', ({ value }) => {
+  isMaximize.value = value;
+});
 
 const handleClickClose = () => {
   if (windowName === 'main') {

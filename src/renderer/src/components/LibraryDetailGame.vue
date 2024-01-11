@@ -43,7 +43,6 @@
 </template>
 
 <script lang="ts" setup>
-import { FangameItem, useAppStore } from '@renderer/stores/appStore';
 import { ref } from 'vue';
 import InstallGameIcon from '@renderer/icons/InstallGameIcon.vue';
 import ButtonGradient from './ButtonGradient.vue';
@@ -51,25 +50,20 @@ import SettingsIcon from '@renderer/icons/SettingsIcon.vue';
 import PopupViewInstallGame from './PopupViewInstallGame.vue';
 import PlayIcon from '@renderer/icons/PlayIcon.vue';
 import DeleteIcon from '@renderer/icons/DeleteIcon.vue';
-import { library } from '@renderer/utils/library';
 import { invoke } from '@renderer/utils/invoke';
-import { useFetch } from '@renderer/hooks/useFetch';
-import { DelFruitFangameDetail, delFruit } from '@renderer/utils/delFruit';
 import { watch } from 'vue';
 import { computed } from 'vue';
 import WindowCloseIcon from '@renderer/icons/WindowCloseIcon.vue';
-import { paths } from '@renderer/utils/paths';
+import { FangameItem } from '@renderer/stores/library';
+import { useNavigateStore } from '@renderer/stores/navigate';
+import { type FangameProfile, type FangameReadme } from 'src/main/services/library';
+import { DelFruitFangameDetail, delFruit } from '@renderer/utils/delFruit';
+import { usePopupStore } from '@renderer/stores/popup';
+
+const navigateStore = useNavigateStore();
+const popupStore = usePopupStore();
 
 const props = defineProps<{ item: FangameItem }>();
-
-const [fetchDetails, details, fetchDetailsStatus, _fetchDetailsError] = useFetch({} as DelFruitFangameDetail, () => {
-  return delFruit.fetchFangameDetail(props.item.id);
-});
-
-export interface FangameProfile {
-  playTime: number;
-  lastPlayed: Date;
-}
 
 const profile = ref<FangameProfile>();
 const playTime = computed(() => {
@@ -79,54 +73,46 @@ const playTime = computed(() => {
 });
 
 const fetchProfile = async () => {
-  const profileFile = paths.fangameProfile('guest', props.item.id);
-  if (await invoke('path-exists', profileFile)) {
-    try {
-      profile.value = JSON.parse(await invoke('read-file', profileFile));
-    } catch (err) {
-      appStore.showError((err as Error).message);
-      profile.value = undefined;
-    }
-  } else {
+  profile.value = undefined;
+  try {
+    profile.value = await invoke('get-profile', { gameID: props.item.id });
+  } catch {
     profile.value = undefined;
   }
 };
 
-interface ReadmeItem {
-  name: string;
-  content: string;
-  path: string;
-}
+const readmeList = ref<FangameReadme[]>([]);
 
-const readmeList = ref<ReadmeItem[]>([]);
-
-const fetchReadme = async () => {
+const fetchReadmes = async () => {
   readmeList.value = [];
   if (!props.item.isInstalled) return;
-  const readmeFiles = await library.getReadmePaths(paths.gameDir(props.item.libraryPath, props.item.id));
-  const list: ReadmeItem[] = [];
-  for (const f of readmeFiles) {
-    const path = paths.gameFile(props.item.libraryPath, props.item.id, f);
-    const name = f.replaceAll('/', '\\').split('\\').pop() as string;
-    const content = (await invoke('read-file', path)) as string;
-    list.push({ name, content, path });
+  readmeList.value = await invoke('get-game-readmes', { gameID: props.item.id, libraryPath: props.item.libraryPath });
+};
+
+const detail = ref<DelFruitFangameDetail>();
+const fetchDetailStatus = ref<'pending' | 'fetching' | 'ok' | 'error'>('pending');
+const fetchDetail = async () => {
+  detail.value = undefined;
+  try {
+    fetchDetailStatus.value = 'fetching';
+    detail.value = await delFruit.fetchFangameDetail(props.item.id);
+  } catch {
+    fetchDetailStatus.value = 'error';
   }
-  readmeList.value = list;
 };
 
 watch(
   props,
   () => {
     fetchProfile();
-    fetchDetails();
-    fetchReadme();
+    fetchReadmes();
+    fetchDetail();
   },
-  { immediate: true }
+  { immediate: true },
 );
 
-const hasDownloadLink = computed(() => fetchDetailsStatus.value === 'ok' && details.value.downloadLink);
+const hasDownloadLink = computed(() => detail.value && detail.value.downloadLink);
 
-const appStore = useAppStore();
 const backgroundY = ref(0);
 
 const handleScroll = (e: any) => {
@@ -134,44 +120,36 @@ const handleScroll = (e: any) => {
 };
 
 const handleToDelFruit = () => {
-  appStore.toggleBrowserAndLoadURL('https://delicious-fruit.com/ratings/game_details.php?id=' + props.item.id);
+  navigateStore.toggleBrowserAndLoadURL('https://delicious-fruit.com/ratings/game_details.php?id=' + props.item.id);
 };
 
 const handleClickInstall = () => {
-  appStore.showPopup(PopupViewInstallGame, { id: props.item.id, name: props.item.name });
+  popupStore.showPopup(PopupViewInstallGame, { id: props.item.id, name: props.item.name });
 };
 
 const handleClickPlay = async () => {
-  const manifest = await library.getManifest(props.item.libraryPath, props.item.id);
-  if (!manifest.startupPath) {
-    appStore.showError('The game startup path is not set. Maybe the game has no or multiple startup path. Please go to the game properties to configure it first.', showGameProperties);
-    return;
-  }
-  const exePath = paths.gameFile(props.item.libraryPath, props.item.id, manifest.startupPath).replaceAll('/', '\\');
-
   try {
-    await invoke('run', props.item.id, exePath, manifest.resize);
+    await invoke('run-game', { gameID: props.item.id, libraryPath: props.item.libraryPath });
   } catch (err) {
-    appStore.showError((err as Error).message);
+    popupStore.showError((err as Error).message);
   }
 };
 
 const handleClickStop = async () => {
   try {
-    await invoke('kill', props.item.id);
+    await invoke('stop-game', { gameID: props.item.id });
   } catch (err) {
-    appStore.showError((err as Error).message);
+    popupStore.showError((err as Error).message);
   }
 };
 
 const handleClickDelete = () => {
-  appStore.showConfirm('Are you sure you want to uninstall this fangame? This will delete all game files, possibly even SAVE files!', async () => {
+  popupStore.showConfirm('Are you sure you want to uninstall this fangame? This will delete all game files, possibly even SAVE files!', async () => {
     try {
-      await library.uninstall(props.item.libraryPath, props.item.id);
+      await invoke('uninstall-game', { gameID: props.item.id, libraryPath: props.item.libraryPath });
     } catch (err) {
-      appStore.showError((err as Error).message);
+      popupStore.showError((err as Error).message);
     }
-    appStore.fetchFangameItems();
   });
 };
 
@@ -183,9 +161,9 @@ const showGameProperties = () => {
       name: props.item.id,
       id: props.item.id,
       gameName: props.item.name,
-      libraryPath: props.item.libraryPath
+      libraryPath: props.item.libraryPath,
     },
-    { width: 800, height: 600 }
+    { width: 800, height: 600 },
   );
 };
 
@@ -195,13 +173,13 @@ const handleClickProperties = () => {
 
 const handleToDownload = () => {
   if (hasDownloadLink.value) {
-    appStore.updateLastVisitedFangameId(props.item.id);
-    appStore.toggleBrowserAndLoadURL(details.value.downloadLink);
+    navigateStore.updateLastVisitedFangameId(props.item.id);
+    navigateStore.toggleBrowserAndLoadURL(detail.value!.downloadLink);
   }
 };
 
 const handleToGameDirectory = () => {
-  invoke('explorer', paths.gameDir(props.item.libraryPath, props.item.id));
+  invoke('open-game-directory', { gameID: props.item.id, libraryPath: props.item.libraryPath });
 };
 
 const handleClickReadme = (path: string) => {
@@ -216,6 +194,7 @@ const handleClickReadme = (path: string) => {
   min-width: 0;
   flex-grow: 1;
   overflow-y: scroll;
+  overflow-x: hidden;
 
   background: url('/game-detail.png');
   background-repeat: no-repeat;

@@ -5,6 +5,8 @@
     "src/renderer/src/**/*",
     "src/renderer/src/**/*.vue",
     "src/preload/*.d.ts",
+    "src/main/api.ts",
+    "src/main/event.ts"
   ],
   "compilerOptions": {
     "composite": true,

@@ -2,8 +2,8 @@
   <div class="library-sidebar">
     <div class="header">
       <button class="header-home-button" :class="{ active: isInHome }" @click="handleToHome">{{ $t('HOME') }}</button>
-      <button class="header-refresh-button" :class="{ enable: fetchStatus !== 'fetching' }" @click="fetchItems(true)">
-        <RefreshIcon :class="{ rotate: fetchStatus === 'fetching' }" />
+      <button class="header-refresh-button" :class="{ enable: libraryStore.fetchFangameItemsStatus !== 'fetching' }" @click="libraryStore.fetchFangameItems(true)">
+        <RefreshIcon :class="{ rotate: libraryStore.fetchFangameItemsStatus === 'fetching' }" />
       </button>
     </div>
     <div class="search">
@@ -23,9 +23,9 @@
         </div>
       </div>
     </div>
-    <div v-show="fetchStatus === 'ok'" class="fangame-list-with-scroll" @scroll="handleScroll">
+    <div v-show="libraryStore.fetchFangameItemsStatus === 'ok'" class="fangame-list-with-scroll" @scroll="handleScroll">
       <div class="fangame-list-with-height" :style="{ height: filteredItems.length * itemHeight + 'px' }">
-        <div v-for="(item, index) in displayItems" :key="index" class="fangame-list-item" :class="{ select: appStore.present.fangameItemId === item.id, installed: item.isInstalled, running: item.isRunning }" :style="{ transform: `translateY(${translateY}px)` }" @click="appStore.selectFangameItem(item.id)">
+        <div v-for="(item, index) in displayItems" :key="index" class="fangame-list-item" :class="{ select: navigateStore.state.fangameItemID === item.id, installed: item.isInstalled, running: item.isRunning }" :style="{ transform: `translateY(${translateY}px)` }" @click="navigateStore.selectFangameItem(item.id)">
           {{ item.name }}
           <template v-if="item.isRunning">
             <div style="color: #a9a9a9">&nbsp;-&nbsp;</div>
@@ -34,9 +34,9 @@
         </div>
       </div>
     </div>
-    <div v-show="fetchStatus === 'error'" class="fangame-list-error">
-      {{ appStore.fetchFangameItemsError }}
-      <ButtonPure @click="fetchItems(true)">{{ $t('Retry') }}</ButtonPure>
+    <div v-show="libraryStore.fetchFangameItemsStatus === 'error'" class="fangame-list-error">
+      {{ libraryStore.fetchFangameItemsError }}
+      <ButtonPure @click="libraryStore.fetchFangameItems(true)">{{ $t('Retry') }}</ButtonPure>
     </div>
   </div>
 </template>
@@ -47,9 +47,13 @@ import SearchIcon from '@renderer/icons/SearchIcon.vue';
 import FilterIcon from '@renderer/icons/FilterIcon.vue';
 import ButtonPure from './ButtonPure.vue';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
-import { useAppStore } from '@renderer/stores/appStore';
 
 import CheckBox from './CheckBox.vue';
+import { useLibraryStore } from '@renderer/stores/library';
+import { useNavigateStore } from '@renderer/stores/navigate';
+
+const libraryStore = useLibraryStore();
+const navigateStore = useNavigateStore();
 
 const itemHeight = 25; // px
 
@@ -59,16 +63,11 @@ const searchText = ref('');
 const displayCount = ref(36);
 const scrollTop = ref(0);
 
-const appStore = useAppStore();
-
-const fetchStatus = computed(() => appStore.fetchFangameItemsStatus);
-const fetchItems = appStore.fetchFangameItems;
-
 const showFilter = ref(false);
 
 const filters = ref({
   installed: false,
-  running: false
+  running: false,
 });
 
 const hasFilter = computed(() => {
@@ -83,8 +82,6 @@ const hasFilter = computed(() => {
 onMounted(() => {
   window.addEventListener('resize', handleWindowResize);
   handleWindowResize();
-
-  fetchItems(false);
 });
 
 onUnmounted(() => {
@@ -101,9 +98,9 @@ const startIndex = computed(() => {
 
 const searchItems = computed(() => {
   if (searchText.value === '') {
-    return appStore.fangameItems;
+    return libraryStore.fangameItems;
   } else {
-    return appStore.fangameItems.filter((i) => i.name.toLowerCase().includes(searchText.value.toLowerCase()));
+    return libraryStore.fangameItems.filter((i) => i.name.toLowerCase().includes(searchText.value.toLowerCase()));
   }
 });
 
@@ -128,10 +125,10 @@ const handleScroll = (e: Event) => {
 };
 
 const handleToHome = () => {
-  appStore.selectFangameItem(undefined);
+  navigateStore.selectFangameItem(undefined);
 };
 
-const isInHome = computed(() => !appStore.present.fangameItemId);
+const isInHome = computed(() => !navigateStore.state.fangameItemID);
 </script>
 
 <style scoped>

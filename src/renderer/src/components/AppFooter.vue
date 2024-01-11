@@ -23,12 +23,14 @@
 
 <script lang="ts" setup>
 import AddGameIcon from '@renderer/icons/AddGameIcon.vue';
-import { useAppStore } from '@renderer/stores/appStore';
+import { useDownloadStore } from '@renderer/stores/download';
+import { useNavigateStore } from '@renderer/stores/navigate';
 import { computed } from 'vue';
 
-const appStore = useAppStore();
+const downloadStore = useDownloadStore();
+const navigateStore = useNavigateStore();
 
-const downloadingItems = computed(() => appStore.downloadItems.filter((i) => i.status === 'downloading'));
+const downloadingItems = computed(() => downloadStore.downloadItems.filter((i) => i.status === 'downloading'));
 const downloadingCount = computed(() => downloadingItems.value.length);
 const downloadingProgress = computed(() => {
   if (downloadingCount.value === 0) return 0;
@@ -38,7 +40,7 @@ const downloadingProgress = computed(() => {
 });
 
 const handleAddGame = () => {
-  if (appStore.present.tab !== 'library') appStore.toggleTab('library');
+  navigateStore.toggleTab('library');
 };
 </script>
 

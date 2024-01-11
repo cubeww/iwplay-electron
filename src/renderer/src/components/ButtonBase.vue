@@ -10,8 +10,8 @@ const props = withDefaults(
     enabled?: boolean;
   }>(),
   {
-    enabled: true
-  }
+    enabled: true,
+  },
 );
 
 const emit = defineEmits<{ click: [] }>();

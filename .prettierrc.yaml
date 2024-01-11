@@ -1,6 +1,6 @@
 singleQuote: true
 semi: true
 printWidth: 999
-trailingComma: none
+trailingComma: all
 endOfLine: auto
 quoteProps: consistent

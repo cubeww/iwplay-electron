@@ -11,6 +11,7 @@
 import { windowName } from '@renderer/main';
 import { invoke } from '@renderer/utils/invoke';
 import { onMounted, ref } from 'vue';
+import { type ShowEventOptions } from 'src/main/event';
 
 const trayMenuEl = ref<HTMLDivElement>();
 
@@ -21,8 +22,8 @@ onMounted(() => {
   }
 });
 
-const handleClickToMain = (action: string) => {
-  invoke('main-show', action);
+const handleClickToMain = (action: ShowEventOptions) => {
+  invoke('send-event', 'show', action);
   invoke('hide', windowName);
 };
 </script>

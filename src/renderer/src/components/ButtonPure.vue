@@ -16,8 +16,8 @@ withDefaults(
   {
     enabled: true,
     color1: '#3d4450',
-    color2: '#464d58'
-  }
+    color2: '#464d58',
+  },
 );
 
 const emit = defineEmits<{ click: [] }>();
