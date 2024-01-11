@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { invoke } from '@renderer/utils/invoke';
-import { type GameDownloadItem } from 'src/main';
+import { GameDownloadItem } from 'src/main';
 import { listenEvent } from '@renderer/utils/listenEvent';
 import { usePopupStore } from './popup';
 import PopupViewDownload from '@renderer/components/PopupViewDownload.vue';

@@ -56,7 +56,7 @@ import { computed } from 'vue';
 import WindowCloseIcon from '@renderer/icons/WindowCloseIcon.vue';
 import { FangameItem } from '@renderer/stores/library';
 import { useNavigateStore } from '@renderer/stores/navigate';
-import { type FangameProfile, type FangameReadme } from 'src/main/services/library';
+import { FangameProfile, FangameReadme } from 'src/main/services/library';
 import { DelFruitFangameDetail, delFruit } from '@renderer/utils/delFruit';
 import { usePopupStore } from '@renderer/stores/popup';
 

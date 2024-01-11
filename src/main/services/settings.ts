@@ -5,7 +5,7 @@ import { readTextFile, writeTextFile } from '../utils/fs';
 
 export interface AppSettings {
   libraryPaths: string[];
-  language: 'en' | 'cn';
+  language: 'en' | 'zh';
 }
 
 const defaultSettings: AppSettings = {

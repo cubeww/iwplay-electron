@@ -72,7 +72,7 @@ const sidebarItems = [
 ];
 
 const index = ref(0);
-const languages = ['en', 'cn'];
+const languages = ['en', 'zh'];
 
 const selectedLibraryPath = ref();
 const selectedLibraryPathIndex = ref(-1);

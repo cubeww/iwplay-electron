@@ -21,9 +21,11 @@ import en from './i18n/en';
 import GameProperties from './components/GameProperties.vue';
 import TrayMenu from './components/TrayMenu.vue';
 import AboutView from './components/AboutView.vue';
+
 import { useSettingsStore } from './stores/settings';
 import { useDownloadStore } from './stores/download';
 import { useNavigateStore } from './stores/navigate';
+import { useLibraryStore } from './stores/library';
 
 export const searchParams = new URLSearchParams(window.location.search);
 export const windowType = searchParams.get('type') as string;
@@ -81,6 +83,7 @@ await useSettingsStore().initialize();
 if (windowName === 'main') {
   useNavigateStore().initialize();
   useDownloadStore().initialize();
+  useLibraryStore().initialize();
 }
 
 app.mount('#app');

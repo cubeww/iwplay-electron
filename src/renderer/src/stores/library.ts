@@ -88,37 +88,39 @@ export const useLibraryStore = defineStore('library', () => {
     }
   };
 
-  listenEvent('game-installed', ({ gameID, libraryPath }) => {
-    fangameItems.value.forEach((i) => {
-      if (i.id === gameID) {
-        i.isInstalled = true;
-        i.libraryPath = libraryPath;
-      }
+  const initialize = () => {
+    listenEvent('game-installed', ({ gameID, libraryPath }) => {
+      fangameItems.value.forEach((i) => {
+        if (i.id === gameID) {
+          i.isInstalled = true;
+          i.libraryPath = libraryPath;
+        }
+      });
     });
-  });
 
-  listenEvent('game-uninstalled', ({ gameID }) => {
-    fangameItems.value.forEach((i) => {
-      if (i.id === gameID) {
-        i.isInstalled = false;
-      }
+    listenEvent('game-uninstalled', ({ gameID }) => {
+      fangameItems.value.forEach((i) => {
+        if (i.id === gameID) {
+          i.isInstalled = false;
+        }
+      });
     });
-  });
 
-  listenEvent('game-run', ({ gameID }) => {
-    fangameItems.value.forEach((i) => {
-      if (i.id === gameID) i.isRunning = true;
+    listenEvent('game-run', ({ gameID }) => {
+      fangameItems.value.forEach((i) => {
+        if (i.id === gameID) i.isRunning = true;
+      });
     });
-  });
 
-  listenEvent('game-close', ({ gameID }) => {
-    fangameItems.value.forEach((i) => {
-      if (i.id === gameID) i.isRunning = false;
+    listenEvent('game-close', ({ gameID }) => {
+      fangameItems.value.forEach((i) => {
+        if (i.id === gameID) i.isRunning = false;
+      });
     });
-  });
 
-  // Fetch once at start
-  fetchFangameItems(false);
+    // Fetch once at start
+    fetchFangameItems(false);
+  };
 
-  return { fangameItems, fetchFangameItems, fetchFangameItemsStatus, fetchFangameItemsError };
+  return { initialize, fangameItems, fetchFangameItems, fetchFangameItemsStatus, fetchFangameItemsError };
 });

@@ -43,7 +43,7 @@ import { ref } from 'vue';
 import { onMounted } from 'vue';
 import { searchParams } from '@renderer/main';
 import { invoke } from '@renderer/utils/invoke';
-import { type FangameManifest } from 'src/main/services/library';
+import { FangameManifest } from 'src/main/services/library';
 import { watch } from 'vue';
 
 const libraryPath = searchParams.get('libraryPath') as string;
