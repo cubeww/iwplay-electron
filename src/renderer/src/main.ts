@@ -26,6 +26,7 @@ import { useSettingsStore } from './stores/settings';
 import { useDownloadStore } from './stores/download';
 import { useNavigateStore } from './stores/navigate';
 import { useLibraryStore } from './stores/library';
+import { usePopupStore } from './stores/popup';
 
 export const searchParams = new URLSearchParams(window.location.search);
 export const windowType = searchParams.get('type') as string;
@@ -84,6 +85,16 @@ if (windowName === 'main') {
   useNavigateStore().initialize();
   useDownloadStore().initialize();
   useLibraryStore().initialize();
+
+  const popupStore = usePopupStore();
+
+  window.addEventListener('error', (ev) => {
+    popupStore.showError(ev.message);
+  });
+
+  window.addEventListener('unhandledrejection', (ev) => {
+    popupStore.showError((ev.reason as Error).message);
+  });
 }
 
 app.mount('#app');

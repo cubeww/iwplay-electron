@@ -93,19 +93,15 @@ const handleClickHelpID = () => {
 };
 
 const downloadGame = async () => {
-  try {
-    invoke('add-download-item', {
-      filename: props.context.filename,
-      gameID: targetFangameId.value,
-      gameName: targetFangameName.value,
-      libraryPath: selectedLibraryPath.value,
-      size: props.context.filesize,
-      url: props.context.url,
-    });
-    emit('closePopup');
-  } catch (err) {
-    popupStore.showError((err as Error).message);
-  }
+  invoke('add-download-item', {
+    filename: props.context.filename,
+    gameID: targetFangameId.value,
+    gameName: targetFangameName.value,
+    libraryPath: selectedLibraryPath.value,
+    size: props.context.filesize,
+    url: props.context.url,
+  });
+  emit('closePopup');
 };
 
 const handleClickInstall = () => {

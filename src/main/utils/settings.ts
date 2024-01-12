@@ -36,6 +36,7 @@ export function loadSettings() {
     const json: AppSettings = JSON.parse(readTextFile(settingsFile));
     settings = { ...defaultSettings, ...json };
   } catch {
+    // Settings not exists or load failed, use default one.
     settings = { ...defaultSettings };
   }
 }

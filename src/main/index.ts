@@ -11,7 +11,7 @@ import icon from '../../resources/icon.png?asset&asarUnpack';
 import { registerMainAPIs } from './api';
 import { sendEvent } from './event';
 import { mkdirSync } from 'fs';
-import { loadSettings } from './services/settings';
+import { loadSettings } from './utils/settings';
 
 export interface GameDownloadItem {
   url: string;

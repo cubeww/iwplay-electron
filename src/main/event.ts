@@ -1,5 +1,5 @@
 import { GameDownloadItem, windows } from '.';
-import { AppSettings } from './services/settings';
+import { AppSettings } from './utils/settings';
 
 interface MaximizeEventOptions {
   value: boolean;

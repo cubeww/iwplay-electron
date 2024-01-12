@@ -1,7 +1,7 @@
 import { invoke } from '@renderer/utils/invoke';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { AppSettings } from 'src/main/services/settings';
+import { AppSettings } from 'src/main/utils/settings';
 import { watch } from 'vue';
 import { toRaw } from 'vue';
 import { listenEvent } from '@renderer/utils/listenEvent';

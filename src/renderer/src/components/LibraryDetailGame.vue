@@ -56,7 +56,7 @@ import { computed } from 'vue';
 import WindowCloseIcon from '@renderer/icons/WindowCloseIcon.vue';
 import { FangameItem } from '@renderer/stores/library';
 import { useNavigateStore } from '@renderer/stores/navigate';
-import { FangameProfile, FangameReadme } from 'src/main/services/library';
+import { FangameProfile, FangameReadme } from 'src/main/utils/library';
 import { DelFruitFangameDetail, delFruit } from '@renderer/utils/delFruit';
 import { usePopupStore } from '@renderer/stores/popup';
 
@@ -128,28 +128,16 @@ const handleClickInstall = () => {
 };
 
 const handleClickPlay = async () => {
-  try {
-    await invoke('run-game', { gameID: props.item.id, libraryPath: props.item.libraryPath });
-  } catch (err) {
-    popupStore.showError((err as Error).message);
-  }
+  await invoke('run-game', { gameID: props.item.id, libraryPath: props.item.libraryPath });
 };
 
 const handleClickStop = async () => {
-  try {
-    await invoke('stop-game', { gameID: props.item.id });
-  } catch (err) {
-    popupStore.showError((err as Error).message);
-  }
+  await invoke('stop-game', { gameID: props.item.id });
 };
 
 const handleClickDelete = () => {
   popupStore.showConfirm('Are you sure you want to uninstall this fangame? This will delete all game files, possibly even SAVE files!', async () => {
-    try {
-      await invoke('uninstall-game', { gameID: props.item.id, libraryPath: props.item.libraryPath });
-    } catch (err) {
-      popupStore.showError((err as Error).message);
-    }
+    await invoke('uninstall-game', { gameID: props.item.id, libraryPath: props.item.libraryPath });
   });
 };
 

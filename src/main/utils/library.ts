@@ -1,7 +1,7 @@
 import { basename, dirname, extname, join, resolve } from 'path';
 import { dirSize, getFiles, readTextFile, writeTextFile } from '../utils/fs';
 import { existsSync, mkdirSync, readdirSync, rmSync, statSync, unlinkSync } from 'fs';
-import { ChildProcess, execFile, execSync } from 'child_process';
+import { ChildProcess, exec, execFile, execSync } from 'child_process';
 import sevenz from '../../../resources/7z.exe?asset&asarUnpack';
 import dbghelper from '../../../resources/dbghelper.exe?asset&asarUnpack';
 import resizer from '../../../resources/resizer.exe?asset&asarUnpack';
@@ -117,7 +117,6 @@ interface SaveProfileOptions {
 
 /**
  * Add a game library.
- * The files in the game library will not be removed.
  */
 export function addLibrary({ path }: AddLibraryOptions) {
   // Check if the directory already exists.
@@ -147,6 +146,8 @@ export function removeLibrary({ index }: RemoveLibraryOptions) {
 
 /**
  * Get all the game ID in the game library.
+ * The basis for finding the game ID is the manifest.
+ * If the game does not have a manifest file, it will not be included in the results.
  */
 export function getInstalledFangameIDs({ libraryPath }: GetInstalledFangameIDsOptions) {
   const appsPath = join(libraryPath, 'iwapps');
@@ -169,7 +170,7 @@ export function getInstalledFangameIDs({ libraryPath }: GetInstalledFangameIDsOp
 // ----------------------
 
 /**
- * Install a game at the specified game ID folder of the specified game library index,
+ * Install a game in the specified game library,
  * And create a manifest file for it
  */
 export function installGame({ file, gameID, libraryPath }: InstallGameOptions) {
@@ -192,7 +193,7 @@ export function installGame({ file, gameID, libraryPath }: InstallGameOptions) {
 }
 
 /**
- * Delete a game of specified game library index
+ * Uninstall a game in the specified game library
  */
 export function uninstallGame({ gameID, libraryPath }: UninstallGameOptions) {
   const gamePath = join(libraryPath, 'iwapps', 'common', gameID);
@@ -207,7 +208,7 @@ export function uninstallGame({ gameID, libraryPath }: UninstallGameOptions) {
 }
 
 /**
- * Start a game
+ * Run a game, and put it in running fangame items
  */
 export function runGame({ gameID, libraryPath }: RunGameOptions) {
   const manifest = getManifest({ gameID, libraryPath });
@@ -259,7 +260,7 @@ export function stopGame({ gameID }: StopGameOptions) {
 }
 
 /**
- * Get running fangame ids
+ * Get running fangame IDs
  */
 export function getRunningFangameIDs() {
   return Object.keys(runningFangameItems);
@@ -310,13 +311,16 @@ export function getManifest({ gameID, libraryPath }: GetManifestOptions) {
   return manifest as FangameManifest;
 }
 
+/**
+ * Save game manifest to file.
+ */
 export function saveManifest({ libraryPath, gameID, manifest }: SaveManifestOptions) {
   const manifestPath = join(libraryPath, 'iwapps', `iwmanifest_${gameID}.json`);
   writeTextFile(manifestPath, JSON.stringify(manifest, null, 4));
 }
 
 // Game Helper Functions
-// -------------------------
+// ---------------------
 
 /**
  * Get the specified game executable file (.exe) collection
@@ -361,19 +365,28 @@ export function applyDebugHelper({ libraryPath, gameID }: ApplyDebugHelperOption
   return execSync(`"${dbghelper}" "${folderPath}"`, { cwd: folderPath });
 }
 
+/**
+ * Open the game directory in the explorer
+ */
 export function openGameDirectory({ libraryPath, gameID }: OpenGameDirectoryOptions) {
   const folderPath = join(libraryPath, 'iwapps', 'common', gameID);
-  return execSync(`explorer "${folderPath}"`);
+  exec(`start "" "${folderPath}"`);
 }
 
 // Fangame Profile Functions
 // -------------------------
 
+/**
+ * Get game profile.
+ */
 export function getProfile({ gameID }: GetProfileOptions) {
   const profileFile = join(app.getPath('userData'), 'userdata', 'guest', gameID, 'profile.json');
   return JSON.parse(readTextFile(profileFile)) as FangameProfile;
 }
 
+/**
+ * Save game profile.
+ */
 export function saveProfile({ gameID, profile }: SaveProfileOptions) {
   const profileFile = join(app.getPath('userData'), 'userdata', 'guest', gameID, 'profile.json');
   return writeTextFile(profileFile, JSON.stringify(profile, null, 4));

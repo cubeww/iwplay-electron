@@ -1,10 +1,10 @@
 import { BrowserWindowConstructorOptions, OpenDialogSyncOptions, app, dialog, ipcMain, shell } from 'electron';
-import { addLibrary, applyDebugHelper, createManifest, getGameExecutables, getGameReadmes, getInstalledFangameIDs, getManifest, getProfile, getRunningFangameIDs, installGame, openGameDirectory, removeLibrary, runGame, saveManifest, stopGame, uninstallGame } from './services/library';
+import { addLibrary, applyDebugHelper, createManifest, getGameExecutables, getGameReadmes, getInstalledFangameIDs, getManifest, getProfile, getRunningFangameIDs, installGame, openGameDirectory, removeLibrary, runGame, saveManifest, stopGame, uninstallGame } from './utils/library';
 import { addDownloadItem, createWindow, trayMenuSize, windows } from '.';
 import { join } from 'path';
 import { readTextFile, writeTextFile } from './utils/fs';
 import { sendEvent } from './event';
-import { getSettings, setSettings } from './services/settings';
+import { getSettings, setSettings } from './utils/settings';
 import { statSync } from 'fs';
 import { execSync } from 'child_process';
 

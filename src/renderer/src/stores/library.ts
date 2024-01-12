@@ -38,16 +38,13 @@ export const useLibraryStore = defineStore('library', () => {
             loadCacheSuccessfully = true;
           }
         } catch {
+          // Cache not exists or load failed
           loadCacheSuccessfully = false;
         }
       }
       if (!loadCacheSuccessfully) {
         // Fetch fangame list from DelFruit
-        try {
-          items = await delFruit.fetchFangameItems();
-        } catch {
-          throw new Error('Network Error');
-        }
+        items = await delFruit.fetchFangameItems();
 
         // Write to cache
         await invoke('write-text-file', DELFRUIT_CACHE, JSON.stringify({ fetchdate: new Date(), list: items }));
