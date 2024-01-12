@@ -1,4 +1,5 @@
 import { GameDownloadItem, windows } from '.';
+import { FangameProfile } from './utils/library';
 import { AppSettings } from './utils/settings';
 
 interface MaximizeEventOptions {
@@ -43,6 +44,11 @@ interface GameUninstalledEventOptions {
   gameID: string;
 }
 
+interface GameProfileUpdatedEventOptions {
+  gameID: string;
+  profile: FangameProfile;
+}
+
 export type ShowEventOptions = 'delfruit' | 'library';
 
 export type EventMap = {
@@ -52,6 +58,7 @@ export type EventMap = {
   'game-uninstalled': GameUninstalledEventOptions;
   'game-run': GameRunEventOptions;
   'game-close': GameCloseEventOptions;
+  'game-profile-updated': GameProfileUpdatedEventOptions;
   'webview-download': WebviewDownloadEventOptions;
   'download-updated': DownloadUpdatedEventOptions;
   'download-successfully': DownloadSuccessfullyEventOptions;

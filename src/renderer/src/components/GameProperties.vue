@@ -45,6 +45,7 @@ import { searchParams } from '@renderer/main';
 import { invoke } from '@renderer/utils/invoke';
 import { FangameManifest } from 'src/main/utils/library';
 import { watch } from 'vue';
+import { toRaw } from 'vue';
 
 const libraryPath = searchParams.get('libraryPath') as string;
 const gameID = searchParams.get('id') as string;
@@ -56,13 +57,17 @@ const manifest = ref<FangameManifest>(undefined!);
 
 let gettingManifest = false;
 
-watch(manifest, (newManifest) => {
-  if (!gettingManifest) {
-    invoke('save-manifest', { gameID, libraryPath, manifest: newManifest });
-  } else {
-    gettingManifest = false;
-  }
-});
+watch(
+  manifest,
+  (newManifest) => {
+    if (!gettingManifest) {
+      invoke('save-manifest', { gameID, libraryPath, manifest: toRaw(newManifest) });
+    } else {
+      gettingManifest = false;
+    }
+  },
+  { deep: true },
+);
 
 const executablePaths = ref<string[]>([]);
 

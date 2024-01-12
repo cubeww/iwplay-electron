@@ -394,5 +394,26 @@ export function getProfile({ gameID }: GetProfileOptions) {
  */
 export function saveProfile({ gameID, profile }: SaveProfileOptions) {
   const profileFile = join(app.getPath('userData'), 'userdata', 'guest', gameID, 'profile.json');
-  return writeTextFile(profileFile, JSON.stringify(profile, null, 4));
+  writeTextFile(profileFile, JSON.stringify(profile, null, 4));
+  sendEvent('game-profile-updated', { gameID, profile });
+}
+
+/**
+ * Get all game profiles
+ */
+export function getAllProfiles() {
+  const path = join(app.getPath('userData'), 'userdata', 'guest');
+  mkdirSync(path, { recursive: true });
+  const ids = readdirSync(path);
+  const profiles: { [gameID: string]: FangameProfile } = {};
+  for (const id of ids) {
+    const profilePath = join(path, id, 'profile.json');
+    try {
+      const profile = JSON.parse(readTextFile(profilePath));
+      profiles[id] = profile;
+    } catch {
+      // Skip
+    }
+  }
+  return profiles;
 }

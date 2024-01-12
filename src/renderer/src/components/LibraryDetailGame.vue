@@ -54,32 +54,24 @@ import { invoke } from '@renderer/utils/invoke';
 import { watch } from 'vue';
 import { computed } from 'vue';
 import WindowCloseIcon from '@renderer/icons/WindowCloseIcon.vue';
-import { FangameItem } from '@renderer/stores/library';
+import { FangameItem, useLibraryStore } from '@renderer/stores/library';
 import { useNavigateStore } from '@renderer/stores/navigate';
-import { FangameProfile, FangameReadme } from 'src/main/utils/library';
+import { FangameReadme } from 'src/main/utils/library';
 import { DelFruitFangameDetail, delFruit } from '@renderer/utils/delFruit';
 import { usePopupStore } from '@renderer/stores/popup';
 
 const navigateStore = useNavigateStore();
 const popupStore = usePopupStore();
+const libraryStore = useLibraryStore();
 
 const props = defineProps<{ item: FangameItem }>();
 
-const profile = ref<FangameProfile>();
+const profile = computed(() => libraryStore.fangameProfiles[props.item.id]);
 const playTime = computed(() => {
   if (!profile.value) return 0;
   const t = profile.value.playTime;
   return t < 3600 ? Math.ceil(t / 60) : (t / 3600.0).toFixed(1);
 });
-
-const fetchProfile = async () => {
-  profile.value = undefined;
-  try {
-    profile.value = await invoke('get-profile', { gameID: props.item.id });
-  } catch {
-    profile.value = undefined;
-  }
-};
 
 const readmeList = ref<FangameReadme[]>([]);
 
@@ -104,7 +96,6 @@ const fetchDetail = async () => {
 watch(
   props,
   () => {
-    fetchProfile();
     fetchReadmes();
     fetchDetail();
   },

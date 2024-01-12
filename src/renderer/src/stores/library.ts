@@ -6,6 +6,7 @@ import { DELFRUIT_CACHE } from '@renderer/utils/paths';
 import { useSettingsStore } from './settings';
 import { listenEvent } from '@renderer/utils/listenEvent';
 import { isDev } from '@renderer/main';
+import { FangameProfile } from 'src/main/utils/library';
 
 export interface FangameItem {
   id: string;
@@ -101,6 +102,12 @@ export const useLibraryStore = defineStore('library', () => {
     }
   };
 
+  const fetchFangameProfiles = async () => {
+    fangameProfiles.value = await invoke('get-all-profiles');
+  };
+
+  const fangameProfiles = ref<{ [gameID: string]: FangameProfile }>({});
+
   const initialize = () => {
     listenEvent('game-installed', ({ gameID, libraryPath }) => {
       fangameItems.value.forEach((i) => {
@@ -131,9 +138,14 @@ export const useLibraryStore = defineStore('library', () => {
       });
     });
 
+    listenEvent('game-profile-updated', ({ gameID, profile }) => {
+      fangameProfiles.value[gameID] = profile;
+    });
+
     // Fetch once at start
     fetchFangameItems(!isDev); // Load cache first in development mode to reduce startup time
+    fetchFangameProfiles();
   };
 
-  return { initialize, fangameItems, fetchFangameItems, fetchFangameItemsStatus, fetchFangameItemsError };
+  return { initialize, fangameProfiles, fangameItems, fetchFangameItems, fetchFangameItemsStatus, fetchFangameItemsError };
 });
