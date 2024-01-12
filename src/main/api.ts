@@ -7,6 +7,7 @@ import { sendEvent } from './event';
 import { getSettings, setSettings } from './utils/settings';
 import { statSync } from 'fs';
 import { execSync } from 'child_process';
+import { is } from '@electron-toolkit/utils';
 
 const mainAPIMap = {
   // Library
@@ -85,7 +86,7 @@ const mainAPIMap = {
 
   'app-version': () => app.getVersion(),
   'join': (...args: string[]) => join(...args),
-  'app-data-path': () => app.getPath('appData'),
+  'user-data-path': () => app.getPath('userData'),
   'add-download-item': addDownloadItem,
   'open-external': (url: string) => shell.openExternal(url),
   'send-event': sendEvent,
@@ -100,6 +101,7 @@ const mainAPIMap = {
   'notepad': (path: string) => {
     return execSync(`notepad "${path.replaceAll('/', '\\')}"`);
   },
+  'is-dev': () => (is.dev && process.env['ELECTRON_RENDERER_URL'] ? true : false),
 };
 
 export type MainAPI = typeof mainAPIMap;

@@ -95,6 +95,7 @@ const handleInstall = async () => {
   try {
     await invoke('install-game', {
       file: filename.value,
+      gameName: props.context.name,
       gameID: props.context.id,
       libraryPath: selectedLibraryPath.value,
     });

@@ -1,6 +1,6 @@
 import { basename, dirname, extname, join, resolve } from 'path';
-import { dirSize, getFiles, readTextFile, writeTextFile } from '../utils/fs';
-import { existsSync, mkdirSync, readdirSync, rmSync, statSync, unlinkSync } from 'fs';
+import { getFiles, readTextFile, writeTextFile } from '../utils/fs';
+import { existsSync, mkdirSync, readdirSync, rmSync, unlinkSync } from 'fs';
 import { ChildProcess, exec, execFile, execSync } from 'child_process';
 import sevenz from '../../../resources/7z.exe?asset&asarUnpack';
 import dbghelper from '../../../resources/dbghelper.exe?asset&asarUnpack';
@@ -23,9 +23,9 @@ export interface FangameProfile {
 
 export interface FangameManifest {
   id: string;
+  name: string;
   installedAt: Date;
   startupPath: string;
-  sizeOnDisk: number;
   resize: boolean;
 }
 
@@ -50,6 +50,7 @@ interface GetInstalledFangameIDsOptions {
 interface InstallGameOptions {
   libraryPath: string;
   gameID: string;
+  gameName: string;
   file: string;
 }
 
@@ -69,6 +70,7 @@ interface StopGameOptions {
 
 interface CreateManifestOptions {
   libraryPath: string;
+  gameName: string;
   gameID: string;
 }
 
@@ -146,23 +148,27 @@ export function removeLibrary({ index }: RemoveLibraryOptions) {
 
 /**
  * Get all the game ID in the game library.
- * The basis for finding the game ID is the manifest.
- * If the game does not have a manifest file, it will not be included in the results.
  */
 export function getInstalledFangameIDs({ libraryPath }: GetInstalledFangameIDsOptions) {
   const appsPath = join(libraryPath, 'iwapps');
-  const files = readdirSync(appsPath);
-  const ids = [] as string[];
-  for (const f of files) {
-    const fullPath = join(appsPath, f);
-    if (statSync(fullPath).isDirectory()) {
-      continue;
-    }
-    if (extname(f) === '.json' && f.slice(0, 10) === 'iwmanifest') {
-      const id = f.substring(f.indexOf('_') + 1, f.indexOf('.'));
-      ids.push(id);
-    }
-  }
+  const commonPath = join(appsPath, 'common');
+  let ids = readdirSync(commonPath);
+
+  // Remove invalid ids
+  ids = ids.filter((id) => {
+    const n = Number(id) | 0;
+    return n !== Infinity && String(n) === id && n >= 0;
+  });
+
+  // Check if manifest file exists
+  // ids.forEach((id) => {
+  //   const manifestFile = join(appsPath, `iwmanifest_${id}.json`);
+  //   if (!existsSync(manifestFile)) {
+  //     // Missing manifest detected, recreate it
+  //     createManifest({ libraryPath, gameID: id, gameName: '' });
+  //   }
+  // });
+
   return ids;
 }
 
@@ -173,7 +179,7 @@ export function getInstalledFangameIDs({ libraryPath }: GetInstalledFangameIDsOp
  * Install a game in the specified game library,
  * And create a manifest file for it
  */
-export function installGame({ file, gameID, libraryPath }: InstallGameOptions) {
+export function installGame({ file, gameID, gameName, libraryPath }: InstallGameOptions) {
   const gamePath = join(libraryPath, 'iwapps', 'common', gameID);
   if (existsSync(gamePath)) {
     uninstallGame({ libraryPath, gameID });
@@ -187,7 +193,7 @@ export function installGame({ file, gameID, libraryPath }: InstallGameOptions) {
     execSync(`"${sevenz}" x "${file}" -o"${gamePath}"`);
   }
 
-  createManifest({ gameID, libraryPath });
+  createManifest({ gameID, gameName, libraryPath });
 
   sendEvent('game-installed', { gameID, libraryPath });
 }
@@ -272,7 +278,7 @@ export function getRunningFangameIDs() {
 /**
  * Create the default manifest for the specified game
  */
-export function createManifest({ gameID, libraryPath }: CreateManifestOptions) {
+export function createManifest({ gameID, gameName, libraryPath }: CreateManifestOptions) {
   const manifestPath = join(libraryPath, 'iwapps', `iwmanifest_${gameID}.json`);
   if (existsSync(manifestPath)) {
     unlinkSync(manifestPath);
@@ -285,17 +291,16 @@ export function createManifest({ gameID, libraryPath }: CreateManifestOptions) {
 
   const executablePaths = getGameExecutables({ libraryPath: libraryPath, gameID: gameID });
   const startupPath = executablePaths.length === 1 ? executablePaths[0] : '';
-  const sizeOnDisk = dirSize(gamePath);
 
   const manifest: FangameManifest = {
     id: gameID,
+    name: gameName,
     installedAt: new Date(),
-    sizeOnDisk,
     startupPath,
     resize: false,
   };
 
-  writeTextFile(manifestPath, JSON.stringify(manifest));
+  writeTextFile(manifestPath, JSON.stringify(manifest, null, 4));
   return manifest;
 }
 

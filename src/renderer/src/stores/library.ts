@@ -1,10 +1,11 @@
 import { invoke } from '@renderer/utils/invoke';
 import { ref } from 'vue';
-import { delFruit } from '@renderer/utils/delFruit';
+import { DelFruitFangameItem, delFruit } from '@renderer/utils/delFruit';
 import { defineStore } from 'pinia';
 import { DELFRUIT_CACHE } from '@renderer/utils/paths';
 import { useSettingsStore } from './settings';
 import { listenEvent } from '@renderer/utils/listenEvent';
+import { isDev } from '@renderer/main';
 
 export interface FangameItem {
   id: string;
@@ -23,33 +24,41 @@ export const useLibraryStore = defineStore('library', () => {
   const fetchFangameItemsError = ref<string>('');
   const fangameItems = ref<FangameItem[]>([]);
 
-  const fetchFangameItems = async (refetchFromDelFruit: boolean) => {
+  const loadDelFruitFangameItemsCache = async () => {
+    return JSON.parse(await invoke('read-text-file', DELFRUIT_CACHE));
+  };
+
+  const saveDelFruitFangameItemsCache = async (items: DelFruitFangameItem[]) => {
+    await invoke('write-text-file', DELFRUIT_CACHE, JSON.stringify(items));
+  };
+
+  const fetchFangameItems = async (fromDelFruitFirst: boolean) => {
     fetchFangameItemsStatus.value = 'fetching';
 
     try {
-      let items: any[] = [];
-      let loadCacheSuccessfully = false;
-      if (!refetchFromDelFruit) {
-        try {
-          const cacheData = JSON.parse(await invoke('read-text-file', DELFRUIT_CACHE));
-          const difDays = (new Date().getTime() - new Date(cacheData.fetchdate).getTime()) / (1000 * 60 * 60 * 24);
-          if (difDays < 1) {
-            items = cacheData.list;
-            loadCacheSuccessfully = true;
-          }
-        } catch {
-          // Cache not exists or load failed
-          loadCacheSuccessfully = false;
+      let delFruitItems: DelFruitFangameItem[];
+
+      try {
+        // First method
+        if (fromDelFruitFirst) {
+          delFruitItems = await delFruit.fetchFangameItems();
+          await saveDelFruitFangameItemsCache(delFruitItems);
+        } else {
+          delFruitItems = await loadDelFruitFangameItemsCache();
+        }
+      } catch {
+        // Second method
+        if (fromDelFruitFirst) {
+          delFruitItems = await loadDelFruitFangameItemsCache();
+        } else {
+          delFruitItems = await delFruit.fetchFangameItems();
+          await saveDelFruitFangameItemsCache(delFruitItems);
         }
       }
-      if (!loadCacheSuccessfully) {
-        // Fetch fangame list from DelFruit
-        items = await delFruit.fetchFangameItems();
+      // Note: If both methods fail, an error is thrown and captured by the outer try
 
-        // Write to cache
-        await invoke('write-text-file', DELFRUIT_CACHE, JSON.stringify({ fetchdate: new Date(), list: items }));
-      }
-
+      // Convert DelFruit fangame items to IWPlay fangame items
+      const items = delFruitItems as FangameItem[];
       items.forEach((i) => {
         i.isInstalled = false;
         i.isRunning = false;
@@ -58,30 +67,37 @@ export const useLibraryStore = defineStore('library', () => {
       // Get installed fangames
       for (const path of settingsStore.settings.libraryPaths) {
         const installedIDs = await invoke('get-installed-fangame-ids', { libraryPath: path });
-        installedIDs.forEach((id) => {
+        for (const id of installedIDs) {
           const index = items.findIndex((item) => item.id === id);
           if (index !== -1) {
             items[index].isInstalled = true;
             items[index].libraryPath = path;
+
+            // Fix manifest if needed
+            try {
+              await invoke('get-manifest', { libraryPath: path, gameID: id });
+            } catch {
+              await invoke('create-manifest', { libraryPath: path, gameID: id, gameName: items[index].name });
+            }
           }
-        });
+        }
       }
 
       // Get running fangames
       const runningIDs: string[] = await invoke('get-running-fangame-ids');
-      runningIDs.forEach((id) => {
+      for (const id of runningIDs) {
         const index = items.findIndex((item) => item.id === id);
         if (index !== -1) {
           items[index].isRunning = true;
         }
-      });
+      }
 
       fetchFangameItemsStatus.value = 'ok';
       fetchFangameItemsError.value = '';
       fangameItems.value = items;
     } catch (err) {
       fetchFangameItemsStatus.value = 'error';
-      fetchFangameItemsError.value = (err as Error).message;
+      fetchFangameItemsError.value = 'Fetch Data Error';
     }
   };
 
@@ -116,7 +132,7 @@ export const useLibraryStore = defineStore('library', () => {
     });
 
     // Fetch once at start
-    fetchFangameItems(false);
+    fetchFangameItems(!isDev); // Load cache first in development mode to reduce startup time
   };
 
   return { initialize, fangameItems, fetchFangameItems, fetchFangameItemsStatus, fetchFangameItemsError };

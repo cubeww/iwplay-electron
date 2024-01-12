@@ -27,6 +27,7 @@ import { useDownloadStore } from './stores/download';
 import { useNavigateStore } from './stores/navigate';
 import { useLibraryStore } from './stores/library';
 import { usePopupStore } from './stores/popup';
+import { invoke } from './utils/invoke';
 
 export const searchParams = new URLSearchParams(window.location.search);
 export const windowType = searchParams.get('type') as string;
@@ -80,6 +81,8 @@ app.use(pinia);
 app.use(mainI18n);
 
 await useSettingsStore().initialize();
+
+export const isDev = await invoke('is-dev');
 
 if (windowName === 'main') {
   useNavigateStore().initialize();

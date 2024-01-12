@@ -19,10 +19,10 @@ export const useDownloadStore = defineStore('download', () => {
 
     listenEvent('download-successfully', ({ items, successItem }) => {
       downloadItems.value = items;
-      const { filePath, gameID, libraryPath } = successItem;
+      const { filePath, gameID, gameName, libraryPath } = successItem;
 
       // Perform install game
-      invoke('install-game', { file: filePath, gameID, libraryPath });
+      invoke('install-game', { file: filePath, gameName, gameID, libraryPath });
     });
 
     listenEvent('download-failed', ({ items }) => {
