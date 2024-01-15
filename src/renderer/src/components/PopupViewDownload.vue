@@ -8,7 +8,14 @@
     <div class="target">
       <div class="target-input-row">
         <input v-model="targetFangameId" placeholder="Input Fangame ID" class="target-input" type="text" />
-        <HelpIcon class="settings-button" @click="handleClickHelpID" />
+        <div class="target-input-buttons">
+          <div class="refresh-button" :class="{ enable: libraryStore.fetchFangameItemsStatus !== 'fetching' }" @click="handleClickRefresh">
+            <RefreshIcon :class="{ rotate: libraryStore.fetchFangameItemsStatus === 'fetching' }" />
+          </div>
+          <div class="settings-button" @click="handleClickHelpID">
+            <HelpIcon />
+          </div>
+        </div>
       </div>
       <div class="target-result" :class="{ valid: targetFangameValid }">
         {{ targetFangameValid ? targetFangameName : $t('NO RESULT') }}
@@ -16,7 +23,9 @@
     </div>
     <div class="install-to-row">
       <div class="bold white">{{ $t('INSTALL TO: ') }}</div>
-      <SettingsIcon class="settings-button" @click="handleClickSettings" />
+      <div class="settings-button" @click="handleClickSettings">
+        <SettingsIcon />
+      </div>
     </div>
     <div v-if="settingsStore.settings.libraryPaths.length === 0" class="warning-message">
       {{ $t('Library path not added! Please click the settings button in the upper right corner to add one.') }}
@@ -42,6 +51,7 @@ import HelpIcon from '@renderer/icons/HelpIcon.vue';
 import ButtonGradient from './ButtonGradient.vue';
 import ButtonPure from './ButtonPure.vue';
 import PopupViewMessage from './PopupViewMessage.vue';
+import RefreshIcon from '@renderer/icons/RefreshIcon.vue';
 
 import { onMounted, ref } from 'vue';
 import { invoke } from '@renderer/utils/invoke';
@@ -92,6 +102,12 @@ const handleClickHelpID = () => {
   });
 };
 
+const handleClickRefresh = () => {
+  if (libraryStore.fetchFangameItemsStatus !== 'fetching') {
+    libraryStore.fetchFangameItems(true);
+  }
+};
+
 const downloadGame = async () => {
   invoke('add-download-item', {
     filename: props.context.filename,
@@ -131,7 +147,12 @@ const handleClickInstall = () => {
 }
 
 .settings-button {
-  padding: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 32px;
+  height: 32px;
+
   background-color: #3d4450;
   border-radius: 4px;
   transition: all 0.1s;
@@ -142,6 +163,39 @@ const handleClickInstall = () => {
     background-color: #464d58;
     color: white;
   }
+}
+
+@keyframes rotating {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+.refresh-button {
+  width: 24px;
+  height: 24px;
+  padding: 4px;
+  margin-right: 8px;
+  background-color: #3d4450;
+  border-radius: 4px;
+  transition: all 0.1s;
+  color: #dfe3e6;
+
+  &.enable {
+    cursor: pointer;
+  }
+
+  &.enable:hover {
+    background-color: #464d58;
+    color: white;
+  }
+}
+
+.rotate {
+  animation: rotating 2s linear infinite;
 }
 
 .bottom {
@@ -189,6 +243,10 @@ const handleClickInstall = () => {
   justify-content: space-between;
   padding-top: 4px;
   padding-bottom: 8px;
+}
+
+.target-input-buttons {
+  display: flex;
 }
 
 .target-input {

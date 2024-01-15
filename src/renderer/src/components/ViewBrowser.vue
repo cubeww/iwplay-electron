@@ -1,7 +1,9 @@
 <template>
   <TabView name="browser">
     <div class="url-bar">
-      <RefreshIcon v-if="!loading" class="url-bar-refresh-button" @click="webviewEl?.reload()"></RefreshIcon>
+      <div v-if="!loading" class="url-bar-refresh-button" @click="webviewEl?.reload()">
+        <RefreshIcon />
+      </div>
       <div class="url-box">
         <LoadingIcon v-if="loading" class="url-box-loading-icon" :size="14" />
         <div class="url-box-text">{{ url }}</div>
@@ -130,6 +132,9 @@ const handleIpcMessage = (event: any) => {
 }
 
 .url-bar-refresh-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-left: 10px;
   width: 20px;
   transition: all 0.1s;

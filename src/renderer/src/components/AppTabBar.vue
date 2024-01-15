@@ -1,7 +1,11 @@
 <template>
   <div class="app-tab-bar">
-    <BrowserBackIcon class="browser-button" :class="{ enable: navigateStore.canBack }" @click="navigateStore.back()" />
-    <BrowserForwardIcon class="browser-button" :class="{ enable: navigateStore.canForward }" @click="navigateStore.forward()" />
+    <div class="browser-button" :class="{ enable: navigateStore.canBack }" @click="navigateStore.back()">
+      <BrowserBackIcon />
+    </div>
+    <div class="browser-button" :class="{ enable: navigateStore.canForward }" @click="navigateStore.forward()">
+      <BrowserForwardIcon />
+    </div>
     <AppTabBarItem to="browser" :items="menuItems[0]">{{ $t('DELFRUIT') }}</AppTabBarItem>
     <AppTabBarItem to="library">{{ $t('LIBRARY') }}</AppTabBarItem>
     <!-- <AppTabBarItem to="user">Cube</AppTabBarItem> -->
@@ -35,9 +39,13 @@ const menuItems: ContextMenuItemData[][] = [
 }
 
 .browser-button {
-  transition: all 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   width: 32px;
   height: 32px;
+  transition: all 0.1s;
 
   &.enable {
     color: #67707b;

@@ -1,7 +1,9 @@
 <template>
   <div class="about">
     <div class="title-bar">
-      <WindowCloseIcon class="close-button" @click="handleClickClose" />
+      <div class="close-button" @click="handleClickClose">
+        <WindowCloseIcon />
+      </div>
     </div>
     <div class="header">
       <img class="logo" src="/logo.png" alt="" />
@@ -59,11 +61,14 @@ const handleClickDiscord = () => {
 }
 
 .close-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
   -webkit-app-region: no-drag;
   position: absolute;
   right: 0;
-  width: 20px;
-  padding: 4px 8px;
   transition: all 0.1s;
   color: #788a92;
 

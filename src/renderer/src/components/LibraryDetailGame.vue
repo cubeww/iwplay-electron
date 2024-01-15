@@ -21,8 +21,12 @@
           </div>
         </div>
         <div v-if="item.isInstalled" class="header-toolbox">
-          <DeleteIcon class="header-toolbox-button" @click="handleClickDelete" />
-          <SettingsIcon class="header-toolbox-button" @click="handleClickProperties" />
+          <div class="header-toolbox-button" @click="handleClickDelete">
+            <DeleteIcon />
+          </div>
+          <div class="header-toolbox-button" @click="handleClickProperties">
+            <SettingsIcon />
+          </div>
         </div>
       </div>
       <div class="nav">
@@ -176,7 +180,7 @@ const handleClickReadme = (path: string) => {
   overflow-x: hidden;
 
   background: url('/game-detail.png');
-  background-repeat: no-repeat;
+  background-repeat: repeat-y;
   background-position-y: v-bind(backgroundY + 'px');
 
   &::-webkit-scrollbar {
@@ -265,9 +269,10 @@ const handleClickReadme = (path: string) => {
   display: flex;
   width: 32px;
   height: 32px;
+  justify-content: center;
+  align-items: center;
   background-color: rgba(255, 255, 255, 0.05);
   margin-left: 10px;
-  padding: 5px;
   box-sizing: border-box;
   border-radius: 4px;
   cursor: pointer;

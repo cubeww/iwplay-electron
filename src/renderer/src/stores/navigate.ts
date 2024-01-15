@@ -91,8 +91,10 @@ export const useNavigateStore = defineStore('navigate', () => {
   };
 
   const selectFangameItem = (id?: string) => {
-    recordCurrentState();
-    state.value = { ...state.value, tab: 'library', fangameItemID: id };
+    if (state.value.fangameItemID !== id) {
+      recordCurrentState();
+      state.value = { ...state.value, tab: 'library', fangameItemID: id };
+    }
   };
 
   const recordBrowserURL = (url: string) => {

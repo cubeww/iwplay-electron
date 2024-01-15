@@ -1,7 +1,9 @@
 <template>
   <div class="popup-background" />
   <div class="popup-wrapper">
-    <WindowCloseIcon class="close-button" @click="emit('closePopup')" />
+    <div class="close-button" @click="emit('closePopup')">
+      <WindowCloseIcon />
+    </div>
     <slot />
   </div>
 </template>
@@ -47,6 +49,9 @@ const emit = defineEmits<{ closePopup: [] }>();
 }
 
 .close-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background-color: transparent;
   border: 0;
   color: #788a92;

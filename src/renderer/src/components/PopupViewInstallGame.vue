@@ -15,7 +15,9 @@
     <PopupSeparator />
     <div class="install-to-row">
       <div class="bold white">{{ $t('INSTALL TO: ') }}</div>
-      <SettingsIcon class="settings-button" @click="handleClickSettings" />
+      <div class="settings-button" @click="handleClickSettings">
+        <SettingsIcon />
+      </div>
     </div>
     <div v-if="settingsStore.settings.libraryPaths.length === 0" class="warning-message">
       {{ $t('Library path not added! Please click the settings button in the upper right corner to add one.') }}
@@ -147,7 +149,11 @@ const handleClickSettings = () => {
 }
 
 .settings-button {
-  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
   background-color: #3d4450;
   border-radius: 4px;
   transition: all 0.1s;

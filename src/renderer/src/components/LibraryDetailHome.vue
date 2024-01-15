@@ -7,8 +7,12 @@
           {{ $t('Recent Games') }}
         </div>
         <div class="list-hr" />
-        <LeftArrowIcon class="list-button left" :class="{ active: canPrevPage }" @click="handlePrevPage" />
-        <LeftArrowIcon class="list-button right" :class="{ active: canNextPage }" @click="handleNextPage" />
+        <div class="list-button left" :class="{ active: canPrevPage }" @click="handlePrevPage">
+          <LeftArrowIcon />
+        </div>
+        <div class="list-button right" :class="{ active: canNextPage }" @click="handleNextPage">
+          <LeftArrowIcon />
+        </div>
       </div>
       <div class="list-items" :style="{ transform: `translateX(-${offsetX}px)` }">
         <div v-for="(item, i) in recentItems" :key="i" class="list-item">
@@ -99,10 +103,9 @@ const recentItems = computed(() => {
     const lastPlayedMoment = moment(libraryStore.fangameProfiles[gameID].lastPlayed);
 
     let date: string;
-    const dayDiff = todayMoment.diff(lastPlayedMoment, 'day');
     const weekDiff = todayMoment.diff(lastPlayedMoment, 'week');
 
-    if (dayDiff === 0) {
+    if (todayMoment.isSame(lastPlayedMoment, 'day')) {
       date = 'Today';
     } else if (weekDiff === 0) {
       date = 'This Week';
@@ -198,6 +201,9 @@ const recentItems = computed(() => {
 }
 
 .list-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-right: 16px;
   color: #51555b;
 

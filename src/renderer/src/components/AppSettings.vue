@@ -29,8 +29,12 @@
             {{ $t('Library Paths') }}
           </div>
           <div class="flex">
-            <DeleteIcon class="storage-button" @click="handleDeleteLibraryPath" />
-            <AddIcon class="storage-button" @click="handleAddLibraryPath" />
+            <div class="storage-button" @click="handleDeleteLibraryPath">
+              <DeleteIcon />
+            </div>
+            <div class="storage-button" @click="handleAddLibraryPath">
+              <AddIcon />
+            </div>
           </div>
         </div>
         <div class="detail-row column-1">
@@ -214,7 +218,6 @@ const handleDeleteLibraryPath = () => {
   width: 32px;
   height: 32px;
   background-color: #292e36;
-  padding: 4px;
   transition: all 0.3s;
   cursor: pointer;
   flex-shrink: 0;

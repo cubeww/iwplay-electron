@@ -1,9 +1,17 @@
 <template>
   <div class="control-buttons">
-    <WindowMinimizeIcon class="control-button minimize" @click="invoke('minimize', windowName)" />
-    <WindowMaximizeIcon v-if="!isMaximize" class="control-button maximize" @click="invoke('maximize', windowName)" />
-    <WindowRestoreIcon v-else class="control-button maximize" @click="invoke('maximize', windowName)" />
-    <WindowCloseIcon class="control-button close" @click="handleClickClose" />
+    <div class="control-button minimize" @click="invoke('minimize', windowName)">
+      <WindowMinimizeIcon class="control-button-icon" />
+    </div>
+    <div v-if="!isMaximize" class="control-button maximize" @click="invoke('maximize', windowName)">
+      <WindowMaximizeIcon class="control-button-icon" />
+    </div>
+    <div v-else class="control-button maximize" @click="invoke('maximize', windowName)">
+      <WindowRestoreIcon class="control-button-icon" />
+    </div>
+    <div class="control-button close" @click="handleClickClose">
+      <WindowCloseIcon class="control-button-icon" />
+    </div>
   </div>
 </template>
 
@@ -35,14 +43,18 @@ const handleClickClose = () => {
 
 <style scoped>
 .control-buttons {
+  display: flex;
   position: absolute;
   right: 0;
   -webkit-app-region: no-drag;
 }
 
 .control-button {
-  width: 20px;
-  padding: 4px 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 32px;
+  height: 32px;
   transition: all 0.1s;
   color: #788a92;
 
@@ -58,5 +70,9 @@ const handleClickClose = () => {
       background-color: #dc322b;
     }
   }
+}
+.control-button-icon {
+  width: 20px;
+  height: 20px;
 }
 </style>
