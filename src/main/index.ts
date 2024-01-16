@@ -10,8 +10,8 @@ import log from 'electron-log/main';
 import icon from '../../resources/icon.png?asset&asarUnpack';
 import { registerMainAPIs } from './api';
 import { sendEvent } from './event';
-import { mkdirSync } from 'fs';
-import { loadSettings } from './utils/settings';
+import { existsSync, mkdirSync, rmSync } from 'fs';
+import { getSettings, loadSettings } from './utils/settings';
 
 export interface GameDownloadItem {
   url: string;
@@ -190,6 +190,15 @@ app.whenReady().then(() => {
   // Register IPC handlers
   registerMainAPIs();
 
+  // Clear download cache
+  for (const p of getSettings().libraryPaths) {
+    const download = join(p, 'iwapps', 'downloading');
+    if (existsSync(download)) {
+      rmSync(download, { recursive: true });
+    }
+    mkdirSync(download);
+  }
+
   // Handle download events
   mainWindow.webContents.session.on('will-download', (_downloadEvent, item, webContents) => {
     if (webContents.getType() === 'webview') {
@@ -201,7 +210,7 @@ app.whenReady().then(() => {
         if (updateState === 'progressing') {
           const index = downloadItems.findIndex((i) => i.url === item.getURL());
           if (index === -1) {
-            console.log('WARNING: A download item has been updated, but it has not entered the download items.');
+            console.warn('WARNING: A download item has been updated, but it has not entered the download items.');
             return;
           }
           downloadItems[index].received = item.getReceivedBytes();
@@ -212,7 +221,7 @@ app.whenReady().then(() => {
         if (itemState === 'completed') {
           const index = downloadItems.findIndex((i) => i.url === item.getURL());
           if (index === -1) {
-            console.log('WARNING: A download item has been updated, but it has not entered the download items.');
+            console.warn('WARNING: A download item has been updated, but it has not entered the download items.');
             return;
           }
           downloadItems[index].status = 'succeed';
@@ -220,7 +229,7 @@ app.whenReady().then(() => {
         } else {
           const index = downloadItems.findIndex((i) => i.url === item.getURL());
           if (index === -1) {
-            console.log('WARNING: A download item has been updated, but it has not entered the download items.');
+            console.warn('WARNING: A download item has been updated, but it has not entered the download items.');
             return;
           }
           downloadItems[index].status = 'failed';

@@ -2,9 +2,9 @@
   <div class="app">
     <AppMenuBar />
     <AppTabBar />
-    <ViewBrowser />
-    <ViewLibrary />
-    <ViewUser />
+    <TabViewBrowser />
+    <TabViewLibrary />
+    <TabViewUser />
     <AppFooter />
     <PopupViewSlot />
     <ContextMenuSlot />
@@ -14,9 +14,9 @@
 <script lang="ts" setup>
 import AppMenuBar from './components/AppMenuBar.vue';
 import AppTabBar from './components/AppTabBar.vue';
-import ViewBrowser from './components/ViewBrowser.vue';
-import ViewLibrary from './components/ViewLibrary.vue';
-import ViewUser from './components/ViewUser.vue';
+import TabViewBrowser from './components/TabViewBrowser.vue';
+import TabViewLibrary from './components/TabViewLibrary.vue';
+import TabViewUser from './components/TabViewUser.vue';
 import AppFooter from './components/AppFooter.vue';
 import PopupViewSlot from './components/PopupViewSlot.vue';
 import ContextMenuSlot from './components/ContextMenuSlot.vue';

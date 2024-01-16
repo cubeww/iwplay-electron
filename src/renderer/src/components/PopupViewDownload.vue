@@ -122,7 +122,7 @@ const downloadGame = async () => {
 
 const handleClickInstall = () => {
   if (libraryStore.fangameItems.findIndex((i) => i.id === targetFangameId.value && i.isInstalled) !== -1) {
-    popupStore.showConfirm('The current fangame is already installed. If you continue, the existing fangame will be uninstalled first (save files may be lost !!!). Are you sure you want to do this?', () => downloadGame());
+    popupStore.showConfirm('The current fangame is already installed. If you continue, the existing fangame will be moved to the "backup" folder first. Are you sure you want to do this?', () => downloadGame());
   } else {
     downloadGame();
   }

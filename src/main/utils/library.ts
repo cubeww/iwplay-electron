@@ -1,13 +1,14 @@
 import { basename, dirname, extname, join, resolve } from 'path';
 import { getFiles, readTextFile, writeTextFile } from '../utils/fs';
-import { existsSync, mkdirSync, readdirSync, rmSync, unlinkSync } from 'fs';
+import { cpSync, existsSync, mkdirSync, readdirSync, rmSync, unlinkSync } from 'fs';
 import { ChildProcess, exec, execFile, execSync } from 'child_process';
 import sevenz from '../../../resources/7z.exe?asset&asarUnpack';
 import dbghelper from '../../../resources/dbghelper.exe?asset&asarUnpack';
 import resizer from '../../../resources/resizer.exe?asset&asarUnpack';
+import icon from '../../../resources/icon.png?asset&asarUnpack';
 import { sendEvent } from '../event';
 import { setSettings, getSettings } from './settings';
-import { app } from 'electron';
+import { app, Notification } from 'electron';
 
 interface RunningFangameItem {
   process: ChildProcess;
@@ -55,6 +56,11 @@ interface InstallGameOptions {
 }
 
 interface UninstallGameOptions {
+  libraryPath: string;
+  gameID: string;
+}
+
+interface BackupGameOptions {
   libraryPath: string;
   gameID: string;
 }
@@ -181,7 +187,10 @@ export function getInstalledFangameIDs({ libraryPath }: GetInstalledFangameIDsOp
  */
 export function installGame({ file, gameID, gameName, libraryPath }: InstallGameOptions) {
   const gamePath = join(libraryPath, 'iwapps', 'common', gameID);
+
+  // If game path already exists, copy to backup folder & uninstall it
   if (existsSync(gamePath)) {
+    backupGame({ libraryPath, gameID });
     uninstallGame({ libraryPath, gameID });
   }
   mkdirSync(gamePath);
@@ -196,6 +205,7 @@ export function installGame({ file, gameID, gameName, libraryPath }: InstallGame
   createManifest({ gameID, gameName, libraryPath });
 
   sendEvent('game-installed', { gameID, libraryPath });
+  new Notification({ icon: icon, title: 'IWPlay', body: 'Fangame Installed: ' + gameName }).show();
 }
 
 /**
@@ -211,6 +221,20 @@ export function uninstallGame({ gameID, libraryPath }: UninstallGameOptions) {
     unlinkSync(manifestPath);
   }
   sendEvent('game-uninstalled', { gameID });
+}
+
+/**
+ * Move specified game to backup folder
+ */
+export function backupGame({ gameID, libraryPath }: BackupGameOptions) {
+  const gamePath = join(libraryPath, 'iwapps', 'common', gameID);
+  const backupPath = join(libraryPath, 'iwapps', 'backup', gameID);
+  if (existsSync(gamePath)) {
+    if (existsSync(backupPath)) {
+      rmSync(backupPath, { recursive: true });
+    }
+    cpSync(gamePath, backupPath, { recursive: true });
+  }
 }
 
 /**
