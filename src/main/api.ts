@@ -2,7 +2,7 @@ import { BrowserWindowConstructorOptions, OpenDialogSyncOptions, app, dialog, ip
 import { addLibrary, applyDebugHelper, createManifest, getAllProfiles, getGameExecutables, getGameReadmes, getInstalledFangameIDs, getManifest, getProfile, getRunningFangameIDs, installGame, openGameDirectory, removeLibrary, runGame, saveManifest, stopGame, uninstallGame } from './utils/library';
 import { addDownloadItem, createWindow, trayMenuSize, windows } from '.';
 import { join } from 'path';
-import { readTextFile, writeTextFile } from './utils/fs';
+import { dirSize, readTextFile, writeTextFile } from './utils/fs';
 import { sendEvent } from './event';
 import { getSettings, setSettings } from './utils/settings';
 import { statSync } from 'fs';
@@ -79,7 +79,8 @@ const mainAPIMap = {
   'read-text-file': readTextFile,
   'write-text-file': writeTextFile,
   'file-size': (file: string) => {
-    return statSync(file).size;
+    const stat = statSync(file);
+    return stat.isDirectory() ? dirSize(file) : stat.size;
   },
 
   // Misc

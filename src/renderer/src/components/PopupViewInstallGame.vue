@@ -4,7 +4,10 @@
     <PopupSeparator />
     <div>{{ context.name }} (ID: {{ context.id }})</div>
     <PopupSeparator />
-    <ButtonGradient style="width: 120px" color1="#4ade80" color2="#16a34a" @click="handleSelectGameFile">{{ $t('Select File') }}</ButtonGradient>
+    <div class="row">
+      <ButtonGradient class="select-button" style="width: 120px" color1="#4ade80" color2="#16a34a" @click="handleSelectGameFile">{{ $t('Select File') }}</ButtonGradient>
+      <ButtonGradient class="select-button" style="width: 120px" color1="#4ade80" color2="#16a34a" @click="handleSelectGameFolder">{{ $t('Select Folder') }}</ButtonGradient>
+    </div>
     <template v-if="filename">
       <div class="bold">{{ $t('File Name: ') }} {{ filename }}</div>
       <div class="bold">{{ $t('File Size: ') }} {{ filesizeStr }}</div>
@@ -92,6 +95,18 @@ const handleSelectGameFile = async () => {
   }
 };
 
+const handleSelectGameFolder = async () => {
+  const f = await invoke('open-file-dialog', 'main', {
+    title: i18n.t('Select Game Folder'),
+    properties: ['openDirectory'],
+  });
+
+  if (typeof f === 'object' && typeof f[0] === 'string') {
+    filename.value = f[0];
+    filesize.value = await invoke('file-size', filename.value);
+  }
+};
+
 const handleInstall = async () => {
   installStatus.value = 'installing';
   try {
@@ -138,6 +153,14 @@ const handleClickSettings = () => {
 .bottom-button {
   width: 120px;
   margin-left: 16px;
+}
+
+.row {
+  display: flex;
+}
+
+.select-button {
+  margin-right: 10px;
 }
 
 .bold {

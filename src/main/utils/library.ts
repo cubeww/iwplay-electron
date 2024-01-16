@@ -1,6 +1,6 @@
 import { basename, dirname, extname, join, resolve } from 'path';
 import { getFiles, readTextFile, writeTextFile } from '../utils/fs';
-import { cpSync, existsSync, mkdirSync, readdirSync, rmSync, unlinkSync } from 'fs';
+import { cpSync, existsSync, mkdirSync, readdirSync, rmSync, statSync, unlinkSync } from 'fs';
 import { ChildProcess, exec, execFile, execSync } from 'child_process';
 import sevenz from '../../../resources/7z.exe?asset&asarUnpack';
 import dbghelper from '../../../resources/dbghelper.exe?asset&asarUnpack';
@@ -195,7 +195,9 @@ export function installGame({ file, gameID, gameName, libraryPath }: InstallGame
   }
   mkdirSync(gamePath);
 
-  if (extname(file) === '.exe') {
+  if (statSync(file).isDirectory()) {
+    cpSync(file, gamePath, { recursive: true });
+  } else if (extname(file) === '.exe') {
     const filename = basename(file);
     execSync(`copy "${file}" "${join(gamePath, filename)}"`);
   } else {
