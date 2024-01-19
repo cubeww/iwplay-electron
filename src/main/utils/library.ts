@@ -120,8 +120,30 @@ interface SaveProfileOptions {
   profile: FangameProfile;
 }
 
+interface CheckLibraryOptions {
+  libraryPath: string;
+}
+
+interface ClearDownloadingOptions {
+  libraryPath: string;
+}
+
 // Basic Library Functions
 // -----------------------
+
+/**
+ * Check library folders.
+ * If not exists, try to create new one.
+ */
+function checkLibrary({ libraryPath }: CheckLibraryOptions) {
+  const commonPath = join(libraryPath, 'iwapps', 'common');
+  const downloadingPath = join(libraryPath, 'iwapps', 'downloading');
+  const backupPath = join(libraryPath, 'iwapps', 'backup');
+
+  mkdirSync(commonPath, { recursive: true });
+  mkdirSync(downloadingPath, { recursive: true });
+  mkdirSync(backupPath, { recursive: true });
+}
 
 /**
  * Add a game library.
@@ -156,6 +178,8 @@ export function removeLibrary({ index }: RemoveLibraryOptions) {
  * Get all the game ID in the game library.
  */
 export function getInstalledFangameIDs({ libraryPath }: GetInstalledFangameIDsOptions) {
+  checkLibrary({ libraryPath });
+
   const appsPath = join(libraryPath, 'iwapps');
   const commonPath = join(appsPath, 'common');
   let ids = readdirSync(commonPath);
@@ -186,6 +210,7 @@ export function getInstalledFangameIDs({ libraryPath }: GetInstalledFangameIDsOp
  * And create a manifest file for it
  */
 export function installGame({ file, gameID, gameName, libraryPath }: InstallGameOptions) {
+  checkLibrary({ libraryPath });
   const gamePath = join(libraryPath, 'iwapps', 'common', gameID);
 
   // If game path already exists, copy to backup folder & uninstall it
@@ -193,7 +218,7 @@ export function installGame({ file, gameID, gameName, libraryPath }: InstallGame
     backupGame({ libraryPath, gameID });
     uninstallGame({ libraryPath, gameID });
   }
-  mkdirSync(gamePath);
+  mkdirSync(gamePath, { recursive: true });
 
   if (statSync(file).isDirectory()) {
     cpSync(file, gamePath, { recursive: true });
@@ -214,6 +239,8 @@ export function installGame({ file, gameID, gameName, libraryPath }: InstallGame
  * Uninstall a game in the specified game library
  */
 export function uninstallGame({ gameID, libraryPath }: UninstallGameOptions) {
+  checkLibrary({ libraryPath });
+
   const gamePath = join(libraryPath, 'iwapps', 'common', gameID);
   if (existsSync(gamePath)) {
     rmSync(gamePath, { recursive: true });
@@ -229,6 +256,8 @@ export function uninstallGame({ gameID, libraryPath }: UninstallGameOptions) {
  * Move specified game to backup folder
  */
 export function backupGame({ gameID, libraryPath }: BackupGameOptions) {
+  checkLibrary({ libraryPath });
+
   const gamePath = join(libraryPath, 'iwapps', 'common', gameID);
   const backupPath = join(libraryPath, 'iwapps', 'backup', gameID);
   if (existsSync(gamePath)) {
@@ -243,6 +272,8 @@ export function backupGame({ gameID, libraryPath }: BackupGameOptions) {
  * Run a game, and put it in running fangame items
  */
 export function runGame({ gameID, libraryPath }: RunGameOptions) {
+  checkLibrary({ libraryPath });
+
   const manifest = getManifest({ gameID, libraryPath });
   if (!manifest.startupPath) {
     throw new Error('No startup path');
@@ -298,6 +329,13 @@ export function getRunningFangameIDs() {
   return Object.keys(runningFangameItems);
 }
 
+export function clearDownloading({ libraryPath }: ClearDownloadingOptions) {
+  checkLibrary({ libraryPath });
+  const download = join(libraryPath, 'iwapps', 'downloading');
+  rmSync(download, { recursive: true });
+  mkdirSync(download, { recursive: true });
+}
+
 // Fangame Manifest Functions
 // --------------------------
 
@@ -305,6 +343,8 @@ export function getRunningFangameIDs() {
  * Create the default manifest for the specified game
  */
 export function createManifest({ gameID, gameName, libraryPath }: CreateManifestOptions) {
+  checkLibrary({ libraryPath });
+
   const manifestPath = join(libraryPath, 'iwapps', `iwmanifest_${gameID}.json`);
   if (existsSync(manifestPath)) {
     unlinkSync(manifestPath);
@@ -334,6 +374,8 @@ export function createManifest({ gameID, gameName, libraryPath }: CreateManifest
  * Get game manifest.
  */
 export function getManifest({ gameID, libraryPath }: GetManifestOptions) {
+  checkLibrary({ libraryPath });
+
   const manifestPath = join(libraryPath, 'iwapps', `iwmanifest_${gameID}.json`);
   const manifest = JSON.parse(readTextFile(manifestPath));
   if (!manifest) {
@@ -346,6 +388,8 @@ export function getManifest({ gameID, libraryPath }: GetManifestOptions) {
  * Save game manifest to file.
  */
 export function saveManifest({ libraryPath, gameID, manifest }: SaveManifestOptions) {
+  checkLibrary({ libraryPath });
+
   const manifestPath = join(libraryPath, 'iwapps', `iwmanifest_${gameID}.json`);
   writeTextFile(manifestPath, JSON.stringify(manifest, null, 4));
 }
@@ -357,6 +401,8 @@ export function saveManifest({ libraryPath, gameID, manifest }: SaveManifestOpti
  * Get the specified game executable file (.exe) collection
  */
 export function getGameExecutables({ gameID, libraryPath }: GetGameExecutablesOptions) {
+  checkLibrary({ libraryPath });
+
   const gamePath = join(libraryPath, 'iwapps', 'common', gameID);
   const files = getFiles(gamePath, '');
   const paths = [] as string[];
@@ -372,6 +418,8 @@ export function getGameExecutables({ gameID, libraryPath }: GetGameExecutablesOp
  * Get the specified game readme file (.txt) collection
  */
 export function getGameReadmes({ gameID, libraryPath }: GetGameReadmesOptions) {
+  checkLibrary({ libraryPath });
+
   const gamePath = join(libraryPath, 'iwapps', 'common', gameID);
   const files = getFiles(gamePath, '');
   const paths = [] as FangameReadme[];
@@ -392,6 +440,8 @@ export function getGameReadmes({ gameID, libraryPath }: GetGameReadmesOptions) {
  * Apply renex's dbghelp to specified game
  */
 export function applyDebugHelper({ libraryPath, gameID }: ApplyDebugHelperOptions) {
+  checkLibrary({ libraryPath });
+
   const folderPath = join(libraryPath, 'iwapps', 'common', gameID);
   return execSync(`"${dbghelper}" "${folderPath}"`, { cwd: folderPath });
 }
@@ -400,6 +450,8 @@ export function applyDebugHelper({ libraryPath, gameID }: ApplyDebugHelperOption
  * Open the game directory in the explorer
  */
 export function openGameDirectory({ libraryPath, gameID }: OpenGameDirectoryOptions) {
+  checkLibrary({ libraryPath });
+
   const folderPath = join(libraryPath, 'iwapps', 'common', gameID);
   exec(`start "" "${folderPath}"`);
 }

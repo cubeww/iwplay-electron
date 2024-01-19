@@ -12,6 +12,7 @@ import { registerMainAPIs } from './api';
 import { sendEvent } from './event';
 import { existsSync, mkdirSync, rmSync } from 'fs';
 import { getSettings, loadSettings } from './utils/settings';
+import { clearDownloading } from './utils/library';
 
 export interface GameDownloadItem {
   url: string;
@@ -191,12 +192,8 @@ app.whenReady().then(() => {
   registerMainAPIs();
 
   // Clear download cache
-  for (const p of getSettings().libraryPaths) {
-    const download = join(p, 'iwapps', 'downloading');
-    if (existsSync(download)) {
-      rmSync(download, { recursive: true });
-    }
-    mkdirSync(download);
+  for (const libraryPath of getSettings().libraryPaths) {
+    clearDownloading({ libraryPath });
   }
 
   // Handle download events
