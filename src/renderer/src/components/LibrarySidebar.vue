@@ -1,7 +1,10 @@
 <template>
   <div class="library-sidebar">
     <div class="header">
-      <button class="header-home-button" :class="{ active: isInHome }" @click="handleToHome">{{ $t('HOME') }}</button>
+      <button class="header-home-button" :class="{ active: isInHome }" @click="handleToHome">
+        <div class="home-button-bg"></div>
+        {{ $t('HOME') }}
+      </button>
       <button class="header-refresh-button" :class="{ enable: libraryStore.fetchFangameItemsStatus !== 'fetching' }" @click="libraryStore.fetchFangameItems(true)">
         <RefreshIcon :class="{ rotate: libraryStore.fetchFangameItemsStatus === 'fetching' }" />
       </button>
@@ -20,6 +23,8 @@
           <div class="filter-title">{{ $t('FILTER') }}</div>
           <CheckBox v-model="filters.installed" class="filter-check-box" :value="false" :label="$t('Installed')" />
           <CheckBox v-model="filters.running" class="filter-check-box" :value="false" :label="$t('Running')" />
+          <CheckBox v-model="filters.uncleared" class="filter-check-box" :value="false" :label="$t('Uncleared')" />
+          <CheckBox v-model="filters.cleared" class="filter-check-box" :value="false" :label="$t('Cleared')" />
         </div>
       </div>
     </div>
@@ -68,6 +73,8 @@ const showFilter = ref(false);
 const filters = ref({
   installed: false,
   running: false,
+  uncleared: false,
+  cleared: false,
 });
 
 const hasFilter = computed(() => {
@@ -108,6 +115,15 @@ const filteredItems = computed(() => {
   return searchItems.value.filter((i) => {
     if (filters.value.installed && !i.isInstalled) return false;
     if (filters.value.running && !i.isRunning) return false;
+
+    const profile = libraryStore.fangameProfiles[i.id];
+    if (profile) {
+      if (filters.value.uncleared && profile.cleared) return false;
+      if (filters.value.cleared && !profile.cleared) return false;
+    } else {
+      if (filters.value.cleared) return false;
+    }
+
     return true;
   });
 });
@@ -150,6 +166,7 @@ const isInHome = computed(() => !navigateStore.state.fangameItemID);
 }
 
 .header-home-button {
+  position: relative;
   margin: 3px;
   margin-left: 6px;
   margin-right: 3px;
@@ -169,6 +186,17 @@ const isInHome = computed(() => !navigateStore.state.fangameItemID);
     background-color: #3e4047;
     color: white;
   }
+}
+
+.home-button-bg {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('/player-fall.png');
+  background-repeat: no-repeat;
+  background-position: 130px -34px;
+  opacity: 0.1;
 }
 
 @keyframes rotating {

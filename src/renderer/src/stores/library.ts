@@ -106,7 +106,7 @@ export const useLibraryStore = defineStore('library', () => {
     fangameProfiles.value = await invoke('get-all-profiles');
   };
 
-  const fangameProfiles = ref<{ [gameID: string]: FangameProfile }>({});
+  const fangameProfiles = ref<{ [gameID: string]: FangameProfile | undefined }>({});
 
   const initialize = () => {
     listenEvent('game-installed', ({ gameID, libraryPath }) => {

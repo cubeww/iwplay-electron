@@ -99,8 +99,11 @@ const recentItems = computed(() => {
 
     const gameName = item.name;
 
+    const profile = libraryStore.fangameProfiles[gameID];
+    if (!profile || !profile.lastPlayed) continue;
+
     // Calculate date string
-    const lastPlayedMoment = moment(libraryStore.fangameProfiles[gameID].lastPlayed);
+    const lastPlayedMoment = moment(profile.lastPlayed);
 
     let date: string;
     const weekDiff = todayMoment.diff(lastPlayedMoment, 'week');

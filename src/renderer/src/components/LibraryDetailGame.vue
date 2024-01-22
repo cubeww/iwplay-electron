@@ -8,13 +8,13 @@
         <ButtonGradient v-if="!item.isInstalled" class="header-button" @click="handleClickInstall"> <InstallGameIcon />{{ $t('INSTALL') }}</ButtonGradient>
         <ButtonGradient v-if="item.isInstalled && !item.isRunning" color1="#4ade80" color2="#16a34a" class="header-button" @click="handleClickPlay"> <PlayIcon />{{ $t('PLAY') }}</ButtonGradient>
         <ButtonGradient v-if="item.isInstalled && item.isRunning" class="header-button" @click="handleClickStop"> <WindowCloseIcon />{{ $t('STOP') }}</ButtonGradient>
-        <div v-if="profile" class="header-item">
+        <div v-if="profile.lastPlayed" class="header-item">
           <div class="header-item-title">{{ $t('LAST PLAYED') }}</div>
           <div class="header-item-content">
             {{ $d(profile.lastPlayed, 'short') }}
           </div>
         </div>
-        <div v-if="profile" class="header-item">
+        <div v-if="profile.playTime" class="header-item">
           <div class="header-item-title">{{ $t('PLAY TIME') }}</div>
           <div class="header-item-content">
             {{ playTime + $t(profile.playTime >= 3600 ? ' hours' : ' minutes') }}
@@ -27,6 +27,9 @@
           <div class="header-toolbox-button" @click="handleClickProperties">
             <SettingsIcon />
           </div>
+          <div class="header-toolbox-button" :class="{ clear: profile.cleared }" @click="handleClickClear">
+            <ClearIcon />
+          </div>
         </div>
       </div>
       <div class="nav">
@@ -34,7 +37,7 @@
         <div class="nav-button" :class="{ disabled: !hasDownloadLink }" @click="handleToDownload">{{ $t('Download Page') }}</div>
         <div v-if="item.isInstalled" class="nav-button" @click="handleToGameDirectory">{{ $t('Game Directory') }}</div>
       </div>
-      <div v-for="(rm, index) of readmeList" class="readme" :key="index">
+      <div v-for="(rm, index) of readmeList" :key="index" class="readme">
         <div class="readme-title">
           {{ rm.name }}
         </div>
@@ -54,6 +57,7 @@ import SettingsIcon from '@renderer/icons/SettingsIcon.vue';
 import PopupViewInstallGame from './PopupViewInstallGame.vue';
 import PlayIcon from '@renderer/icons/PlayIcon.vue';
 import DeleteIcon from '@renderer/icons/DeleteIcon.vue';
+import ClearIcon from '@renderer/icons/ClearIcon.vue';
 import { invoke } from '@renderer/utils/invoke';
 import { watch } from 'vue';
 import { computed } from 'vue';
@@ -63,6 +67,7 @@ import { useNavigateStore } from '@renderer/stores/navigate';
 import { FangameReadme } from 'src/main/utils/library';
 import { DelFruitFangameDetail, delFruit } from '@renderer/utils/delFruit';
 import { usePopupStore } from '@renderer/stores/popup';
+import { toRaw } from 'vue';
 
 const navigateStore = useNavigateStore();
 const popupStore = usePopupStore();
@@ -70,9 +75,9 @@ const libraryStore = useLibraryStore();
 
 const props = defineProps<{ item: FangameItem }>();
 
-const profile = computed(() => libraryStore.fangameProfiles[props.item.id]);
+const profile = computed(() => libraryStore.fangameProfiles[props.item.id] || { cleared: false });
 const playTime = computed(() => {
-  if (!profile.value) return 0;
+  if (!profile.value.playTime) return 0;
   const t = profile.value.playTime;
   return t < 3600 ? Math.ceil(t / 60) : (t / 3600.0).toFixed(1);
 });
@@ -167,6 +172,11 @@ const handleToGameDirectory = () => {
 
 const handleClickReadme = (path: string) => {
   invoke('notepad', path);
+};
+
+const handleClickClear = () => {
+  profile.value.cleared = !profile.value.cleared;
+  invoke('save-profile', { gameID: props.item.id, profile: toRaw(profile.value) });
 };
 </script>
 
@@ -281,6 +291,10 @@ const handleClickReadme = (path: string) => {
   &:hover {
     background-color: rgba(255, 255, 255, 0.2);
     color: rgba(255, 255, 255, 1);
+  }
+
+  &.clear {
+    color: #67b3ff;
   }
 }
 

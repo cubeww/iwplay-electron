@@ -1,5 +1,5 @@
 import { BrowserWindowConstructorOptions, OpenDialogSyncOptions, app, dialog, ipcMain, shell } from 'electron';
-import { addLibrary, applyDebugHelper, createManifest, getAllProfiles, getGameExecutables, getGameReadmes, getInstalledFangameIDs, getManifest, getProfile, getRunningFangameIDs, installGame, openGameDirectory, removeLibrary, runGame, saveManifest, stopGame, uninstallGame } from './utils/library';
+import { addLibrary, applyDebugHelper, createManifest, getAllProfiles, getGameExecutables, getGameReadmes, getInstalledFangameIDs, getManifest, getProfile, getRunningFangameIDs, installGame, openGameDirectory, removeLibrary, runGame, saveManifest, saveProfile, stopGame, uninstallGame } from './utils/library';
 import { addDownloadItem, createWindow, trayMenuSize, windows } from '.';
 import { join } from 'path';
 import { dirSize, readTextFile, writeTextFile } from './utils/fs';
@@ -26,6 +26,7 @@ const mainAPIMap = {
   'get-game-readmes': getGameReadmes,
   'apply-debug-helper': applyDebugHelper,
   'get-profile': getProfile,
+  'save-profile': saveProfile,
   'get-all-profiles': getAllProfiles,
   'run-game': runGame,
   'stop-game': stopGame,

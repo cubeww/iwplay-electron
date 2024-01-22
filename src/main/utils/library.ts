@@ -18,8 +18,9 @@ interface RunningFangameItem {
 const runningFangameItems: { [gameID: string]: RunningFangameItem } = {};
 
 export interface FangameProfile {
-  playTime: number;
-  lastPlayed: Date;
+  playTime?: number;
+  lastPlayed?: Date;
+  cleared?: boolean;
 }
 
 export interface FangameManifest {
@@ -304,7 +305,7 @@ export function runGame({ gameID, libraryPath }: RunGameOptions) {
       // Profile not exists, create new one
       profile = { playTime: 0 } as FangameProfile;
     }
-    profile.playTime += playTime;
+    profile.playTime! += playTime;
     profile.lastPlayed = lastPlayed;
     saveProfile({ gameID, profile });
 
@@ -329,6 +330,9 @@ export function getRunningFangameIDs() {
   return Object.keys(runningFangameItems);
 }
 
+/**
+ * Clear downloading fangame files
+ */
 export function clearDownloading({ libraryPath }: ClearDownloadingOptions) {
   checkLibrary({ libraryPath });
   const download = join(libraryPath, 'iwapps', 'downloading');
