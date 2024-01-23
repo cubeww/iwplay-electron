@@ -65,6 +65,11 @@ const mainAPIMap = {
     window.close();
   },
 
+  'show': (name: string) => {
+    const window = windows[name];
+    window.show();
+  },
+
   'hide': (name: string) => {
     const window = windows[name];
     window.hide();

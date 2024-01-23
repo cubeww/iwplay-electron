@@ -1,3 +1,5 @@
+import { windowName } from '@renderer/main';
+import { invoke } from '@renderer/utils/invoke';
 import { listenEvent } from '@renderer/utils/listenEvent';
 import { defineStore } from 'pinia';
 import { computed } from 'vue';
@@ -14,6 +16,7 @@ export interface NavState {
 export const useNavigateStore = defineStore('navigate', () => {
   const initialize = () => {
     listenEvent('show', (action) => {
+      invoke('show', windowName);
       if (action === 'delfruit') {
         toggleBrowserAndLoadURL('https://delicious-fruit.com/');
       }

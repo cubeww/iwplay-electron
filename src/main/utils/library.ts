@@ -447,7 +447,8 @@ export function applyDebugHelper({ libraryPath, gameID }: ApplyDebugHelperOption
   checkLibrary({ libraryPath });
 
   const folderPath = join(libraryPath, 'iwapps', 'common', gameID);
-  return execSync(`"${dbghelper}" "${folderPath}"`, { cwd: folderPath });
+  const tempPath = app.getPath('temp');
+  return execSync(`"${dbghelper}" "${folderPath}"`, { cwd: tempPath });
 }
 
 /**
