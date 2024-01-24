@@ -5,9 +5,9 @@
     </div>
     <div class="content">
       <div class="header">
-        <ButtonGradient v-if="!item.isInstalled" class="header-button" @click="handleClickInstall"> <InstallGameIcon />{{ $t('INSTALL') }}</ButtonGradient>
-        <ButtonGradient v-if="item.isInstalled && !item.isRunning" color1="#4ade80" color2="#16a34a" class="header-button" @click="handleClickPlay"> <PlayIcon />{{ $t('PLAY') }}</ButtonGradient>
-        <ButtonGradient v-if="item.isInstalled && item.isRunning" class="header-button" @click="handleClickStop"> <WindowCloseIcon />{{ $t('STOP') }}</ButtonGradient>
+        <ButtonGradient v-if="!item.installed" class="header-button" @click="handleClickInstall"> <InstallGameIcon />{{ $t('INSTALL') }}</ButtonGradient>
+        <ButtonGradient v-if="item.installed && !item.running" color1="#4ade80" color2="#16a34a" class="header-button" @click="handleClickPlay"> <PlayIcon />{{ $t('PLAY') }}</ButtonGradient>
+        <ButtonGradient v-if="item.installed && item.running" class="header-button" @click="handleClickStop"> <WindowCloseIcon />{{ $t('STOP') }}</ButtonGradient>
         <div v-if="profile.lastPlayed" class="header-item">
           <div class="header-item-title">{{ $t('LAST PLAYED') }}</div>
           <div class="header-item-content">
@@ -20,22 +20,32 @@
             {{ playTime + $t(profile.playTime >= 3600 ? ' hours' : ' minutes') }}
           </div>
         </div>
-        <div v-if="item.isInstalled" class="header-toolbox">
-          <div class="header-toolbox-button" @click="handleClickDelete">
-            <DeleteIcon />
-          </div>
-          <div class="header-toolbox-button" @click="handleClickProperties">
-            <SettingsIcon />
-          </div>
-          <div class="header-toolbox-button" :class="{ clear: profile.cleared }" @click="handleClickClear">
-            <ClearIcon />
-          </div>
+        <div class="header-toolbox">
+          <template v-if="item.installed">
+            <div class="header-toolbox-button" @click="handleClickDelete">
+              <DeleteIcon />
+            </div>
+            <div class="header-toolbox-button" @click="handleClickProperties">
+              <SettingsIcon />
+            </div>
+          </template>
+          <template v-if="1 || libraryStore.delFruitSynced">
+            <div class="header-toolbox-button" :class="{ clear: item.favorite }" @click="handleClickFavorite">
+              <FavoriteIcon />
+            </div>
+            <div class="header-toolbox-button" :class="{ clear: item.cleared }" @click="handleClickClear">
+              <ClearIcon />
+            </div>
+            <div class="header-toolbox-button" :class="{ clear: item.bookmark }" @click="handleClickBookmark">
+              <BookmarkIcon />
+            </div>
+          </template>
         </div>
       </div>
       <div class="nav">
         <div class="nav-button" @click="handleToDelFruit">{{ $t('DelFruit Page') }}</div>
         <div class="nav-button" :class="{ disabled: !hasDownloadLink }" @click="handleToDownload">{{ $t('Download Page') }}</div>
-        <div v-if="item.isInstalled" class="nav-button" @click="handleToGameDirectory">{{ $t('Game Directory') }}</div>
+        <div v-if="item.installed" class="nav-button" @click="handleToGameDirectory">{{ $t('Game Directory') }}</div>
       </div>
       <div v-for="(rm, index) of readmeList" :key="index" class="readme">
         <div class="readme-title">
@@ -67,7 +77,8 @@ import { useNavigateStore } from '@renderer/stores/navigate';
 import { FangameReadme } from 'src/main/utils/library';
 import { DelFruitFangameDetail, delFruit } from '@renderer/utils/delFruit';
 import { usePopupStore } from '@renderer/stores/popup';
-import { toRaw } from 'vue';
+import FavoriteIcon from '@renderer/icons/FavoriteIcon.vue';
+import BookmarkIcon from '@renderer/icons/BookmarkIcon.vue';
 
 const navigateStore = useNavigateStore();
 const popupStore = usePopupStore();
@@ -75,7 +86,7 @@ const libraryStore = useLibraryStore();
 
 const props = defineProps<{ item: FangameItem }>();
 
-const profile = computed(() => libraryStore.fangameProfiles[props.item.id] || { cleared: false });
+const profile = computed(() => libraryStore.fangameProfiles[props.item.id] || {});
 const playTime = computed(() => {
   if (!profile.value.playTime) return 0;
   const t = profile.value.playTime;
@@ -86,7 +97,7 @@ const readmeList = ref<FangameReadme[]>([]);
 
 const fetchReadmes = async () => {
   readmeList.value = [];
-  if (!props.item.isInstalled) return;
+  if (!props.item.installed) return;
   readmeList.value = await invoke('get-game-readmes', { gameID: props.item.id, libraryPath: props.item.libraryPath });
 };
 
@@ -174,9 +185,19 @@ const handleClickReadme = (path: string) => {
   invoke('notepad', path);
 };
 
-const handleClickClear = () => {
-  profile.value.cleared = !profile.value.cleared;
-  invoke('save-profile', { gameID: props.item.id, profile: toRaw(profile.value) });
+const handleClickFavorite = async () => {
+  await invoke('modify-delfruit-profile', { gameID: props.item.id, cookie: libraryStore.delFruitCookie!, type: 'favorite', value: !props.item.favorite ? '1' : '0' });
+  libraryStore.fangameItems.find((i) => i.id === props.item.id)!.favorite = !props.item.favorite;
+};
+
+const handleClickClear = async () => {
+  await invoke('modify-delfruit-profile', { gameID: props.item.id, cookie: libraryStore.delFruitCookie!, type: 'clear', value: !props.item.cleared ? '1' : '0' });
+  libraryStore.fangameItems.find((i) => i.id === props.item.id)!.cleared = !props.item.cleared;
+};
+
+const handleClickBookmark = async () => {
+  await invoke('modify-delfruit-profile', { gameID: props.item.id, cookie: libraryStore.delFruitCookie!, type: 'bookmark', value: !props.item.bookmark ? '1' : '0' });
+  libraryStore.fangameItems.find((i) => i.id === props.item.id)!.bookmark = !props.item.bookmark;
 };
 </script>
 

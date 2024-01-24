@@ -96,6 +96,9 @@ if (windowName === 'main') {
   });
 
   window.addEventListener('unhandledrejection', (ev) => {
+    if ((ev.reason as Error).message.includes('GUEST_VIEW_MANAGER_CALL')) {
+      return;
+    }
     popupStore.showError((ev.reason as Error).message);
   });
 }

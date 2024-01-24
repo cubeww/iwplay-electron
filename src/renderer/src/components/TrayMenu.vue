@@ -11,7 +11,7 @@
 import { windowName } from '@renderer/main';
 import { invoke } from '@renderer/utils/invoke';
 import { onMounted, ref } from 'vue';
-import { ShowEventOptions } from 'src/main/event';
+import { type ShowEventOptions } from 'src/main/event';
 
 const trayMenuEl = ref<HTMLDivElement>();
 

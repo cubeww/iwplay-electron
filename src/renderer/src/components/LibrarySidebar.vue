@@ -20,19 +20,24 @@
       <div class="filter" :class="{ show: showFilter }">
         <div class="filter-occluder"></div>
         <div class="filter-content">
-          <div class="filter-title">{{ $t('FILTER') }}</div>
+          <div class="filter-title">{{ $t('STATE') }}</div>
           <CheckBox v-model="filters.installed" class="filter-check-box" :value="false" :label="$t('Installed')" />
           <CheckBox v-model="filters.running" class="filter-check-box" :value="false" :label="$t('Running')" />
-          <CheckBox v-model="filters.uncleared" class="filter-check-box" :value="false" :label="$t('Uncleared')" />
-          <CheckBox v-model="filters.cleared" class="filter-check-box" :value="false" :label="$t('Cleared')" />
+          <template v-if="libraryStore.delFruitSynced">
+            <div class="filter-title">{{ $t('DELFRUIT') }}</div>
+            <CheckBox v-model="filters.favorite" class="filter-check-box" :value="false" :label="$t('Favorite')" />
+            <CheckBox v-model="filters.uncleared" class="filter-check-box" :value="false" :label="$t('Uncleared')" />
+            <CheckBox v-model="filters.cleared" class="filter-check-box" :value="false" :label="$t('Cleared')" />
+            <CheckBox v-model="filters.bookmark" class="filter-check-box" :value="false" :label="$t('Bookmark')" />
+          </template>
         </div>
       </div>
     </div>
     <div v-show="libraryStore.fetchFangameItemsStatus === 'ok'" class="fangame-list-with-scroll" @scroll="handleScroll">
       <div class="fangame-list-with-height" :style="{ height: filteredItems.length * itemHeight + 'px' }">
-        <div v-for="(item, index) in displayItems" :key="index" class="fangame-list-item" :class="{ select: navigateStore.state.fangameItemID === item.id, installed: item.isInstalled, running: item.isRunning }" :style="{ transform: `translateY(${translateY}px)` }" @click="navigateStore.selectFangameItem(item.id)">
+        <div v-for="(item, index) in displayItems" :key="index" class="fangame-list-item" :class="{ select: navigateStore.state.fangameItemID === item.id, installed: item.installed, running: item.running }" :style="{ transform: `translateY(${translateY}px)` }" @click="navigateStore.selectFangameItem(item.id)">
           {{ item.name }}
-          <template v-if="item.isRunning">
+          <template v-if="item.running">
             <div style="color: #a9a9a9">&nbsp;-&nbsp;</div>
             <div style="color: #7cb927">Running</div>
           </template>
@@ -56,6 +61,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue';
 import CheckBox from './CheckBox.vue';
 import { useLibraryStore } from '@renderer/stores/library';
 import { useNavigateStore } from '@renderer/stores/navigate';
+import { watchEffect } from 'vue';
 
 const libraryStore = useLibraryStore();
 const navigateStore = useNavigateStore();
@@ -71,10 +77,23 @@ const scrollTop = ref(0);
 const showFilter = ref(false);
 
 const filters = ref({
+  // STATE
   installed: false,
   running: false,
+  // DELFRUIT
+  favorite: false,
   uncleared: false,
   cleared: false,
+  bookmark: false,
+});
+
+watchEffect(() => {
+  if (!libraryStore.delFruitSynced) {
+    filters.value.cleared = false;
+    filters.value.uncleared = false;
+    filters.value.bookmark = false;
+    filters.value.favorite = false;
+  }
 });
 
 const hasFilter = computed(() => {
@@ -113,16 +132,12 @@ const searchItems = computed(() => {
 
 const filteredItems = computed(() => {
   return searchItems.value.filter((i) => {
-    if (filters.value.installed && !i.isInstalled) return false;
-    if (filters.value.running && !i.isRunning) return false;
-
-    const profile = libraryStore.fangameProfiles[i.id];
-    if (profile) {
-      if (filters.value.uncleared && profile.cleared) return false;
-      if (filters.value.cleared && !profile.cleared) return false;
-    } else {
-      if (filters.value.cleared) return false;
-    }
+    if (filters.value.installed && !i.installed) return false;
+    if (filters.value.running && !i.running) return false;
+    if (filters.value.cleared && !i.cleared) return false;
+    if (filters.value.uncleared && i.cleared) return false;
+    if (filters.value.favorite && !i.favorite) return false;
+    if (filters.value.bookmark && !i.bookmark) return false;
 
     return true;
   });
@@ -394,7 +409,6 @@ const isInHome = computed(() => !navigateStore.state.fangameItemID);
   top: calc(100% - 36px);
   z-index: 100;
   width: 200px;
-  height: 200px;
   background-color: #4c515a;
   box-sizing: border-box;
 

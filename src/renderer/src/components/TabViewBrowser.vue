@@ -21,9 +21,11 @@ import LoadingIcon from '@renderer/icons/LoadingIcon.vue';
 import { WebviewTag } from 'electron';
 import { useNavigateStore } from '@renderer/stores/navigate';
 import { useContextMenuStore } from '@renderer/stores/contextMenu';
+import { useLibraryStore } from '@renderer/stores/library';
 
 const navigateStore = useNavigateStore();
 const contextMenuStore = useContextMenuStore();
+const libraryStore = useLibraryStore();
 
 const loading = ref(true);
 const url = ref('https://delicious-fruit.com/');
@@ -90,6 +92,15 @@ const handleDidNavigate = (event: any) => {
     const id = event.url.substring(index + prefix.length);
     navigateStore.updateLastVisitedFangameId(id);
   }
+
+  webviewEl.value.executeJavaScript(`
+  window.electron.ipcRenderer.sendToHost('user',
+  {
+    username: document.querySelector('#header p').childNodes[0].textContent.trim(),
+    cookie: document.cookie,
+  }  
+  )
+  `);
 };
 
 const handleDidStopLoading = () => {
@@ -118,6 +129,14 @@ const handleWillNavigate = (event: any) => {
 const handleIpcMessage = (event: any) => {
   if (event.channel === 'mousedown') {
     contextMenuStore.hideContextMenu();
+  }
+  if (event.channel === 'user') {
+    const options = event.args[0];
+    if (options.username && libraryStore.delFruitUserName !== options.username) {
+      libraryStore.delFruitUserName = options.username;
+      libraryStore.delFruitCookie = options.cookie;
+      libraryStore.syncProfileFromDelFruit();
+    }
   }
 };
 </script>

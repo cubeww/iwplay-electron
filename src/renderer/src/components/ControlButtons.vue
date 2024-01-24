@@ -44,8 +44,6 @@ const handleClickClose = () => {
 <style scoped>
 .control-buttons {
   display: flex;
-  position: absolute;
-  right: 0;
   -webkit-app-region: no-drag;
 }
 

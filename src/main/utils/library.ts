@@ -8,7 +8,7 @@ import resizer from '../../../resources/resizer.exe?asset&asarUnpack';
 import icon from '../../../resources/icon.png?asset&asarUnpack';
 import { sendEvent } from '../event';
 import { setSettings, getSettings } from './settings';
-import { app, Notification } from 'electron';
+import { app, net, Notification } from 'electron';
 
 interface RunningFangameItem {
   process: ChildProcess;
@@ -20,7 +20,6 @@ const runningFangameItems: { [gameID: string]: RunningFangameItem } = {};
 export interface FangameProfile {
   playTime?: number;
   lastPlayed?: Date;
-  cleared?: boolean;
 }
 
 export interface FangameManifest {
@@ -127,6 +126,17 @@ interface CheckLibraryOptions {
 
 interface ClearDownloadingOptions {
   libraryPath: string;
+}
+
+interface GetDelFruitProfileOptions {
+  cookie: string;
+}
+
+interface ModifyDelFruitProfileOptions {
+  gameID: string;
+  type: 'clear' | 'favorite' | 'bookmark';
+  value: '1' | '0';
+  cookie: string;
 }
 
 // Basic Library Functions
@@ -511,4 +521,34 @@ export function getAllProfiles() {
     }
   }
   return profiles;
+}
+
+// DelFruit Profile Functions
+// --------------------------
+
+export async function getDelFruitProfile({ cookie }: GetDelFruitProfileOptions): Promise<string> {
+  const res = await net.fetch('https://delicious-fruit.com/profile.php', {
+    method: 'GET',
+    headers: { cookie },
+  });
+  return await res.text();
+}
+
+export async function modifyDelFruitProfile({ gameID, type, value, cookie }: ModifyDelFruitProfileOptions) {
+  const res = await net.fetch('https://delicious-fruit.com/ratings/ratings_api.php', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      cookie,
+    },
+    body: new URLSearchParams({
+      method: type,
+      id: gameID,
+      opt: value,
+    }),
+  });
+  const result = await res.json();
+  if (!result.success) {
+    throw new Error(result.error);
+  }
 }

@@ -29,7 +29,7 @@
       </template>
     </div>
     <div class="drag-area"></div>
-    <ControlButtons />
+    <ControlButtons class="control-buttons" />
   </div>
 </template>
 
@@ -96,6 +96,12 @@ const handlePatchDebugger = async () => {
   width: 100vw;
   height: 100vh;
   display: flex;
+}
+
+.control-buttons {
+  position: absolute;
+  right: 0;
+  top: 0;
 }
 
 .drag-area {

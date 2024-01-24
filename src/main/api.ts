@@ -1,5 +1,5 @@
 import { BrowserWindowConstructorOptions, OpenDialogSyncOptions, app, dialog, ipcMain, shell } from 'electron';
-import { addLibrary, applyDebugHelper, createManifest, getAllProfiles, getGameExecutables, getGameReadmes, getInstalledFangameIDs, getManifest, getProfile, getRunningFangameIDs, installGame, openGameDirectory, removeLibrary, runGame, saveManifest, saveProfile, stopGame, uninstallGame } from './utils/library';
+import { addLibrary, applyDebugHelper, createManifest, getAllProfiles, getDelFruitProfile, getGameExecutables, getGameReadmes, getInstalledFangameIDs, getManifest, getProfile, getRunningFangameIDs, installGame, modifyDelFruitProfile, openGameDirectory, removeLibrary, runGame, saveManifest, saveProfile, stopGame, uninstallGame } from './utils/library';
 import { addDownloadItem, createWindow, trayMenuSize, windows } from '.';
 import { join } from 'path';
 import { dirSize, readTextFile, writeTextFile } from './utils/fs';
@@ -31,6 +31,8 @@ const mainAPIMap = {
   'run-game': runGame,
   'stop-game': stopGame,
   'open-game-directory': openGameDirectory,
+  'get-delfruit-profile': getDelFruitProfile,
+  'modify-delfruit-profile': modifyDelFruitProfile,
 
   // Settings
   // --------
@@ -116,8 +118,8 @@ export type MainAPI = typeof mainAPIMap;
 
 export function registerMainAPIs() {
   for (const i of Object.keys(mainAPIMap)) {
-    ipcMain.handle(i, (_event, ...args) => {
-      return mainAPIMap[i](...args);
+    ipcMain.handle(i, async (_event, ...args) => {
+      return await mainAPIMap[i](...args);
     });
   }
 }

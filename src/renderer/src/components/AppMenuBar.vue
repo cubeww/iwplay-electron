@@ -1,8 +1,16 @@
 <template>
   <div class="app-menu-bar" :class="{ 'can-drag': !hasContextMenu }">
-    <AppMenuBarItem :items="menuItems[0]">IWPlay</AppMenuBarItem>
-    <AppMenuBarItem :items="menuItems[1]">{{ $t('Help') }}</AppMenuBarItem>
-    <ControlButtons />
+    <div class="left">
+      <AppMenuBarItem :items="menuItems[0]">IWPlay</AppMenuBarItem>
+      <AppMenuBarItem :items="menuItems[1]">{{ $t('Help') }}</AppMenuBarItem>
+    </div>
+    <div class="right">
+      <div v-if="libraryStore.delFruitSynced" class="user">
+        <div class="user-logo"></div>
+        <div class="user-name">{{ libraryStore.delFruitUserName }}</div>
+      </div>
+      <ControlButtons />
+    </div>
   </div>
 </template>
 
@@ -14,8 +22,10 @@ import { computed } from 'vue';
 import { invoke } from '@renderer/utils/invoke';
 import { ContextMenuItemData } from './ContextMenu.vue';
 import { useContextMenuStore } from '@renderer/stores/contextMenu';
+import { useLibraryStore } from '@renderer/stores/library';
 
 const contextMenuStore = useContextMenuStore();
+const libraryStore = useLibraryStore();
 const hasContextMenu = computed(() => contextMenuStore.contextMenu !== undefined);
 
 const menuItems: ContextMenuItemData[][] = [
@@ -37,9 +47,54 @@ const menuItems: ContextMenuItemData[][] = [
 <style scoped>
 .app-menu-bar {
   display: flex;
-
+  justify-content: space-between;
   &.can-drag {
     -webkit-app-region: drag;
   }
+}
+
+.left {
+  display: flex;
+}
+
+.right {
+  display: flex;
+}
+
+.user {
+  padding-right: 10px;
+  margin-top: 5px;
+  margin-right: 10px;
+  -webkit-app-region: no-drag;
+  min-width: 64px;
+  height: 24px;
+  border-radius: 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #4bb3fd;
+  font-size: small;
+  background-color: #272d37;
+  cursor: pointer;
+  transition: all 0.1s;
+
+  &:hover {
+    background-color: #213a50;
+  }
+}
+
+.user-logo {
+  width: 24px;
+  height: 24px;
+  background-image: url('/cherry.png');
+  background-repeat: no-repeat;
+  background-size: 16px 18px;
+  background-position: center;
+  margin-right: 4px;
+  border-right: 2px solid #6bccf2;
+}
+
+.user-name {
+  margin-bottom: 2px;
 }
 </style>

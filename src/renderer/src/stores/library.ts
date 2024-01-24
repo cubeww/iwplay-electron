@@ -7,12 +7,16 @@ import { useSettingsStore } from './settings';
 import { listenEvent } from '@renderer/utils/listenEvent';
 import { isDev } from '@renderer/main';
 import { FangameProfile } from 'src/main/utils/library';
+import { computed } from 'vue';
 
 export interface FangameItem {
   id: string;
   name: string;
-  isRunning: boolean;
-  isInstalled: boolean;
+  running: boolean;
+  installed: boolean;
+  cleared: boolean;
+  favorite: boolean;
+  bookmark: boolean;
   libraryPath: string;
 }
 
@@ -61,9 +65,15 @@ export const useLibraryStore = defineStore('library', () => {
       // Convert DelFruit fangame items to IWPlay fangame items
       const items = delFruitItems as FangameItem[];
       items.forEach((i) => {
-        i.isInstalled = false;
-        i.isRunning = false;
+        i.installed = false;
+        i.running = false;
+        i.favorite = false;
+        i.cleared = false;
+        i.bookmark = false;
       });
+
+      // Sync delfruit profile
+      await syncProfileFromDelFruit();
 
       // Get installed fangames
       for (const path of settingsStore.settings.libraryPaths) {
@@ -71,7 +81,7 @@ export const useLibraryStore = defineStore('library', () => {
         for (const id of installedIDs) {
           const index = items.findIndex((item) => item.id === id);
           if (index !== -1) {
-            items[index].isInstalled = true;
+            items[index].installed = true;
             items[index].libraryPath = path;
 
             // Fix manifest if needed
@@ -89,7 +99,7 @@ export const useLibraryStore = defineStore('library', () => {
       for (const id of runningIDs) {
         const index = items.findIndex((item) => item.id === id);
         if (index !== -1) {
-          items[index].isRunning = true;
+          items[index].running = true;
         }
       }
 
@@ -108,11 +118,58 @@ export const useLibraryStore = defineStore('library', () => {
 
   const fangameProfiles = ref<{ [gameID: string]: FangameProfile | undefined }>({});
 
+  const delFruitUserName = ref<string>();
+  const delFruitCookie = ref<string>();
+  const delFruitLogged = computed(() => delFruitUserName.value !== undefined);
+  const delFruitSynced = ref<boolean>(false);
+
+  const syncProfileFromDelFruit = async () => {
+    delFruitSynced.value = false;
+
+    if (!delFruitLogged.value) {
+      return;
+    }
+
+    try {
+      const html = await invoke('get-delfruit-profile', { cookie: delFruitCookie.value! });
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+
+      doc.querySelectorAll('#favorites a').forEach((a) => {
+        const id = a.getAttribute('href')!.split('=')[1];
+        const idx = fangameItems.value.findIndex((i) => i.id === id);
+        if (idx !== -1) {
+          fangameItems.value[idx].favorite = true;
+        }
+      });
+
+      doc.querySelectorAll('#clear a').forEach((a) => {
+        const id = a.getAttribute('href')!.split('=')[1];
+        const idx = fangameItems.value.findIndex((i) => i.id === id);
+        if (idx !== -1) {
+          fangameItems.value[idx].cleared = true;
+        }
+      });
+
+      doc.querySelectorAll('#bookmark a').forEach((a) => {
+        const id = a.getAttribute('href')!.split('=')[1];
+        const idx = fangameItems.value.findIndex((i) => i.id === id);
+        if (idx !== -1) {
+          fangameItems.value[idx].bookmark = true;
+        }
+      });
+
+      delFruitSynced.value = true;
+    } catch {
+      // Do nothing
+    }
+  };
+
   const initialize = () => {
     listenEvent('game-installed', ({ gameID, libraryPath }) => {
       fangameItems.value.forEach((i) => {
         if (i.id === gameID) {
-          i.isInstalled = true;
+          i.installed = true;
           i.libraryPath = libraryPath;
         }
       });
@@ -121,20 +178,20 @@ export const useLibraryStore = defineStore('library', () => {
     listenEvent('game-uninstalled', ({ gameID }) => {
       fangameItems.value.forEach((i) => {
         if (i.id === gameID) {
-          i.isInstalled = false;
+          i.installed = false;
         }
       });
     });
 
     listenEvent('game-run', ({ gameID }) => {
       fangameItems.value.forEach((i) => {
-        if (i.id === gameID) i.isRunning = true;
+        if (i.id === gameID) i.running = true;
       });
     });
 
     listenEvent('game-close', ({ gameID }) => {
       fangameItems.value.forEach((i) => {
-        if (i.id === gameID) i.isRunning = false;
+        if (i.id === gameID) i.running = false;
       });
     });
 
@@ -147,5 +204,5 @@ export const useLibraryStore = defineStore('library', () => {
     fetchFangameProfiles();
   };
 
-  return { initialize, fangameProfiles, fangameItems, fetchFangameItems, fetchFangameItemsStatus, fetchFangameItemsError };
+  return { initialize, fangameProfiles, fangameItems, fetchFangameItems, fetchFangameItemsStatus, fetchFangameItemsError, delFruitLogged, delFruitSynced, delFruitUserName, delFruitCookie, syncProfileFromDelFruit };
 });
