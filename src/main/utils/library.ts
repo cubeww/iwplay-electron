@@ -1,6 +1,6 @@
 import { basename, dirname, extname, join, resolve } from 'path';
 import { getFiles, readTextFile, writeTextFile } from '../utils/fs';
-import { cpSync, existsSync, mkdirSync, readdirSync, rmSync, statSync, unlinkSync } from 'fs';
+import { closeSync, cpSync, existsSync, mkdirSync, openSync, readFileSync, readSync, readdirSync, rmSync, statSync, unlinkSync } from 'fs';
 import { ChildProcess, exec, execFile, execSync } from 'child_process';
 import sevenz from '../../../resources/7z.exe?asset&asarUnpack';
 import dbghelper from '../../../resources/dbghelper.exe?asset&asarUnpack';
@@ -430,9 +430,21 @@ export function getGameReadmes({ gameID, libraryPath }: GetGameReadmesOptions) {
   for (const f of files) {
     if (extname(f) === '.txt') {
       const fullPath = join(gamePath, f);
+      // Get byte order mark
+      const bin = openSync(fullPath, 'r');
+      const buffer = Buffer.alloc(4);
+      readSync(bin, buffer);
+      closeSync(bin);
+      // Detect encoding
+      let encoding: BufferEncoding = 'utf-8';
+      const header = buffer.toString('hex');
+      if (header.slice(0, 4) === 'fffe') {
+        encoding = 'utf16le';
+      }
+
       paths.push({
         name: basename(f),
-        content: readTextFile(fullPath),
+        content: readFileSync(fullPath, encoding),
         path: fullPath,
       });
     }
