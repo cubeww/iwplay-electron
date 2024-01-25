@@ -93,7 +93,8 @@ const handleDidNavigate = (event: any) => {
     navigateStore.updateLastVisitedFangameId(id);
   }
 
-  webviewEl.value.executeJavaScript(`
+  if (event.url.substring(0, 27) === 'https://delicious-fruit.com') {
+    webviewEl.value.executeJavaScript(`
   window.electron.ipcRenderer.sendToHost('user',
   {
     username: document.querySelector('#header p').childNodes[0].textContent.trim(),
@@ -101,6 +102,7 @@ const handleDidNavigate = (event: any) => {
   }  
   )
   `);
+  }
 };
 
 const handleDidStopLoading = () => {
