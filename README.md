@@ -16,6 +16,10 @@ Experimental "I Wanna Fangames" Management Software
 - Sync favorite, clear, bookmark from DelFruit
 - Apply Debugger Helper patch with one click
 
+## Download
+
+[Releases](https://github.com/cubeww/iwplay-electron/releases)
+
 ## Contributing
 
 This project is still in the early stages of development and may be extremely unstable.
