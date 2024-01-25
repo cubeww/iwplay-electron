@@ -22,23 +22,33 @@
         </div>
         <div class="header-toolbox">
           <template v-if="item.installed">
-            <div class="header-toolbox-button" @click="handleClickDelete">
-              <DeleteIcon />
-            </div>
-            <div class="header-toolbox-button" @click="handleClickProperties">
-              <SettingsIcon />
-            </div>
+            <Tooltip text="Uninstall">
+              <div class="header-toolbox-button" @click="handleClickDelete">
+                <DeleteIcon />
+              </div>
+            </Tooltip>
+            <Tooltip text="Properties">
+              <div class="header-toolbox-button" @click="handleClickProperties">
+                <SettingsIcon />
+              </div>
+            </Tooltip>
           </template>
           <template v-if="1 || libraryStore.delFruitSynced">
-            <div class="header-toolbox-button" :class="{ clear: item.favorite }" @click="handleClickFavorite">
-              <FavoriteIcon />
-            </div>
-            <div class="header-toolbox-button" :class="{ clear: item.cleared }" @click="handleClickClear">
-              <ClearIcon />
-            </div>
-            <div class="header-toolbox-button" :class="{ clear: item.bookmark }" @click="handleClickBookmark">
-              <BookmarkIcon />
-            </div>
+            <Tooltip text="Favorite">
+              <div class="header-toolbox-button" :class="{ clear: item.favorite }" @click="handleClickFavorite">
+                <FavoriteIcon />
+              </div>
+            </Tooltip>
+            <Tooltip text="Clear">
+              <div class="header-toolbox-button" :class="{ clear: item.cleared }" @click="handleClickClear">
+                <ClearIcon />
+              </div>
+            </Tooltip>
+            <Tooltip text="Bookmark" :x="-20">
+              <div class="header-toolbox-button" :class="{ clear: item.bookmark }" @click="handleClickBookmark">
+                <BookmarkIcon />
+              </div>
+            </Tooltip>
           </template>
         </div>
       </div>
@@ -79,6 +89,7 @@ import { DelFruitFangameDetail, delFruit } from '@renderer/utils/delFruit';
 import { usePopupStore } from '@renderer/stores/popup';
 import FavoriteIcon from '@renderer/icons/FavoriteIcon.vue';
 import BookmarkIcon from '@renderer/icons/BookmarkIcon.vue';
+import Tooltip from './Tooltip.vue';
 
 const navigateStore = useNavigateStore();
 const popupStore = usePopupStore();
@@ -211,7 +222,7 @@ const handleClickBookmark = async () => {
   overflow-x: hidden;
 
   background: url('/game-detail.png');
-  background-repeat: repeat-y;
+  background-repeat: repeat;
   background-position-y: v-bind(backgroundY + 'px');
 
   &::-webkit-scrollbar {
