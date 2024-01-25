@@ -30,7 +30,6 @@ const handleOK = () => {
 <style scoped>
 .error-message {
   user-select: text;
-  margin-bottom: 20px;
 }
 
 .ok-button {

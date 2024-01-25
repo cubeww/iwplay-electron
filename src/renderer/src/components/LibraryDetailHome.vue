@@ -185,29 +185,32 @@ const recentItems = computed(() => {
   z-index: 100;
 }
 
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .list-header {
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
+  gap: 10px;
 }
 
 .list-hr {
   height: 2px;
   background-color: #31363c;
   flex-grow: 1;
-  margin-right: 10px;
 }
 
 .list-title {
   color: #cccccc;
-  margin-right: 20px;
 }
 
 .list-button {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-right: 16px;
   color: #51555b;
 
   &.right {
@@ -225,18 +228,20 @@ const recentItems = computed(() => {
 
 .list-items {
   display: flex;
+  gap: 20px;
   transition: all 0.5s;
 }
 
 .list-item {
-  margin-right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .list-item-title {
   height: 16px;
   color: #6a6d72;
   font-size: small;
-  margin-bottom: 10px;
 }
 
 .list-item-content {

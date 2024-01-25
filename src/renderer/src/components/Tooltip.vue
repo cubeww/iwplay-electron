@@ -30,13 +30,16 @@ const handleMouseOut = () => {
 
 <style scoped>
 .tooltip {
+  display: flex;
+  flex-direction: column;
   position: relative;
+  align-items: center;
 }
 
 .tooltip-box {
   position: absolute;
   top: calc(100% + 10px);
-  left: v-bind(x + 'px');
+  transform: translateX(v-bind(x + 'px'));
   pointer-events: none;
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   background-color: #696773;

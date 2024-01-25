@@ -30,6 +30,7 @@ const model = computed({
 <style scoped>
 .check-box {
   display: flex;
+  gap: 8px;
   align-items: center;
   color: #d3d6d7;
   cursor: pointer;
@@ -50,7 +51,6 @@ const model = computed({
   height: 16px;
   border-radius: 4px;
   background-color: #383b42;
-  margin-right: 8px;
   box-shadow:
     rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
     rgba(0, 0, 0, 0.3) 0px 30px 60px -30px,

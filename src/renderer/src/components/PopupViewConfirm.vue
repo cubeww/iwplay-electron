@@ -1,7 +1,7 @@
 <template>
   <PopupView :width="450" @close-popup="handleNo">
     <PopupTitle>{{ $t('Confirm') }}</PopupTitle>
-    <div class="confirm-message">{{ $t(context.message) }}</div>
+    <div>{{ $t(context.message) }}</div>
     <div class="buttons">
       <ButtonPure class="button" @click="handleYes">{{ $t('YES') }}</ButtonPure>
       <ButtonPure class="button" @click="handleNo">{{ $t('NO') }}</ButtonPure>
@@ -39,17 +39,13 @@ const handleNo = () => {
 </script>
 
 <style scoped>
-.confirm-message {
-  margin-bottom: 20px;
-}
-
 .button {
   width: 64px;
-  margin-right: 10px;
 }
 
 .buttons {
   display: flex;
   justify-content: center;
+  gap: 10px;
 }
 </style>

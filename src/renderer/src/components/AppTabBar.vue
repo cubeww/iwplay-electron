@@ -8,7 +8,6 @@
     </div>
     <AppTabBarItem to="browser" :items="menuItems[0]">{{ $t('DELFRUIT') }}</AppTabBarItem>
     <AppTabBarItem to="library">{{ $t('LIBRARY') }}</AppTabBarItem>
-    <!-- <AppTabBarItem to="user">Cube</AppTabBarItem> -->
   </div>
 </template>
 

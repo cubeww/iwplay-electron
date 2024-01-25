@@ -80,6 +80,7 @@ const selectItem = (item: string | undefined, index: number) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
 
   background-color: #292e36;
   border-radius: 4px;
@@ -103,7 +104,6 @@ const selectItem = (item: string | undefined, index: number) => {
 .button-arrow {
   transform: rotate(180deg);
   color: #189cff;
-  margin-left: 4px;
   flex-shrink: 0;
 }
 

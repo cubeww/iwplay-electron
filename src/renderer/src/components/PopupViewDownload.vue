@@ -31,7 +31,7 @@
       {{ $t('Library path not added! Please click the settings button in the upper right corner to add one.') }}
     </div>
     <div v-for="(path, index) in settingsStore.settings.libraryPaths" :key="index" class="library-path-item" :class="{ selected: selectedLibraryPath === path }" @click="selectedLibraryPath = path">
-      <DiskIcon class="library-path-item-icon" />
+      <DiskIcon />
       {{ path }}
     </div>
     <div class="bottom">
@@ -178,7 +178,6 @@ const handleClickInstall = () => {
   width: 24px;
   height: 24px;
   padding: 4px;
-  margin-right: 8px;
   background-color: #3d4450;
   border-radius: 4px;
   transition: all 0.1s;
@@ -201,11 +200,10 @@ const handleClickInstall = () => {
 .bottom {
   display: flex;
   justify-content: center;
-  margin-top: 16px;
+  gap: 16px;
 }
 .bottom-button {
   width: 120px;
-  margin-left: 16px;
 }
 
 .library-path-item {
@@ -218,7 +216,7 @@ const handleClickInstall = () => {
   color: white;
   border-radius: 4px;
   cursor: pointer;
-  margin-bottom: 4px;
+  gap: 10px;
 
   &:hover {
     background-color: #67707b;
@@ -227,10 +225,6 @@ const handleClickInstall = () => {
   &.selected {
     background-color: #1a9fff;
   }
-}
-
-.library-path-item-icon {
-  margin-right: 10px;
 }
 
 .warning-message {
@@ -247,6 +241,7 @@ const handleClickInstall = () => {
 
 .target-input-buttons {
   display: flex;
+  gap: 8px;
 }
 
 .target-input {

@@ -21,14 +21,14 @@
         <div class="filter-occluder"></div>
         <div class="filter-content">
           <div class="filter-title">{{ $t('STATE') }}</div>
-          <CheckBox v-model="filters.installed" class="filter-check-box" :value="false" :label="$t('Installed')" />
-          <CheckBox v-model="filters.running" class="filter-check-box" :value="false" :label="$t('Running')" />
+          <CheckBox v-model="filters.installed" :value="false" :label="$t('Installed')" />
+          <CheckBox v-model="filters.running" :value="false" :label="$t('Running')" />
           <template v-if="libraryStore.delFruitSynced">
             <div class="filter-title">{{ $t('DELFRUIT') }}</div>
-            <CheckBox v-model="filters.favorite" class="filter-check-box" :value="false" :label="$t('Favorite')" />
-            <CheckBox v-model="filters.uncleared" class="filter-check-box" :value="false" :label="$t('Uncleared')" />
-            <CheckBox v-model="filters.cleared" class="filter-check-box" :value="false" :label="$t('Cleared')" />
-            <CheckBox v-model="filters.bookmark" class="filter-check-box" :value="false" :label="$t('Bookmark')" />
+            <CheckBox v-model="filters.favorite" :value="false" :label="$t('Favorite')" />
+            <CheckBox v-model="filters.uncleared" :value="false" :label="$t('Uncleared')" />
+            <CheckBox v-model="filters.cleared" :value="false" :label="$t('Cleared')" />
+            <CheckBox v-model="filters.bookmark" :value="false" :label="$t('Bookmark')" />
           </template>
         </div>
       </div>
@@ -175,16 +175,15 @@ const isInHome = computed(() => !navigateStore.state.fangameItemID);
 
 .header {
   display: flex;
-  height: 40px;
-  background-color: #1f1f21;
+  padding: 4px;
+  gap: 4px;
+  height: 32px;
+  background-color: #171d25;
   box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
 }
 
 .header-home-button {
   position: relative;
-  margin: 3px;
-  margin-left: 6px;
-  margin-right: 3px;
   border: 0;
   background-color: #25272d;
   color: #8f8f8f;
@@ -228,14 +227,11 @@ const isInHome = computed(() => !navigateStore.state.fangameItemID);
   justify-content: center;
   align-items: center;
   color: #4c4d50;
-  margin: 3px;
-  margin-left: 0px;
-  margin-right: 6px;
   border: 0;
   background-color: #25272d;
   border-radius: 2px;
   flex-shrink: 0;
-  width: 36px;
+  width: 32px;
   text-align: left;
   cursor: pointer;
   transition: all 0.1s;
@@ -252,10 +248,10 @@ const isInHome = computed(() => !navigateStore.state.fangameItemID);
 
 .search {
   position: relative;
-  height: 36px;
+  height: 32px;
   display: flex;
   align-items: center;
-  margin: 6px;
+  margin: 4px;
   background-color: #222429;
   border-radius: 2px;
 }
@@ -288,7 +284,7 @@ const isInHome = computed(() => !navigateStore.state.fangameItemID);
 }
 
 .search-icon {
-  width: 36px;
+  width: 32px;
   display: flex;
   align-self: stretch;
   align-items: center;
@@ -305,7 +301,7 @@ const isInHome = computed(() => !navigateStore.state.fangameItemID);
   border: 0;
   border-radius: 2px;
   color: #808080;
-  width: 36px;
+  width: 32px;
   align-self: stretch;
   transition: all 0.1s;
   cursor: pointer;
@@ -436,6 +432,9 @@ const isInHome = computed(() => !navigateStore.state.fangameItemID);
 }
 
 .filter-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   width: 100%;
   height: 100%;
   box-sizing: border-box;
@@ -446,10 +445,5 @@ const isInHome = computed(() => !navigateStore.state.fangameItemID);
 .filter-title {
   color: #26b7ff;
   font-weight: bold;
-  margin-bottom: 8px;
-}
-
-.filter-check-box {
-  margin-bottom: 8px;
 }
 </style>

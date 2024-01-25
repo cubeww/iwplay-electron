@@ -15,7 +15,7 @@
         <!--  -->
         <!-- Interface -->
         <!--  -->
-        <div class="detail-row column-2">
+        <div class="column-2">
           <div class="detail-row-title">{{ $t('IWPlay Language') }}</div>
           <ComboBox v-model="settingsStore.settings.language" :list="languages" />
         </div>
@@ -24,7 +24,7 @@
         <!--  -->
         <!-- Storage -->
         <!--  -->
-        <div class="detail-row column-2">
+        <div class="column-2">
           <div class="detail-row-title">
             {{ $t('Library Paths') }}
           </div>
@@ -37,13 +37,13 @@
             </div>
           </div>
         </div>
-        <div class="detail-row column-1">
+        <div class="column-1">
           <ComboBox v-model="selectedLibraryPath" v-model:index="selectedLibraryPathIndex" class="storage-combo" :list="settingsStore.settings.libraryPaths" watch-item-add watch-item-remove />
         </div>
-        <div class="description">
+        <div>
           {{ $t('The library path is used to store installed fangame files. It is recommended to choose an empty folder with ample remaining space on the hard drive. Example: D:\\IWPlayLibrary') }}
         </div>
-        <div class="description">
+        <div>
           {{ $t("You can add multiple library paths at the same time, but it's best to use just one.") }}
         </div>
       </template>
@@ -143,6 +143,7 @@ const handleDeleteLibraryPath = () => {
 .sidebar-item {
   display: flex;
   align-items: center;
+  gap: 20px;
   height: 24px;
   color: #b8bcbf;
   padding-top: 8px;
@@ -166,7 +167,6 @@ const handleDeleteLibraryPath = () => {
   padding: 24px;
 }
 .sidebar-item .icon {
-  margin-right: 20px;
   width: 20px;
   height: 20px;
 }
@@ -176,14 +176,12 @@ const handleDeleteLibraryPath = () => {
   padding: 24px;
   display: flex;
   flex-direction: column;
+  gap: 10px;
 }
 
 .flex {
   display: flex;
-}
-
-.detail-row {
-  margin-bottom: 10px;
+  gap: 10px;
 }
 
 .detail-title {
@@ -228,18 +226,9 @@ const handleDeleteLibraryPath = () => {
   cursor: pointer;
   flex-shrink: 0;
   border-radius: 4px;
-  margin-right: 10px;
-
-  &:nth-last-child(1) {
-    margin-right: 0;
-  }
 
   &:hover {
     background-color: #464d58;
   }
-}
-
-.description {
-  margin-bottom: 10px;
 }
 </style>

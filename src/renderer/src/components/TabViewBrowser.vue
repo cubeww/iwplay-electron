@@ -147,6 +147,8 @@ const handleIpcMessage = (event: any) => {
 .url-bar {
   display: flex;
   padding-bottom: 4px;
+  padding-left: 10px;
+  gap: 4px;
   align-items: center;
   height: 20px;
   border-bottom: 1.5px solid #1e252d;
@@ -156,7 +158,6 @@ const handleIpcMessage = (event: any) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-left: 10px;
   width: 20px;
   transition: all 0.1s;
   cursor: pointer;
@@ -179,7 +180,6 @@ const handleIpcMessage = (event: any) => {
 
   font-size: x-small;
   border-radius: 10px;
-  margin-left: 4px;
   padding: 2px;
   padding-left: 8px;
   padding-right: 16px;

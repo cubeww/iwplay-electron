@@ -1,7 +1,7 @@
 <template>
   <PopupView :width="450" @close-popup="handleOk">
     <PopupTitle>{{ $t(context.title) }}</PopupTitle>
-    <div class="message">{{ $t(context.message) }}</div>
+    <div>{{ $t(context.message) }}</div>
     <div class="buttons">
       <ButtonPure class="button" @click="handleOk">{{ $t('OK') }}</ButtonPure>
     </div>
@@ -31,17 +31,13 @@ const handleOk = () => {
 </script>
 
 <style scoped>
-.message {
-  margin-bottom: 20px;
-}
-
 .button {
   width: 64px;
-  margin-right: 10px;
 }
 
 .buttons {
   display: flex;
   justify-content: center;
+  gap: 10px;
 }
 </style>

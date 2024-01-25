@@ -62,6 +62,7 @@ const handleAddGame = () => {
 .button {
   display: flex;
   align-items: center;
+  gap: 8px;
   color: #8b929a;
   transition: all 0.1s;
 
@@ -75,21 +76,20 @@ const handleAddGame = () => {
 
 .button-image {
   width: 20px;
-  margin-right: 8px;
 }
 
 .download {
   width: 300px;
   display: flex;
-  align-items: center;
   flex-direction: column;
+  align-items: center;
+  gap: 4px;
 }
 
 .download-title {
   width: 100%;
   display: flex;
   justify-content: space-between;
-  margin-bottom: 4px;
 }
 
 .download-progress {

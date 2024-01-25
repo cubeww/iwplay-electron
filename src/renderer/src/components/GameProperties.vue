@@ -14,15 +14,15 @@
         <!--  -->
         <!-- General -->
         <!--  -->
-        <div class="detail-row column-2">
+        <div class="column-2">
           <div class="detail-row-title">{{ $t('Startup Path') }}</div>
           <ComboBox v-model="manifest.startupPath" :list="executablePaths" watch-item-remove />
         </div>
-        <div class="detail-row column-2">
+        <div class="column-2">
           <div class="detail-row-title">{{ $t('Debugger Helper') }}</div>
           <ButtonPure @click="handlePatchDebugger">{{ $t('Patch') }}</ButtonPure>
         </div>
-        <div class="detail-row column-2">
+        <div class="column-2">
           <div class="detail-row-title">{{ $t('Resize Window With DPI (Experimental)') }}</div>
           <SwitchButton v-model="manifest.resize" />
         </div>
@@ -148,25 +148,17 @@ const handlePatchDebugger = async () => {
   font-weight: bold;
   padding: 24px;
 }
-.sidebar-item .icon {
-  margin-right: 20px;
-  width: 20px;
-  height: 20px;
-}
 .detail {
   background-color: #171d25;
   flex-grow: 1;
   padding: 24px;
   display: flex;
   flex-direction: column;
+  gap: 20px;
 }
 
 .flex {
   display: flex;
-}
-
-.detail-row {
-  margin-bottom: 20px;
 }
 
 .detail-title {
@@ -193,8 +185,5 @@ const handlePatchDebugger = async () => {
 
 .detail-row-title {
   color: #dcdedf;
-}
-.description {
-  margin-bottom: 10px;
 }
 </style>

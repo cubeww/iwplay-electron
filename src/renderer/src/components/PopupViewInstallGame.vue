@@ -5,8 +5,8 @@
     <div>{{ context.name }} (ID: {{ context.id }})</div>
     <PopupSeparator />
     <div class="row">
-      <ButtonGradient class="select-button" style="width: 120px" color1="#4ade80" color2="#16a34a" @click="handleSelectGameFile">{{ $t('Select File') }}</ButtonGradient>
-      <ButtonGradient class="select-button" style="width: 120px" color1="#4ade80" color2="#16a34a" @click="handleSelectGameFolder">{{ $t('Select Folder') }}</ButtonGradient>
+      <ButtonGradient style="width: 120px" color1="#4ade80" color2="#16a34a" @click="handleSelectGameFile">{{ $t('Select File') }}</ButtonGradient>
+      <ButtonGradient style="width: 120px" color1="#4ade80" color2="#16a34a" @click="handleSelectGameFolder">{{ $t('Select Folder') }}</ButtonGradient>
     </div>
     <template v-if="filename">
       <div class="bold">{{ $t('File Name: ') }} {{ filename }}</div>
@@ -26,7 +26,7 @@
       {{ $t('Library path not added! Please click the settings button in the upper right corner to add one.') }}
     </div>
     <div v-for="(path, index) in settingsStore.settings.libraryPaths" :key="index" class="library-path-item" :class="{ selected: selectedLibraryPath === path }" @click="selectedLibraryPath = path">
-      <DiskIcon class="library-path-item-icon" />
+      <DiskIcon />
       {{ path }}
     </div>
     <div v-if="installStatus === 'installing'" class="installing-row"><LoadingIcon :size="32" />{{ $t('INSTALLING...') }}</div>
@@ -148,19 +148,15 @@ const handleClickSettings = () => {
 .bottom {
   display: flex;
   justify-content: center;
-  margin-top: 16px;
+  gap: 16px;
 }
 .bottom-button {
   width: 120px;
-  margin-left: 16px;
 }
 
 .row {
   display: flex;
-}
-
-.select-button {
-  margin-right: 10px;
+  gap: 10px;
 }
 
 .bold {
@@ -199,7 +195,7 @@ const handleClickSettings = () => {
   color: white;
   border-radius: 4px;
   cursor: pointer;
-  margin-bottom: 4px;
+  gap: 10px;
 
   &:hover {
     background-color: #67707b;
@@ -208,10 +204,6 @@ const handleClickSettings = () => {
   &.selected {
     background-color: #1a9fff;
   }
-}
-
-.library-path-item-icon {
-  margin-right: 10px;
 }
 
 .installing-row {

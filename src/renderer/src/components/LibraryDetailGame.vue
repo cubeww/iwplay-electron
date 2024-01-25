@@ -267,6 +267,9 @@ const handleClickBookmark = async () => {
 }
 
 .content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   backdrop-filter: blur(8px) saturate(180%);
   background-color: rgba(0, 0, 0, 0.17);
   flex-grow: 1;
@@ -283,12 +286,12 @@ const handleClickBookmark = async () => {
 .header {
   display: flex;
   align-items: center;
+  gap: 20px;
 }
 
 .header-item {
   display: flex;
   flex-direction: column;
-  margin-left: 20px;
 }
 
 .header-item-title {
@@ -305,6 +308,7 @@ const handleClickBookmark = async () => {
   display: flex;
   align-items: center;
   margin-left: auto;
+  gap: 10px;
 }
 
 .header-toolbox-button {
@@ -314,7 +318,6 @@ const handleClickBookmark = async () => {
   justify-content: center;
   align-items: center;
   background-color: rgba(255, 255, 255, 0.05);
-  margin-left: 10px;
   box-sizing: border-box;
   border-radius: 4px;
   cursor: pointer;
@@ -333,16 +336,14 @@ const handleClickBookmark = async () => {
 .nav {
   display: flex;
   align-items: center;
-  margin-top: 10px;
-  margin-bottom: 20px;
+  gap: 20px;
   background-color: rgba(255, 255, 255, 0.05);
   height: 24px;
   padding: 8px;
+  padding-left: 20px;
 }
 
 .nav-button {
-  margin-left: 20px;
-  margin-right: 20px;
   transition:
     color 0.1s,
     background-color 0.25s;
@@ -365,7 +366,6 @@ const handleClickBookmark = async () => {
 .readme {
   background-color: #343940;
   border: 1px solid #1a9af5;
-  margin-bottom: 10px;
   box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
 }
 

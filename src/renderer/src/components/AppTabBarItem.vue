@@ -35,10 +35,10 @@ const handleMouseEnter = () => {
 
 <style scoped>
 .app-tab-bar-item {
+  padding-left: 10px;
+  padding-right: 10px;
   position: relative;
   font-size: large;
-  margin-left: 10px;
-  margin-right: 10px;
   transition: all 0.1s;
   cursor: pointer;
 
@@ -64,9 +64,10 @@ const handleMouseEnter = () => {
   transition: all 0.1s;
   left: 50%;
   transform: translateX(-50%);
+  box-sizing: border-box;
 
   &.selected {
-    width: 100%;
+    width: calc(100% - 20px);
   }
 }
 

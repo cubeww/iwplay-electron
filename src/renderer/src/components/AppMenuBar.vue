@@ -59,17 +59,18 @@ const menuItems: ContextMenuItemData[][] = [
 
 .right {
   display: flex;
+  gap: 10px;
 }
 
 .user {
   padding-right: 10px;
   margin-top: 5px;
-  margin-right: 10px;
   -webkit-app-region: no-drag;
   min-width: 64px;
   height: 24px;
   border-radius: 2px;
   display: flex;
+  gap: 10px;
   justify-content: center;
   align-items: center;
   color: #4bb3fd;
@@ -90,7 +91,6 @@ const menuItems: ContextMenuItemData[][] = [
   background-repeat: no-repeat;
   background-size: 16px 18px;
   background-position: center;
-  margin-right: 4px;
   border-right: 2px solid #6bccf2;
 }
 

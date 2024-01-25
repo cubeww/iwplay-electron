@@ -25,6 +25,7 @@ const emit = defineEmits<{ closePopup: [] }>();
 .popup-wrapper {
   display: flex;
   flex-direction: column;
+  gap: 10px;
 
   color: #b8bcbf;
 
