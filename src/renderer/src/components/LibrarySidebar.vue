@@ -402,7 +402,7 @@ const isInHome = computed(() => !navigateStore.state.fangameItemID);
 .filter {
   position: absolute;
   left: calc(100% + 6px);
-  top: calc(100% - 36px);
+  top: calc(100% - 32px);
   z-index: 100;
   width: 200px;
   background-color: #4c515a;
@@ -428,7 +428,7 @@ const isInHome = computed(() => !navigateStore.state.fangameItemID);
   left: -8px;
   background-color: #4c515a;
   width: 8px;
-  height: 36px;
+  height: 32px;
 }
 
 .filter-content {
