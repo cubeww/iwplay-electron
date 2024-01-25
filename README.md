@@ -13,6 +13,7 @@ Experimental "I Wanna Fangames" Management Software
 - Browse the Delicious Fruit and I wanna wiki in the built-in browser
 - Download and install fangames directly from the built-in browser
 - Record your game time and play dates
+- Sync favorite, clear, bookmark from DelFruit
 - Apply Debugger Helper patch with one click
 
 ## Contributing
@@ -44,6 +45,14 @@ vscode + typescript + electron-vite + vue3
    ```sh
    npm run dev
    ```
+
+6. To build, execute:
+
+   ```sh
+   npm run build:win
+   ```
+
+   This will create a zip in the **dist/** folder.
 
 ## Additional Credits
 
