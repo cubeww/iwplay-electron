@@ -118,6 +118,7 @@ export function createWindow<T extends { type: string; name: string }>(params: T
     if (params.name !== 'traymenu') window.webContents.openDevTools();
   } else {
     window.loadURL(join('file://', __dirname, '../renderer/index.html' + queryString));
+    // if (params.name !== 'traymenu') window.webContents.openDevTools();
   }
 
   windows[params.name] = window;

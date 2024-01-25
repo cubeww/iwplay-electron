@@ -5,7 +5,7 @@
       <AppMenuBarItem :items="menuItems[1]">{{ $t('Help') }}</AppMenuBarItem>
     </div>
     <div class="right">
-      <div v-if="libraryStore.delFruitSynced" class="user">
+      <div v-if="libraryStore.delFruitLogged" class="user">
         <div class="user-logo"></div>
         <div class="user-name">{{ libraryStore.delFruitUserName }}</div>
       </div>

@@ -72,9 +72,6 @@ export const useLibraryStore = defineStore('library', () => {
         i.bookmark = false;
       });
 
-      // Sync delfruit profile
-      await syncProfileFromDelFruit();
-
       // Get installed fangames
       for (const path of settingsStore.settings.libraryPaths) {
         const installedIDs = await invoke('get-installed-fangame-ids', { libraryPath: path });
@@ -103,9 +100,9 @@ export const useLibraryStore = defineStore('library', () => {
         }
       }
 
+      fangameItems.value = items;
       fetchFangameItemsStatus.value = 'ok';
       fetchFangameItemsError.value = '';
-      fangameItems.value = items;
     } catch (err) {
       fetchFangameItemsStatus.value = 'error';
       fetchFangameItemsError.value = 'Fetch Data Error';
@@ -126,9 +123,8 @@ export const useLibraryStore = defineStore('library', () => {
   const syncProfileFromDelFruit = async () => {
     delFruitSynced.value = false;
 
-    if (!delFruitLogged.value) {
-      return;
-    }
+    if (!delFruitLogged.value) return;
+    if (fetchFangameItemsStatus.value !== 'ok') return;
 
     try {
       const html = await invoke('get-delfruit-profile', { cookie: delFruitCookie.value! });
@@ -200,7 +196,10 @@ export const useLibraryStore = defineStore('library', () => {
     });
 
     // Fetch once at start
-    fetchFangameItems(!isDev); // Load cache first in development mode to reduce startup time
+    fetchFangameItems(!isDev) // Load cache first in development mode to reduce startup time
+      .then(() => {
+        syncProfileFromDelFruit();
+      });
     fetchFangameProfiles();
   };
 
