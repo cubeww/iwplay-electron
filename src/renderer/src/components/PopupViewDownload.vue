@@ -78,7 +78,7 @@ const selectedLibraryPath = ref('');
 const targetFangameId = ref(props.context.possibleID);
 
 const targetFangameName = computed(() => {
-  const item = libraryStore.fangameItems.find((i) => i.id === targetFangameId.value);
+  const item = libraryStore.fangameItemsMap[targetFangameId.value];
   return item ? item.name : '';
 });
 
@@ -121,7 +121,8 @@ const downloadGame = async () => {
 };
 
 const handleClickInstall = () => {
-  if (libraryStore.fangameItems.findIndex((i) => i.id === targetFangameId.value && i.installed) !== -1) {
+  const item = libraryStore.fangameItemsMap[targetFangameId.value];
+  if (item.installed) {
     popupStore.showConfirm('The current fangame is already installed. If you continue, the existing fangame will be moved to the "backup" folder first. Are you sure you want to do this?', () => downloadGame());
   } else {
     downloadGame();

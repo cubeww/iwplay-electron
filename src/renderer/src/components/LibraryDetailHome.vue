@@ -94,7 +94,7 @@ const recentItems = computed(() => {
   const items: HomeGameItem[] = [];
   const todayMoment = moment();
   for (const gameID of Object.keys(libraryStore.fangameProfiles)) {
-    const item = libraryStore.fangameItems.find((i) => i.id === gameID);
+    const item = libraryStore.fangameItemsMap[gameID];
     if (!item) continue;
 
     const gameName = item.name;

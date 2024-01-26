@@ -198,17 +198,17 @@ const handleClickReadme = (path: string) => {
 
 const handleClickFavorite = async () => {
   await invoke('modify-delfruit-profile', { gameID: props.item.id, cookie: libraryStore.delFruitCookie!, type: 'favorite', value: !props.item.favorite ? '1' : '0' });
-  libraryStore.fangameItems.find((i) => i.id === props.item.id)!.favorite = !props.item.favorite;
+  libraryStore.fangameItemsMap[props.item.id].favorite = !props.item.favorite;
 };
 
 const handleClickClear = async () => {
   await invoke('modify-delfruit-profile', { gameID: props.item.id, cookie: libraryStore.delFruitCookie!, type: 'clear', value: !props.item.cleared ? '1' : '0' });
-  libraryStore.fangameItems.find((i) => i.id === props.item.id)!.cleared = !props.item.cleared;
+  libraryStore.fangameItemsMap[props.item.id].cleared = !props.item.cleared;
 };
 
 const handleClickBookmark = async () => {
   await invoke('modify-delfruit-profile', { gameID: props.item.id, cookie: libraryStore.delFruitCookie!, type: 'bookmark', value: !props.item.bookmark ? '1' : '0' });
-  libraryStore.fangameItems.find((i) => i.id === props.item.id)!.bookmark = !props.item.bookmark;
+  libraryStore.fangameItemsMap[props.item.id].bookmark = !props.item.bookmark;
 };
 </script>
 

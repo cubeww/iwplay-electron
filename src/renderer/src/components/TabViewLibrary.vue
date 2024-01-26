@@ -19,7 +19,7 @@ import { useNavigateStore } from '@renderer/stores/navigate';
 const libraryStore = useLibraryStore();
 const navigateStore = useNavigateStore();
 
-const item = computed(() => libraryStore.fangameItems.find((i) => i.id === navigateStore.state.fangameItemID));
+const item = computed(() => (navigateStore.state.fangameItemID ? libraryStore.fangameItemsMap[navigateStore.state.fangameItemID] : undefined));
 
 onMounted(() => {
   window.addEventListener('mouseup', handleWindowMouseUp);
