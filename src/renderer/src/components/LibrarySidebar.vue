@@ -35,7 +35,7 @@
     </div>
     <div v-show="libraryStore.fetchFangameItemsStatus === 'ok'" class="fangame-list-with-scroll" @scroll="handleScroll">
       <div class="fangame-list-with-height" :style="{ height: filteredItems.length * itemHeight + 'px' }">
-        <div v-for="(item, index) in displayItems" :key="index" class="fangame-list-item" :class="{ select: navigateStore.state.fangameItemID === item.id, installed: item.installed, running: item.running }" :style="{ transform: `translateY(${translateY}px)` }" @click="navigateStore.selectFangameItem(item.id)">
+        <div v-for="(item, index) in displayItems" :key="index" class="fangame-list-item" :class="{ select: navigateStore.state.fangameItemID === item.id, installed: item.installed, running: item.running, cleared: item.cleared }" :style="{ transform: `translateY(${translateY}px)` }" @click="navigateStore.selectFangameItem(item.id)">
           {{ item.name }}
           <template v-if="item.running">
             <div style="color: #a9a9a9">&nbsp;-&nbsp;</div>
@@ -384,6 +384,10 @@ const isInHome = computed(() => !navigateStore.state.fangameItemID);
 
   &.installed {
     color: white;
+  }
+
+  &.cleared {
+    color: #f2e47b;
   }
 
   &.running {
