@@ -1,7 +1,7 @@
 <template>
   <div ref="trayMenuEl" class="tray-menu">
-    <div class="item" @click="handleClickToMain('delfruit')">DelFruit</div>
-    <div class="item" @click="handleClickToMain('library')">Library</div>
+    <div class="item" @click="handleClickToMain({ tab: 'delfruit' })">DelFruit</div>
+    <div class="item" @click="handleClickToMain({ tab: 'library' })">Library</div>
     <div class="separator" />
     <div class="item" @click="invoke('quit')">Quit IWPlay</div>
   </div>

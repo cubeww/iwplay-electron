@@ -49,7 +49,10 @@ interface GameProfileUpdatedEventOptions {
   profile: FangameProfile;
 }
 
-export type ShowEventOptions = 'delfruit' | 'library';
+export interface ShowEventOptions {
+  tab: 'delfruit' | 'library';
+  gameID?: string;
+}
 
 export type EventMap = {
   'minimize': void;

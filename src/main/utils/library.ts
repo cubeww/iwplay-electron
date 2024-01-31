@@ -243,7 +243,11 @@ export function installGame({ file, gameID, gameName, libraryPath }: InstallGame
   createManifest({ gameID, gameName, libraryPath });
 
   sendEvent('game-installed', { gameID, libraryPath });
-  new Notification({ icon: icon, title: 'IWPlay', body: 'Fangame Installed: ' + gameName }).show();
+  const notification = new Notification({ icon: icon, title: 'IWPlay', body: 'Fangame Installed: ' + gameName });
+  notification.on('click', () => {
+    sendEvent('show', { tab: 'library', gameID });
+  });
+  notification.show();
 }
 
 /**

@@ -6,7 +6,7 @@
       </div>
       <div class="url-box">
         <LoadingIcon v-if="loading" class="url-box-loading-icon" :size="14" />
-        <div class="url-box-text">{{ url }}</div>
+        <div class="url-box-text" @click="handleClickURL()">{{ url }}</div>
       </div>
     </div>
     <webview ref="webviewEl" style="flex-grow: 1" src="https://delicious-fruit.com/" allowpopups disablewebsecurity nodeintegration />
@@ -22,6 +22,7 @@ import { WebviewTag } from 'electron';
 import { useNavigateStore } from '@renderer/stores/navigate';
 import { useContextMenuStore } from '@renderer/stores/contextMenu';
 import { useLibraryStore } from '@renderer/stores/library';
+import { invoke } from '@renderer/utils/invoke';
 
 const navigateStore = useNavigateStore();
 const contextMenuStore = useContextMenuStore();
@@ -86,11 +87,11 @@ const handleDidNavigate = (event: any) => {
   webviewEl.value.insertCSS(webviewCSS);
   url.value = event.url;
 
-  const prefix = 'https://delicious-fruit.com/ratings/game_details.php?id=';
-  const index = event.url.indexOf(prefix);
-  if (index !== -1) {
-    const id = event.url.substring(index + prefix.length);
-    navigateStore.updateLastVisitedFangameId(id);
+  if (event.url.includes('https://delicious-fruit.com/ratings/game_details.php')) {
+    const id = event.url.split('id=')[1];
+    if (id) {
+      navigateStore.updateLastVisitedFangameId(id);
+    }
   }
 
   if (event.url.substring(0, 27) === 'https://delicious-fruit.com') {
@@ -140,6 +141,10 @@ const handleIpcMessage = (event: any) => {
       libraryStore.syncProfileFromDelFruit();
     }
   }
+};
+
+const handleClickURL = () => {
+  invoke('open-external', url.value);
 };
 </script>
 

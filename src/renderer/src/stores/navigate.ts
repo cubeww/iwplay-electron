@@ -17,11 +17,15 @@ export const useNavigateStore = defineStore('navigate', () => {
   const initialize = () => {
     listenEvent('show', (action) => {
       invoke('show', windowName);
-      if (action === 'delfruit') {
+      if (action.tab === 'delfruit') {
         toggleBrowserAndLoadURL('https://delicious-fruit.com/');
       }
-      if (action === 'library') {
-        toggleTab('library');
+      if (action.tab === 'library') {
+        if (!action.gameID) {
+          toggleTab('library');
+        } else {
+          selectFangameItem(action.gameID);
+        }
       }
     });
   };
