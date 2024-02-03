@@ -41,4 +41,19 @@ export const delFruit = {
     const difficulty = doc.getElementById('avgDifficulty')?.innerText;
     return { auther, difficulty, downloadLink, id, name, rating } as DelFruitFangameDetail;
   },
+  async fetchTaggedFangameIDs(tag: string) {
+    const res = await fetch(`https://delicious-fruit.com/ratings/full.php?advanced=1&tags=${tag}`);
+    const html = await res.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const tbody = doc.getElementsByTagName('tbody')[0];
+    const links = tbody.getElementsByTagName('a');
+    const items = new Set<string>();
+    for (const a of links) {
+      const id = a.getAttribute('href')?.split('=')[1];
+      if (!id) continue;
+      items.add(id);
+    }
+    return items;
+  },
 };

@@ -72,6 +72,8 @@ export type EventMap = {
 
 export function sendEvent<T extends keyof EventMap>(name: T, options: EventMap[T]) {
   for (const window of Object.values(windows)) {
-    window.webContents.send(name, options);
+    if (!window.isDestroyed()) {
+      window.webContents.send(name, options);
+    }
   }
 }

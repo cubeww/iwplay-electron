@@ -1,6 +1,6 @@
 <template>
-  <label class="check-box">
-    <input v-model="model" class="builtin-input" type="checkbox" :value="value" />
+  <label class="check-box" :class="{ disabled }">
+    <input v-model="model" class="builtin-input" type="checkbox" :value="value" :disabled="disabled" />
     <div class="input">
       <CheckIcon class="check-icon" :class="{ show: modelValue }" />
     </div>
@@ -11,11 +11,15 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
 import CheckIcon from '@renderer/icons/CheckIcon.vue';
-const props = defineProps<{
-  modelValue: boolean;
-  value: boolean;
-  label: string;
-}>();
+const props = withDefaults(
+  defineProps<{
+    modelValue: boolean;
+    value: boolean;
+    label: string;
+    disabled?: boolean;
+  }>(),
+  { disabled: false },
+);
 const emit = defineEmits(['update:modelValue']);
 const model = computed({
   get() {
@@ -33,8 +37,13 @@ const model = computed({
   gap: 8px;
   align-items: center;
   color: #d3d6d7;
-  cursor: pointer;
   font-weight: 300;
+  cursor: pointer;
+
+  &.disabled {
+    color: rgb(138, 138, 138);
+    cursor: default;
+  }
 }
 .builtin-input {
   position: absolute;

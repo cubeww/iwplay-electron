@@ -20,16 +20,35 @@
       <div class="filter" :class="{ show: showFilter }">
         <div class="filter-occluder"></div>
         <div class="filter-content">
-          <div class="filter-title">{{ $t('STATE') }}</div>
-          <CheckBox v-model="filters.installed" :value="false" :label="$t('Installed')" />
-          <CheckBox v-model="filters.running" :value="false" :label="$t('Running')" />
-          <template v-if="libraryStore.delFruitSynced">
-            <div class="filter-title">{{ $t('DELFRUIT') }}</div>
-            <CheckBox v-model="filters.favorite" :value="false" :label="$t('Favorite')" />
-            <CheckBox v-model="filters.uncleared" :value="false" :label="$t('Uncleared')" />
-            <CheckBox v-model="filters.cleared" :value="false" :label="$t('Cleared')" />
-            <CheckBox v-model="filters.bookmark" :value="false" :label="$t('Bookmark')" />
-          </template>
+          <div class="filter-col">
+            <div class="filter-title">{{ $t('STATE') }}</div>
+            <CheckBox v-model="filters.installed" :value="false" :label="$t('Installed')" />
+            <CheckBox v-model="filters.running" :value="false" :label="$t('Running')" />
+            <template v-if="libraryStore.delFruitSynced">
+              <div class="filter-title">{{ $t('PROFILE') }}</div>
+              <CheckBox v-model="filters.favorite" :value="false" :label="$t('Favorite')" />
+              <CheckBox v-model="filters.uncleared" :value="false" :label="$t('Uncleared')" />
+              <CheckBox v-model="filters.cleared" :value="false" :label="$t('Cleared')" />
+              <CheckBox v-model="filters.bookmark" :value="false" :label="$t('Bookmark')" />
+            </template>
+          </div>
+          <div class="filter-col">
+            <div class="filter-tag-title">
+              <div class="filter-title">{{ $t('TAG') }}</div>
+              <Tooltip :text="$t('Refresh Tagged Fangames (Slow!)')">
+                <div class="filter-tag-refresh" :class="{ enable: libraryStore.fetchTaggedFangameIDSetsStatus !== 'fetching' }" @click="handleRefreshTag">
+                  <RefreshIcon :class="{ rotate: libraryStore.fetchTaggedFangameIDSetsStatus === 'fetching' }"></RefreshIcon>
+                </div>
+              </Tooltip>
+            </div>
+            <div v-for="(tag, i) in Object.keys(filters.tags)" :key="i" class="filter-tag-row">
+              <CheckBox v-model="filters.tags[tag]" :disabled="libraryStore.fetchTaggedFangameIDSetsStatus !== 'ok'" :value="false" :label="tag" />
+              <div v-if="libraryStore.fetchTaggedFangameIDSetsStatus === 'ok'" class="filter-remove-tag-button">
+                <WindowCloseIcon class="filter-remove-icon" @click="handleRemoveTag(tag)"></WindowCloseIcon>
+              </div>
+            </div>
+            <input :disabled="libraryStore.fetchTaggedFangameIDSetsStatus !== 'ok'" class="filter-add-tag-input" type="text" placeholder="Add Tag (Enter)" @keydown="handleAddTag" />
+          </div>
         </div>
       </div>
     </div>
@@ -56,12 +75,15 @@ import RefreshIcon from '@renderer/icons/RefreshIcon.vue';
 import SearchIcon from '@renderer/icons/SearchIcon.vue';
 import FilterIcon from '@renderer/icons/FilterIcon.vue';
 import ButtonPure from './ButtonPure.vue';
+import WindowCloseIcon from '@renderer/icons/WindowCloseIcon.vue';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 
 import CheckBox from './CheckBox.vue';
+import Tooltip from './Tooltip.vue';
 import { useLibraryStore } from '@renderer/stores/library';
 import { useNavigateStore } from '@renderer/stores/navigate';
 import { watchEffect } from 'vue';
+import { watch } from 'vue';
 
 const libraryStore = useLibraryStore();
 const navigateStore = useNavigateStore();
@@ -80,12 +102,33 @@ const filters = ref({
   // STATE
   installed: false,
   running: false,
-  // DELFRUIT
+  // PROFILE
   favorite: false,
   uncleared: false,
   cleared: false,
   bookmark: false,
+  // TAG
+  tags: {} as { [tagName: string]: boolean },
 });
+
+watch(
+  () => libraryStore.taggedFangameIDSets,
+  (newList) => {
+    // Add missing tags in store
+    for (const tag of Object.keys(newList)) {
+      if (!(tag in filters.value.tags)) {
+        filters.value.tags[tag] = false;
+      }
+    }
+    // Remove redundant tags in filter
+    for (const tag of Object.keys(filters.value.tags)) {
+      if (!(tag in newList)) {
+        delete filters.value.tags[tag];
+      }
+    }
+  },
+  { immediate: true, deep: true },
+);
 
 watchEffect(() => {
   if (!libraryStore.delFruitSynced) {
@@ -139,6 +182,11 @@ const filteredItems = computed(() => {
     if (filters.value.favorite && !i.favorite) return false;
     if (filters.value.bookmark && !i.bookmark) return false;
 
+    // Tag filter
+    for (const [tagName, enable] of Object.entries(filters.value.tags)) {
+      if (enable && !libraryStore.taggedFangameIDSets[tagName].has(i.id)) return false;
+    }
+
     return true;
   });
 });
@@ -157,6 +205,27 @@ const handleScroll = (e: Event) => {
 
 const handleToHome = () => {
   navigateStore.selectFangameItem(undefined);
+};
+
+const handleAddTag = (ev: KeyboardEvent) => {
+  if (ev.key === 'Enter') {
+    const tagName = (ev.target as HTMLInputElement).value.trim().replaceAll(' ', '+');
+    if (!(tagName in libraryStore.taggedFangameIDSets)) {
+      (ev.target as HTMLInputElement).value = '';
+      (ev.target as HTMLInputElement).blur();
+      libraryStore.addTagSet(tagName);
+    }
+  }
+};
+
+const handleRemoveTag = (tagName: string) => {
+  libraryStore.removeTagSet(tagName);
+};
+
+const handleRefreshTag = () => {
+  if (libraryStore.fetchTaggedFangameIDSetsStatus !== 'fetching') {
+    libraryStore.fetchTaggedFangameIDSets(true);
+  }
 };
 
 const isInHome = computed(() => !navigateStore.state.fangameItemID);
@@ -408,7 +477,6 @@ const isInHome = computed(() => !navigateStore.state.fangameItemID);
   left: calc(100% + 6px);
   top: calc(100% - 32px);
   z-index: 100;
-  width: 200px;
   background-color: #4c515a;
   box-sizing: border-box;
 
@@ -437,8 +505,7 @@ const isInHome = computed(() => !navigateStore.state.fangameItemID);
 
 .filter-content {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  gap: 32px;
   width: 100%;
   height: 100%;
   box-sizing: border-box;
@@ -446,8 +513,77 @@ const isInHome = computed(() => !navigateStore.state.fangameItemID);
   color: #d3d6d7;
 }
 
+.filter-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .filter-title {
   color: #26b7ff;
   font-weight: bold;
+}
+
+.filter-tag-title {
+  display: flex;
+  justify-content: space-between;
+}
+
+.filter-tag-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.filter-remove-tag-button {
+  display: flex;
+  flex-direction: row-reverse;
+  flex-grow: 1;
+  opacity: 0;
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.filter-remove-icon {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.filter-add-tag-input {
+  width: 128px;
+  height: 16px;
+  padding: 8px;
+  margin-left: 16px;
+  background-color: #393d43;
+  border: 0;
+  box-shadow:
+    rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+    rgba(0, 0, 0, 0.3) 0px 30px 60px -30px,
+    rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+  color: #d3d6d7;
+
+  &:hover {
+    background-color: #1e1f23;
+  }
+
+  &:focus {
+    outline: none;
+    background-color: #ffffff;
+    color: #0e141b;
+  }
+}
+
+.filter-tag-refresh {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  &.enable {
+    cursor: pointer;
+  }
+  &:hover {
+    color: white;
+  }
 }
 </style>

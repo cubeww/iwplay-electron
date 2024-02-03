@@ -2,7 +2,7 @@ import { invoke } from '@renderer/utils/invoke';
 import { ref } from 'vue';
 import { DelFruitFangameItem, delFruit } from '@renderer/utils/delFruit';
 import { defineStore } from 'pinia';
-import { DELFRUIT_CACHE } from '@renderer/utils/paths';
+import { DELFRUIT_CACHE, TAGGED_CACHE } from '@renderer/utils/paths';
 import { useSettingsStore } from './settings';
 import { listenEvent } from '@renderer/utils/listenEvent';
 import { isDev } from '@renderer/main';
@@ -167,6 +167,87 @@ export const useLibraryStore = defineStore('library', () => {
     }
   };
 
+  const taggedFangameIDSets = ref<{ [tagName: string]: Set<string> }>({});
+  const fetchTaggedFangameIDSetsStatus = ref<'pending' | 'fetching' | 'ok' | 'error'>('pending');
+  const fetchTaggedFangameIDSetsError = ref('');
+
+  const loadTaggedFangameIDSetsCache = async () => {
+    const sets: { [tagName: string]: Set<string> } = JSON.parse(await invoke('read-text-file', TAGGED_CACHE));
+    for (const [tagName, ids] of Object.entries(sets)) {
+      sets[tagName] = new Set(ids); // Array -> Set
+    }
+    return sets;
+  };
+
+  const saveTaggedFangameIDSetsCache = async (sets: { [tagName: string]: Set<string> }) => {
+    await invoke(
+      'write-text-file',
+      TAGGED_CACHE,
+      JSON.stringify(sets, (_, value) => (value instanceof Set ? [...value] : value)), // Set -> Array
+    );
+  };
+
+  const fetchTaggedFangameIDSets = async (fromDelFruitFirst: boolean) => {
+    fetchTaggedFangameIDSetsStatus.value = 'fetching';
+    try {
+      let sets: { [tagName: string]: Set<string> };
+
+      try {
+        // First method
+        if (fromDelFruitFirst) {
+          sets = {};
+          for (const tag of Object.keys(taggedFangameIDSets.value)) {
+            sets[tag] = await delFruit.fetchTaggedFangameIDs(tag);
+          }
+          await saveTaggedFangameIDSetsCache(sets);
+        } else {
+          sets = await loadTaggedFangameIDSetsCache();
+        }
+      } catch {
+        // Second method
+        if (fromDelFruitFirst) {
+          sets = await loadTaggedFangameIDSetsCache();
+        } else {
+          sets = {};
+          for (const tag of Object.keys(taggedFangameIDSets.value)) {
+            sets[tag] = await delFruit.fetchTaggedFangameIDs(tag);
+          }
+          await saveTaggedFangameIDSetsCache(sets);
+        }
+      }
+
+      taggedFangameIDSets.value = sets;
+      fetchTaggedFangameIDSetsStatus.value = 'ok';
+    } catch (err) {
+      fetchTaggedFangameIDSetsStatus.value = 'error';
+      fetchTaggedFangameIDSetsError.value = (err as Error).message;
+    }
+  };
+
+  const addTagSet = async (tagName: string) => {
+    fetchTaggedFangameIDSetsStatus.value = 'fetching';
+    try {
+      taggedFangameIDSets.value[tagName] = await delFruit.fetchTaggedFangameIDs(tagName);
+      await saveTaggedFangameIDSetsCache(taggedFangameIDSets.value);
+      fetchTaggedFangameIDSetsStatus.value = 'ok';
+    } catch (err) {
+      fetchTaggedFangameIDSetsStatus.value = 'error';
+      fetchFangameItemsError.value = (err as Error).message;
+    }
+  };
+
+  const removeTagSet = async (tagName: string) => {
+    fetchTaggedFangameIDSetsStatus.value = 'fetching';
+    try {
+      delete taggedFangameIDSets.value[tagName];
+      await saveTaggedFangameIDSetsCache(taggedFangameIDSets.value);
+      fetchTaggedFangameIDSetsStatus.value = 'ok';
+    } catch (err) {
+      fetchTaggedFangameIDSetsStatus.value = 'error';
+      fetchFangameItemsError.value = (err as Error).message;
+    }
+  };
+
   const initialize = () => {
     listenEvent('game-installed', ({ gameID, libraryPath }) => {
       const item = fangameItemsMap.value[gameID];
@@ -205,6 +286,9 @@ export const useLibraryStore = defineStore('library', () => {
     // Fetch once at start
     fetchFangameItems(!isDev) // Load cache first in development mode to reduce startup time
       .then(() => {
+        fetchTaggedFangameIDSets(false);
+      })
+      .then(() => {
         syncProfileFromDelFruit();
       });
     fetchFangameProfiles();
@@ -223,5 +307,11 @@ export const useLibraryStore = defineStore('library', () => {
     delFruitUserName,
     delFruitCookie,
     syncProfileFromDelFruit,
+    taggedFangameIDSets,
+    fetchTaggedFangameIDSets,
+    fetchTaggedFangameIDSetsStatus,
+    fetchTaggedFangameIDSetsError,
+    addTagSet,
+    removeTagSet,
   };
 });

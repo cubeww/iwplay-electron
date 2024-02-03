@@ -14,7 +14,7 @@
       <div class="fields">
         <div class="field">
           <div class="field-name">{{ $t('Version:') }}</div>
-          <div class="field-value">{{ version }}</div>
+          <div class="field-value">Beta-240203</div>
         </div>
 
         <div class="field">
@@ -35,14 +35,6 @@ import { windowName } from '@renderer/main';
 import { invoke } from '@renderer/utils/invoke';
 import WindowCloseIcon from '@renderer/icons/WindowCloseIcon.vue';
 import ButtonPure from './ButtonPure.vue';
-import { ref } from 'vue';
-import { onMounted } from 'vue';
-
-const version = ref('');
-
-onMounted(async () => {
-  version.value = await invoke('app-version');
-});
 
 const handleClickClose = () => {
   invoke('close', windowName);
