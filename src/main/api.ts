@@ -1,6 +1,6 @@
 import { BrowserWindowConstructorOptions, OpenDialogSyncOptions, app, dialog, ipcMain, shell } from 'electron';
 import { addLibrary, applyDebugHelper, createManifest, getAllProfiles, getDelFruitProfile, getGameExecutables, getGameReadmes, getInstalledFangameIDs, getManifest, getProfile, getRunningFangameIDs, installGame, modifyDelFruitProfile, openGameDirectory, removeLibrary, runGame, saveManifest, saveProfile, stopGame, uninstallGame } from './utils/library';
-import { addDownloadItem, createWindow, trayMenuSize, windows } from '.';
+import { addDownloadItem, createWindow, hideInsteadCloseMainWindow, trayMenuSize, windows } from '.';
 import { join } from 'path';
 import { dirSize, readTextFile, writeTextFile } from './utils/fs';
 import { sendEvent } from './event';
@@ -63,7 +63,6 @@ const mainAPIMap = {
 
   'close': (name: string) => {
     const window = windows[name];
-    delete windows[name];
     window.close();
   },
 
@@ -78,6 +77,7 @@ const mainAPIMap = {
   },
 
   'quit': () => {
+    hideInsteadCloseMainWindow.value = false;
     Object.values(windows).forEach((window) => window.close());
   },
 

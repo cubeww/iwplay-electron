@@ -10,7 +10,7 @@ import log from 'electron-log/main';
 import icon from '../../resources/icon.png?asset&asarUnpack';
 import { registerMainAPIs } from './api';
 import { sendEvent } from './event';
-import { existsSync, mkdirSync, rmSync } from 'fs';
+import { mkdirSync } from 'fs';
 import { getSettings, loadSettings } from './utils/settings';
 import { clearDownloading } from './utils/library';
 
@@ -35,6 +35,7 @@ interface AddDownloadItemOptions {
 }
 
 export const windows: { [name: string]: BrowserWindow } = {};
+export const hideInsteadCloseMainWindow = { value: true };
 
 export const downloadItems: GameDownloadItem[] = [];
 export const downloadContext = {
@@ -102,6 +103,17 @@ export function createWindow<T extends { type: string; name: string }>(params: T
 
   window.on('unmaximize', () => {
     sendEvent('maximize', { value: false });
+  });
+
+  window.on('close', (evt) => {
+    if (hideInsteadCloseMainWindow.value && params.name === 'main') {
+      evt.preventDefault();
+      window.hide();
+    }
+  });
+
+  window.on('closed', () => {
+    delete windows[params.name];
   });
 
   window.webContents.setWindowOpenHandler((details) => {

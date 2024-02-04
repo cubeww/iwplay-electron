@@ -33,11 +33,7 @@ useListenEvent('maximize', ({ value }) => {
 });
 
 const handleClickClose = () => {
-  if (windowName === 'main') {
-    invoke('hide', windowName);
-  } else {
-    invoke('close', windowName);
-  }
+  invoke('close', windowName);
 };
 </script>
 
