@@ -33,7 +33,7 @@
               </div>
             </Tooltip>
           </template>
-          <template v-if="1 || libraryStore.delFruitSynced">
+          <template v-if="libraryStore.delFruitSynced">
             <Tooltip text="Favorite">
               <div class="header-toolbox-button" :class="{ clear: item.favorite }" @click="handleClickFavorite">
                 <FavoriteIcon />
